@@ -1,0 +1,1 @@
+print(df.set_index("Department").join(df_other.set_index("Department"),how='right',lsuffix="_left", rsuffix="_right"))
