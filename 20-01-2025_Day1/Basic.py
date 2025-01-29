@@ -91,7 +91,7 @@ fun()
 print("outside",x)
 
 def fun1():
-    global x #global variable inside function using global keyword
+  #global variable inside function using global keyword
     x="python"
 
 fun1()
