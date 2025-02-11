@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<!-- {% spaceless %} -->
+    <ul>
+         {% for x in fruits %}
+        <!-- <tr style='color:{% cycle 'red' 'black' 'blue' %}'>  -->
+             <li>{{ forloop.counter0 }}</li>
+            {% if forloop.first %}
+       <li style='background-color:lightblue;'>
+      {% endif %}
+            <h1>{{ x }}</h1>
+        </li>  
+        {% endfor %}
+        <!-- {%verbatim%} -->
+        <h1>{% firstof  x color fruits %}</h1>
+        <!-- {%endverbatim%} -->
+    </ul>
+<!-- {% endspaceless %} -->
+    
+<p>In views.py you can see what the fruits variable looks like.</p>
+</body>
+</html>

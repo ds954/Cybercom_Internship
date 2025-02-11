@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tags</title>
+</head>
+<body>
+    <!-- <h1>Hello</h1>
+    {% if Greeting == 1 %}
+        <h1>How are you?</h1>
+    {% endif %} -->
+    <h1>List {# of members #}</h1>
+    {%comment%}
+    <h2>Members List</h2>
+    {% endcomment %}
+    <ul>
+    {% for x in members reversed %}
+    <!-- {% empty %}
+    <li>No members</li> -->
+    <h1>{{ x.id }}</h1>
+    <p>
+      {{ x.firstname }}
+      {{ x.lastname }}
+    </p>
+    {% endfor %}
+</ul>
+</body>
+</html>

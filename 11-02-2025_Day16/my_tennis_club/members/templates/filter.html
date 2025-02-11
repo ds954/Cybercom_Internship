@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Use of Filter</h1>
+    {% filter upper %}
+    <h2>Upper Case</h2>
+    {% endfilter %}
+
+    {% for x in fruits %}
+    <h1>{{ x|add:"-CHECK"}}</h1>
+    {% endfor %}
+    <h6>{{ fruits|add:vegetables }}</h6>
+
+    <h2>{{vegetables|capfirst}}</h2>
+    <h3> {{vegetables|center:50}}</h3>
+    <textarea> {{vegetables|center:100}}</textarea>
+    <h3> {{vegetables|cut:'ot'}}</h3>
+
+    {% for x in fruits %}
+    
+    <h3>{{x|default:'No fruits'}}</h3>
+    {% endfor %}
+    <h2>Replace only None Value</h2>
+    {% for x in fruits %}
+    <h3>{{x|default_if_none:"No fruits"}}</h3>
+    {% endfor %}
+
+    <h2>{{y|divisibleby:5}}</h2>
+    <h2>{{size|filesizeformat}}</h2>
+    <h2>{{fruits|first}}</h2>
+    <h2>{{vegetables|first}}</h2>
+    <h2>{{fruits|last}}</h2>
+    <button onclick="alert('{{ name|addslashes }}')"> Click me!</button>
+    <h3>{{5.656886|floatformat:3}}</h3>
+    <h3>{{5.656886|floatformat:-3}}</h3>
+    <h3>{{5.6|floatformat:-3}}</h3>
+    <h3>{{5|floatformat:-3}}</h3>
+
+    <h4>{{98756324|floatformat:'2g'}}</h4>
+    <h4>{{98756324|floatformat:'3u'}}</h4>
+    <h4>{{98756324|get_digit:0}}</h4>
+
+    <h2>{{fruits|join:"@"}}</h2>
+    <h2>{{fruits|length}}</h2>
+    <h2>{{vegetables|length}}</h2>
+   
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <!-- {% lorem 10 w %} -->
+     {% now 'd-m-Y: z' %}
+
+{% for x in cars %}
+  {% ifchanged x.brand %}
+    <h1>{{ x.brand }}:</h1>
+  {% endifchanged %}
+  <p>{{ x.model }}, {{ x.year }}</p>
+{% endfor %}
+
+{% for x in cars|dictsortreversed:"year" %}
+    <p>{{ x.year }} {{ x.brand }} {{ x.model }}.</p>
+{% endfor %}
+
+{{cars|json_script}}
+
+</body>
+</html>
