@@ -7,48 +7,140 @@
 </head>
 <body>
     <h1>Use of Filter</h1>
+    
+    <!-- Converts text inside the block to uppercase -->
     {% filter upper %}
     <h2>Upper Case</h2>
     {% endfilter %}
 
+    <!-- Iterates over 'fruits' and appends '-CHECK' to each item -->
     {% for x in fruits %}
     <h1>{{ x|add:"-CHECK"}}</h1>
     {% endfor %}
+
+    <!-- Tries to add 'fruits' and 'vegetables', should be used carefully -->
     <h6>{{ fruits|add:vegetables }}</h6>
 
+    <!-- Capitalizes the first letter of 'vegetables' -->
     <h2>{{vegetables|capfirst}}</h2>
+
+    <!-- Centers the text within 50 characters width -->
     <h3> {{vegetables|center:50}}</h3>
-    <textarea> {{vegetables|center:100}}</textarea>
+
+    <!-- Centers the text within 20 characters width inside a textarea -->
+    <textarea> {{vegetables|center:20}}</textarea>
+
+    <!-- Removes occurrences of 'ot' from 'vegetables' -->
     <h3> {{vegetables|cut:'ot'}}</h3>
 
     {% for x in fruits %}
-    
+    <!-- Uses default value if 'x' is empty -->
     <h3>{{x|default:'No fruits'}}</h3>
     {% endfor %}
+
     <h2>Replace only None Value</h2>
     {% for x in fruits %}
     <h3>{{x|default_if_none:"No fruits"}}</h3>
     {% endfor %}
 
-    <h2>{{y|divisibleby:5}}</h2>
+    <!-- Checks if 'y' is divisible by 5 -->
+    <h2>{{y|divisibleby:5 }}</h2>This is Divisible by 5
+    
+    <!-- Formats file size into a readable format -->
     <h2>{{size|filesizeformat}}</h2>
+    
+    <!-- Retrieves the first and last item from 'fruits' and 'vegetables' -->
     <h2>{{fruits|first}}</h2>
     <h2>{{vegetables|first}}</h2>
     <h2>{{fruits|last}}</h2>
+    
+    <!-- Escapes special characters in 'name' -->
     <button onclick="alert('{{ name|addslashes }}')"> Click me!</button>
+    
+    <!-- Formats floating point numbers with different precisions -->
     <h3>{{5.656886|floatformat:3}}</h3>
-    <h3>{{5.656886|floatformat:-3}}</h3>
-    <h3>{{5.6|floatformat:-3}}</h3>
-    <h3>{{5|floatformat:-3}}</h3>
+    <h3>{{5.656886|floatformat:-4}}</h3>
+    <h3>{{5.6|floatformat:3}}</h3>
+    <h3>{{5|floatformat:3}}</h3>
 
-    <h4>{{98756324|floatformat:'2g'}}</h4>
-    <h4>{{98756324|floatformat:'3u'}}</h4>
-    <h4>{{98756324|get_digit:0}}</h4>
-
+    <!-- Joins list items with '@' separator -->
     <h2>{{fruits|join:"@"}}</h2>
+    
+    <!-- Displays length of lists -->
     <h2>{{fruits|length}}</h2>
     <h2>{{vegetables|length}}</h2>
+
+    <!-- Displays text with and without line breaks -->
+    <h3>without linebreak</h3>
+    {{text}}
+    <h3>with linebreak</h3>
+    {{text|linebreaks}}
+    {{text|linebreaksbr}}
+    
+    <!-- Adds line numbers to text -->
+    <h2>add line numbers</h2>
+    {{text|linenumbers}}
    
+    <!-- Adjusts text alignment and case transformations -->
+    <pre>{{vegetables|ljust:25}} is vegetable.</pre>
+    <pre>{{vegetables|rjust:25}} is vegetable.</pre>
+    <pre>{{vegetables|lower}} is vegetable.</pre>
+    <pre>{{vegetables|upper}} is vegetable.</pre>
+
+    <!-- Converts text to list of characters -->
+    <h2>{{text|make_list}}</h2>
+    
+    <!-- Converts phone-like text into numeric format -->
+    <h2>{{'555-abcdefghijklmnopqrstuvwxyz'|phone2numeric}}</h2>
+    
+    <!-- Uses pluralization based on number of butterflies -->
+    {% for x in arr %}
+        <h1>You have {{ x }} butterfl{{ x|pluralize:'y,ies' }} left.</h1>
+    {% endfor %}
+
+    <!-- Picks a random item from 'fruits' -->
+    <h3>{{fruits|random}}</h3>
+    
+    <!-- Slices the list to first 3 elements -->
+    <h3>{{fruits|slice:"0:3"}}</h3>
+    
+    <!-- Converts text into a URL slug -->
+    <h3>{{text|slugify}}</h3>
+
+    <h3>Without striptags filter:</h3>
+    {{ mytext }}
+    
+    <h3>With striptags filter:</h3>
+    {{ mytext|striptags }}
+
+    <!-- Time-related filters (commented out) -->
+    <!-- {{date|time}} -->
+    <!-- {{birthday|timesince:date}} -->
+    {{birthday|timeuntil:date}}
+    
+    <!-- Truncates text to a specified number of characters or words -->
+    <h1> {{mytext|truncatechars:15}}</h1>
+    <h1> {{mytext|truncatechars_html:15}}</h1>
+    <h2>{{newtext|truncatewords:2}}</h2>
+    <h2>{{newtext|truncatewords_html:4}}</h2>
+
+    <!-- Displays unordered list from 'fruits' -->
+    <h3>{{fruits|unordered_list}}</h3>
+
+    <!-- URL encoding and hyperlinking -->
+    {{url|urlencode}}
+    <br>
+    {{url|urlize}}
+    <br>
+    {{url|urlizetrunc:20}}
+    <br>
+    
+    <!-- Counts words in text -->
+    {{newtext|wordcount}}
+    <br>
+    
+    <!-- Displays yes/no/maybe based on boolean value -->
+    {{ True|yesno:"yeah,no,maybe" }}
 
 </body>
 </html>

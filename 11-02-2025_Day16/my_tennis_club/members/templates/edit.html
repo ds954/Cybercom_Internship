@@ -1,0 +1,17 @@
+<h1>Edit Member</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ member.firstname }}
+    <br>
+    {{ member.lastname }}
+    <br>
+    {{ member.phone }}
+    <br>
+    {{ member.joined_date|date:'Y-m-d' }}
+    <br>
+    <input type="text" name="firstname" placeholder="First Name" required>
+    <input type="text" name="lastname" placeholder="Last Name" required>
+    <input type="text" name="phone" placeholder="Phone" required>
+    <input type="date" name="joined_date" required>
+    <button type="submit">Save</button>
+</form>
