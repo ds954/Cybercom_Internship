@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Price</title>
+</head>
+<body>
+    {% load tag %}  <!-- Load your custom tag file -->
+
+    <h1>Product Total Price</h1>
+
+    <p>Price per item: ${{ price }}</p>
+    <p>Quantity: {{ quantity }}</p>
+
+    <!-- Use the custom tag to calculate the total price -->
+    <p>Total: {% calculate_total price quantity %}</p>  <!-- Output: Total: 1500 -->
+</body>
+</html>

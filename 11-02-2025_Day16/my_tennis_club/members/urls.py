@@ -12,5 +12,8 @@ urlpatterns = [
     path('car/',views.car),
     path('filter/',views.filter),
     path('edit/<int:member_id>/', views.edit_member, name='edit_member'),
+    path('reverse-word/', views.reverse_word_view, name='reverse_word'),
+    path('calculate-total/', views.calculate_total_view, name='calculate_total'),
+
 ]
 

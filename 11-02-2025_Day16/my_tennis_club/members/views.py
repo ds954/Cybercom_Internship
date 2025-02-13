@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Member
 import datetime
+from members.templatetags.reverse import reverse_word
+
 
 
 def members(request):
@@ -87,7 +89,7 @@ def filter(request):
   context={
     'fruits': ['apple', 'banana','', 'cherry',None],
     'vegetables':'potaTo',
-    'name':'xyz\t error',
+    'name':"xyz\\nerror",
     "x":0,
     "y":15,
     "size":1024*1024,
@@ -113,3 +115,24 @@ def edit_member(request, member_id):
         return redirect('details', id=member.id)
 
     return render(request, 'edit.html', {'member': member})
+
+def reverse_word_view(request):
+    text = "Hello Django Custom Filter"
+    reversed_text = reverse_word(text)  # Use the filter function in views
+    return HttpResponse(f"Original: {text} <br> Reversed: {reversed_text}")
+
+from django.shortcuts import render
+
+# View for displaying total price
+def calculate_total_view(request):
+    # Example price and quantity (you can modify this as per your needs)
+    price = 500  # Price per item
+    quantity = 3  # Quantity of the items
+
+    # Pass the price and quantity to the template
+    return render(request, 'custom_tag.html', {
+        'price': price,
+        'quantity': quantity,
+    })
+
+

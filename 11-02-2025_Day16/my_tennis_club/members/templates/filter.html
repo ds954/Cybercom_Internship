@@ -55,7 +55,10 @@
     <h2>{{fruits|last}}</h2>
     
     <!-- Escapes special characters in 'name' -->
+     <h1>with addslashes</h1>
     <button onclick="alert('{{ name|addslashes }}')"> Click me!</button>
+    <h1>without addslashes</h1>
+    <button onclick="alert('{{ name }}')"> Click me!</button>
     
     <!-- Formats floating point numbers with different precisions -->
     <h3>{{5.656886|floatformat:3}}</h3>
@@ -65,6 +68,13 @@
 
     <!-- Joins list items with '@' separator -->
     <h2>{{fruits|join:"@"}}</h2>
+
+    <h4>{{98756324|floatformat:'2g'}}</h4>
+    <h1>3u</h1>
+    <h4>{{15286949875.6324|floatformat:'3u'}}</h4>
+    <h1>3:</h1>
+    <h4>{{15286949875.6324|floatformat:'3'}}</h4>
+    <h4>{{98756324|get_digit:-2}}</h4>
     
     <!-- Displays length of lists -->
     <h2>{{fruits|length}}</h2>
