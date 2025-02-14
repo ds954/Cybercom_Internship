@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    {% for x in myuser %}
+        {{x.firstname}}  <br>
+        {{x.lastname}}  <br>
+        {{x.college_name|default:'vgec'}} <br>
+        {{x.email}} <br>
+        <br>
+        <a href="{% url 'update_user' x.id %}"> <button>Update</button></a>
+        <a href="{% url 'delete_user' x.id%}"><button>Delete</button></a>
+        <br><br><br>
+        {% endfor %}
+        <a href="{% url 'add' %}"><button>Add</button></a>
+        {% if messages %}
+        {% for message in messages %}
+            <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <br>
+    <a href="{% url 'logout' %}">Logout</a>
+
+</body>
+</html>
