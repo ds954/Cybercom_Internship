@@ -1,0 +1,16 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Index</title>  
+</head>  
+<body>  
+    <!-- Form for submitting data (supports file upload) -->
+    <form method="POST" class="post-form" enctype="multipart/form-data">  
+        {% csrf_token %}  <!-- CSRF token for security (Django requirement for form submissions) -->
+        {{ form.as_p }}  <!-- Render the form fields with paragraph tags -->
+       
+        <button type="submit" class="save btn btn-default">Save</button>  <!-- Submit button -->
+    </form>  
+</body>  
+</html>  

@@ -55,7 +55,7 @@ ROOT_URLCONF = "employee.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -130,3 +130,4 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'dsm952004@gmail.com'
 EMAIL_HOST_PASSWORD ='srjb yaqo odma ydrd'
 
+AUTH_USER_MODEL = 'employee_data.CustomUser'

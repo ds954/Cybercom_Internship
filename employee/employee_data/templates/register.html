@@ -1,0 +1,9 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="firstname" placeholder="firstname" required>
+    <input type="text" name="lastname" placeholder="lastname" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="password" required>
+   
+    <button type="submit">Register</button>
+</form>
