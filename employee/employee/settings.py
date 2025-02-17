@@ -31,14 +31,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "employee_data"
+    "employee_data",
 ]
+ASGI_APPLICATION= 'employee.asgi.application'
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -68,9 +70,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "employee.wsgi.application"
+# WSGI_APPLICATION = "employee.wsgi.application"
+ASGI_APPLICATION = "employee.asgi.application"
 
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -131,3 +141,6 @@ EMAIL_HOST_USER = 'dsm952004@gmail.com'
 EMAIL_HOST_PASSWORD ='srjb yaqo odma ydrd'
 
 AUTH_USER_MODEL = 'employee_data.CustomUser'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/home/'  # Redirect after login
+LOGOUT_REDIRECT_URL = '/login/'

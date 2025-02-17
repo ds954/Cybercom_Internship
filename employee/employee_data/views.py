@@ -26,9 +26,9 @@ def index(request):
         password=request.POST.get('password')
         email_otp = generate_otp()  # Generate a time-based OTP
 
-
+        hashed_password = make_password(password)
         # Create a new user entry in the database with generated OTP
-        user = CustomUser.objects.create(email=email, email_otp=email_otp,password=password)
+        user = CustomUser.objects.create(email=email, email_otp=email_otp,password=hashed_password)
         print(f"User created: ID={user.id}, Email={user.email}")  # Debugging print statement
         print(password)
     
@@ -73,14 +73,21 @@ def login_user(request):
         password = request.POST.get('password')
 
         
-        user = CustomUser.objects.get(email=email)
-        if user.password == password:  # Compare plain text passwords
-                login(request, user)  # Log in manually
-                return redirect('/home/')
+        # user = CustomUser.objects.get(email=email)
+        # if user.password == password:  # Compare plain text passwords
+        #         login(request, user)  # Log in manually
+        #         return redirect('/home/')
+        # else:
+        #         messages.error(request, 'Incorrect password. Try again!')
+        #         return redirect('/login/')
+        user = authenticate(request, username=email, password=password) 
+
+        if user is not None:
+            login(request, user)
+            return redirect('/home/')
         else:
-                messages.error(request, 'Incorrect password. Try again!')
-                return redirect('/login/')
-        
+            messages.error(request, 'Incorrect email or password. Try again!')
+            return redirect('/login/')
 
     return render(request, 'login.html')
  
@@ -135,7 +142,7 @@ def reset_password(request, user_id):
         confirm_password = request.POST.get('check-password')  # Confirm password
 
         if password == confirm_password and password != user.password:  # Ensure new password is different
-            user.password = password  # Store the plain text password
+            user.password = make_password(password)  # Store the hashed password
             user.save()  # Save the user with the updated password
             return redirect('/login/')  # Redirect to login after password reset
         else:
