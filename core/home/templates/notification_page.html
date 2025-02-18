@@ -3,9 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Notifications</title>
+    <script>
+        // Establish WebSocket connection for user requests
+        var requestSocket = new WebSocket('ws://' + window.location.host + '/ws/user_requests/');
+
+        // Function to send a request to the admin
+        function sendRequest() {
+            const userMessage = document.getElementById("request-message").value;
+            
+            if (userMessage.trim() !== "") {
+                requestSocket.send(JSON.stringify({
+                    message: userMessage  // Send only the message field to the server
+                }));
+                document.getElementById("request-message").value = ""; // Clear input
+            }
+        }
+
+        // Establish WebSocket connection for notifications
+        var notificationSocket = new WebSocket('ws://' + window.location.host + '/ws/notifications/');
+
+        // This function handles incoming messages from the notifications WebSocket
+        notificationSocket.onmessage = function(e) {
+            var data = JSON.parse(e.data);  // Parse incoming data
+            if (data.type === "notification") {
+                var message = data.message;
+
+                // Create a new notification element
+                var notificationDiv = document.createElement("div");
+                notificationDiv.classList.add("notification");
+                notificationDiv.innerHTML = message;
+
+                // Append the notification to the notifications container
+                document.getElementById("notifications-container").appendChild(notificationDiv);
+
+                // Hide the notification after 10 seconds
+                setTimeout(function() {
+                    notificationDiv.style.opacity = '0';  
+                    notificationDiv.style.visibility = 'hidden';
+                }, 10000);
+            }
+        };
+
+        // Handle WebSocket open connection for notifications
+        notificationSocket.onopen = function() {
+            console.log("Connected to WebSocket for notifications.");
+        };
+
+        // Handle WebSocket close connection for notifications
+        notificationSocket.onclose = function(e) {
+            console.error("WebSocket closed unexpectedly:", e);
+        };
+    </script>
+    <style>
+        .notification {
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .notification p {
+            margin: 0;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello world!</h1>
+    <h1>Notification Page</h1>
+
+    <!-- Send Request to Admin -->
+    <h2>Send Request to Admin</h2>
+    <textarea name="request-message" id="request-message" placeholder="Type message"></textarea>
+    <button onclick="sendRequest()">Submit</button>
+
+    <!-- Receive Notifications -->
+    <div id="notifications-container">
+        <!-- Notifications will appear here -->
+    </div>
 </body>
 </html>
