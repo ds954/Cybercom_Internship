@@ -11,13 +11,42 @@ class WSconsumer(WebsocketConsumer):
             self.send(json.dumps({'message':randint(1,100)}))
             sleep(1)
 
+# NormalClosure	1000	
+# (1000) The connection has closed after the request was fulfilled.
 
+# EndpointUnavailable	1001	
+# (1001) Indicates an endpoint is being removed. Either the server or client will become unavailable.
+
+# ProtocolError	1002	
+# (1002) The client or server is terminating the connection because of a protocol error.
+
+# InvalidMessageType	1003	
+# (1003) The client or server is terminating the connection because it cannot accept the data type it received.
+
+# Empty	1005	
+# No error specified.
+
+# InvalidPayloadData	1007	
+# (1007) The client or server is terminating the connection because it has received data inconsistent with the message type.
+
+# PolicyViolation	1008	
+# (1008) The connection will be closed because an endpoint has received a message that violates its policy.
+
+# MessageTooBig	1009	
+# (1009) The client or server is terminating the connection because it has received a message that is too big for it to process.
+
+# MandatoryExtension	1010	
+# (1010) The client is terminating the connection because it expected the server to negotiate an extension.
+
+# InternalServerError	1011	
+# (1011) The connection will be closed by the server because of an error on the server.
 # User
 class Notificationconsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
         await self.channel_layer.group_add('notification',self.channel_name)
     async def disconnect(self,code):
+        print(f"Disconnect code: {code}")
         await self.channel_layer.group_discard('notification',self.channel_name)
 
     async def receive(self,text_data):
