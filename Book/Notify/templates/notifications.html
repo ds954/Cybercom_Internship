@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Due Notifications</title>
+    <script>
+    var socket = new WebSocket("ws://localhost:8000/ws/notifications/");
+
+    socket.onopen = function() {
+        console.log("Connected to WebSocket");
+    };
+    
+    socket.onmessage = function(event) {
+        console.log(" Message received:", event.data);
+        var data = JSON.parse(event.data);
+        var notificationBox = document.getElementById("notification-box");
+        var newNotification = document.createElement("div");
+        newNotification.classList.add("alert");
+        newNotification.innerHTML = `<strong>Reminder:</strong> ${data.message}`;
+        notificationBox.appendChild(newNotification);
+    };
+    
+    socket.onerror = function(error) {
+        console.error("WebSocket Error:", error);
+    };
+    
+    socket.onclose = function(e) {
+        console.warn("WebSocket closed unexpectedly:", e);
+    };
+</script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .alert {
+            padding: 10px;
+            background-color: #ffcc00;
+            color: black;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Book Due Notifications</h2>
+        <p>You will receive notifications here when a book is due soon.</p>
+        <div id="notification-box"></div>
+    </div>
+</body>
+</html>
