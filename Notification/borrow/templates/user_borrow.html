@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Borrow Request</title>
+    <script>
+        var socket = new WebSocket("ws://" + window.location.host + "/ws/borrow-requests/");
+        socket.onopen = function() {
+        console.log("Connected to WebSocket");
+    };
+    
+        socket.onmessage = function(event) {
+            console.log(" Message received:", event.data);
+            var data = JSON.parse(event.data);
+            document.getElementById("status").innerText = data.message;
+        };
+        socket.onerror = function(error) {
+        console.error("WebSocket Error:", error);
+    };
+    
+    socket.onclose = function(e) {
+        console.warn("WebSocket closed unexpectedly:", e);
+    };
+    </script>
+</head>
+<body>
+    <h2>Borrow a Book</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="book_title" placeholder="Enter book title" required>
+        <button type="submit">Request</button>
+    </form>
+
+    <h2>Your Borrow Requests</h2>
+    <p id="status">Waiting for admin approval...</p>
+
+    <ul>
+        {% for request in borrow_requests %}
+            <li>{{ request.book_title }} - <strong>{{ request.status }}</strong></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
