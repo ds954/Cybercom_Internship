@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<body>
+   
+    <h2>Available Books</h2>
+    <table border="1">
+        <tr>
+            <th>Book Title</th>
+            <th>Action</th>
+        </tr>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>
+                <form method="post" action="{% url 'request_book' book.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Request</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Your Borrow Requests</h2>
+    <table>
+        <tr>
+            <th>Book</th>
+            <th>Status</th>
+            <th>Issued Date</th>
+            <th>Due Date</th>
+            <th>Action</th>
+        </tr>
+        {% for request in borrow_requests %}
+        <tr id="request-{{ request.id }}">
+            <td>{{ request.book.title }}</td>
+            <td class="status">{{ request.status }}</td>
+            <td>{{ request.IssuedDate }}</td>
+            <td>{{ request.Duedate }}</td>
+            <td>
+                {% if request.status == 'accepted' or request.status == 'renew_accpect' and request.Duedate < today %}
+                <form method="post" action="{% url 'request_renewal' request.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Request Renewal</button>
+                </form>
+                {% endif %}
+                
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+    <h3 id="notification"></h3>
+
+    <script>
+        // Connect WebSocket for real-time updates
+        const socket = new WebSocket("ws://" + window.location.host + "/ws/borrow_request/");
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            document.getElementById("notification").innerText = `Your request for '${data.book}' is ${data.status}.`;
+
+            // Update the request status in the table
+            document.querySelectorAll('.status').forEach(statusElem => {
+                if (statusElem.innerText === "Pending" && statusElem.parentElement.querySelector('td:first-child').innerText === data.book) {
+                    statusElem.innerText = data.status;
+                }
+            });
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket closed.");
+        };
+    </script>
+</body>
+</html>
