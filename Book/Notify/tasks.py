@@ -6,8 +6,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import Book
 from django.contrib.auth.models import User
+from background_task import background
 
-@shared_task
+# @shared_task
+@background(schedule=30)
 def send_due_date_notifications(user_id):
     print(user_id)
     print(type(user_id))

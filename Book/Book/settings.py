@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "daphne",
+    'background_task',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_celery_beat",
-    'django_celery_results',
+    "django_celery_results",
     "Notify",
 
 ]
@@ -75,15 +76,19 @@ TEMPLATES = [
 WSGI_APPLICATION = "Book.wsgi.application"
 ASGI_APPLICATION = "Book.asgi.application"
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -137,23 +142,23 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CELERY_BROKER_URL='redis://127.0.0.1:6379/0'  #database 0
-CELERY_ACCEPT_CONTENT=['json']
-CELERY_TASK_SERIALIZER='json'
-CELERY_TIMEZONE="Asia/kolkata"        
-CELERY_RESULT_BACKEND='django-db' 
-CELERY_RESULT_EXTENDED=True
+# CELERY_BROKER_URL='redis://127.0.0.1:6379/0'  #database 0
+# CELERY_ACCEPT_CONTENT=['json']
+# CELERY_TASK_SERIALIZER='json'
+# CELERY_TIMEZONE="Asia/kolkata"        
+# CELERY_RESULT_BACKEND='django-db' 
+# CELERY_RESULT_EXTENDED=True
 
-CELERY_BEAT_SCHEDULER= 'django_celery_beat.schedulers:DatabaseScheduler'
+# CELERY_BEAT_SCHEDULER= 'django_celery_beat.schedulers:DatabaseScheduler'
 
-CELERY_BEAT_SCHEDULE = {
-    'send_due_notifications': {
-        'task': 'Notify.tasks.send_due_date_notifications',
-        'schedule': crontab('*/1'),  
-        'args':(1,)
+# CELERY_BEAT_SCHEDULE = {
+#     'send_due_notifications': {
+#         'task': 'Notify.tasks.send_due_date_notifications',
+#         'schedule': crontab('*/1'),  
+#         'args':(1,)
         
-    },
-}
+#     },
+# }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

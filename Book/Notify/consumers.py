@@ -23,5 +23,6 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         try:
             message = event["message"]
             await self.send(text_data=json.dumps({"message": message}))
+            print("✅ WebSocket Message Sent:", message)  # Debugging
         except Exception as e:
             print(f"WebSocket Message Send Error: {e}")

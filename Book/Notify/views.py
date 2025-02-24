@@ -9,7 +9,8 @@ def notifications(request):
 
     user = User.objects.get(username="dhara") 
     print(user)
-    send_due_date_notifications.delay(user.id)
+    # send_due_date_notifications.delay(user.id)
+    send_due_date_notifications(user.id,repeat=60)
     print(f"Task sent for user: {user.id}")
     today = timezone.now().date()
     due_books = Book.objects.filter(user=user, due_date=today + timezone.timedelta(days=3))
