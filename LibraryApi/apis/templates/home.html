@@ -10,11 +10,13 @@
 
     <h1>{{ data.title }}</h1>
     <p>{{data.description}}</p>
-
+    
+    <h3>{{data.username}}</h3>
     <h3>{{data.name}}</h3>
     <h3>{{data.email}}</h3>
     <!-- <h3>{{data.content}}</h3> -->
 
     {% endfor %}
+    <a href="{% url 'logout' %}">Logout</a>
 </body>
 </html>

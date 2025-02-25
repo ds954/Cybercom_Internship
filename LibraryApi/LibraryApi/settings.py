@@ -79,6 +79,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+AUTH_USER_MODEL = 'apis.CustomUser'
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
