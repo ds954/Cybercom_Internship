@@ -6,21 +6,34 @@
     <title>User Dashboard</title>
 </head>
 <body>
+    <h1>welcome {{ request.user.username}} </h1>
    
     <h2>Available Books</h2>
     <table border="1">
         <tr>
             <th>Book Title</th>
+            <th>Availability</th>
             <th>Action</th>
         </tr>
         {% for book in books %}
         <tr>
             <td>{{ book.title }}</td>
             <td>
-                <form method="post" action="{% url 'request_book' book.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Request</button>
-                </form>
+                {% if book.is_available %}
+                    Available
+                {% else %}
+                    Not Available 
+                {% endif %}
+            </td>
+            <td>
+                {% if book.is_available %}
+                    <form method="post" action="{% url 'request_book' book.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Request</button>
+                    </form>
+                {% else %}
+                    Book is not available
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
@@ -42,13 +55,27 @@
             <td>{{ request.IssuedDate }}</td>
             <td>{{ request.Duedate }}</td>
             <td>
-                {% if request.status == 'accepted' or request.status == 'renew_accpect' and request.Duedate < today %}
-                <form method="post" action="{% url 'request_renewal' request.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Request Renewal</button>
-                </form>
+                {% if request.status == 'accepted' or request.status == 'renew_accpect' %}
+                    {% if request.Duedate < today and request.book.is_available %}
+                        <form method="post" action="{% url 'request_renewal' request.id %}">
+                            {% csrf_token %}
+                            <button type="submit">Request Renewal</button>
+                        </form>
+                    {% endif %}
+                {% if request.Duedate > today and request.status == 'accepted' or request.status == 'renew_accpect' %}
+                    <form method="post" action="{% url 'return_book' request.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Return</button>
+                    </form>
+                {% elif request.status == 'pending' %}
+                    <form method="post" action="{% url 'cancel_book' request.id %}">
+                        {% csrf_token %}
+                        <button type="submit">Cancel</button>
+                    </form>
                 {% endif %}
-                
+                {% endif %}
+
+
             </td>
         </tr>
         {% endfor %}
@@ -56,6 +83,13 @@
 
 
     <h3 id="notification"></h3>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
     <script>
         // Connect WebSocket for real-time updates

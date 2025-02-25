@@ -15,3 +15,10 @@ class BorrowRequestConsumer(AsyncWebsocketConsumer):
             "status": event["status"],
             "book": event["book"]
         }))
+    async def cancel_request(self, event):
+        """Handles book cancellation requests."""
+        self.send(text_data=json.dumps({
+            "type": "cancel_request",
+            "status": event["status"],
+            "book": event["book"]
+        }))    
