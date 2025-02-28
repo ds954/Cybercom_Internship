@@ -55,22 +55,28 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     Serializer for user profile.
     """
-    password=serializers.CharField(style={'input_type':'password'},write_only=True)
-    class Meta:
-        model=CustomUser
-        fields=['password']
+    # password=serializers.CharField(style={'input_type':'password'},write_only=True)
+    # class Meta:
+    #     model=CustomUser
+    #     fields=['password']
         
-    def validate(self, attrs):
-        password = attrs.get('password')
-        user = self.context.get('user')  # Access the user object correctly
+    # def validate(self, attrs):
+    #     password = attrs.get('password')
+    #     user = self.context.get('user')  # Access the user object correctly
 
-        if user:  # Check if the user object exists
-            user.set_password(password)
-            user.save()
-        else:
-            raise serializers.ValidationError("User not found in context.")
+    #     if user:  # Check if the user object exists
+    #         user.set_password(password)
+    #         user.save()
+    #     else:
+    #         raise serializers.ValidationError("User not found in context.")
 
-        return attrs
+    #     return attrs
+    new_password = serializers.CharField(required=True)
+
+    def validate(self, data):
+        if not data['new_password']:
+            raise serializers.ValidationError({"new_password": "Password is required"})
+        return data
     
 class SendPasswordResetEmailSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=255)
@@ -152,10 +158,10 @@ class  BookSerializer(serializers.ModelSerializer):
 
 class BorrowRequestSerializer(serializers.ModelSerializer):
     class Meta:
-        modek=BorrowRequest
+        model=BorrowRequest
         fields=['id','user','book','status','IssuedDate','Duedate']
 
-       
-
-
-        
+class RenewalRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model:BorrowRequest
+        fields='__all__'

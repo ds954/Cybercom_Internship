@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    {% if message %}
+        {{message}}
+        {{refresh}}
+    {% endif %}
+<form  method="post">
+    {% csrf_token %}
+    <label for="email">Email:</label>
+    <input type="email" name="email"> <br> <br>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password">
+    <button type="submit">Login</button>
+  
+</form>
+<p><a href="{% url 'password' %}">Forgot Password?</a></p>
+<p><a href="{% url 'email' %}">Reset Link</a></p>
+</body>
+</html>

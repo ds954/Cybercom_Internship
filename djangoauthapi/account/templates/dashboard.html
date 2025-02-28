@@ -1,0 +1,40 @@
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
+{% if refresh_token %}
+<p><strong>Refresh Token:</strong> {{ refresh_token }}</p>
+{% endif %}
+
+{% if access_token %}
+<p><strong>Access Token:</strong> {{ access_token }}</p>
+{% endif %}
+
+<h2>Welcome, {{ user.email }}</h2>
+
+<h3>Available Books</h3>
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    {% for book in books %}
+    <tr>
+        <td>{{ book.title }}</td>
+        <td>{% if book.is_available %} Available {% else %}Not Available{% endif %}</td>
+        <td></td>
+        <td>
+            {% if book.is_available %}
+            <form method="POST" action="{% url 'borrow_book' book.id %}">
+                {% csrf_token %}
+                <button type="submit">Borrow</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+

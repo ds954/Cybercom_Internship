@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class CustomUserManager(BaseUserManager):
@@ -55,7 +55,7 @@ class BorrowRequest(models.Model):
         ('book_returned',"return"),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     status = models.CharField( max_length=30,choices=STATUS_CHOICES, default='pending')
     IssuedDate=models.DateField(null=True)

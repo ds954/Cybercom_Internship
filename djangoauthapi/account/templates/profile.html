@@ -1,0 +1,17 @@
+
+
+<div class="container">
+    <h2>User Profile</h2>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+
+    <h3>Update Profile</h3>
+    <form method="post">
+        {% csrf_token %}
+        <label>Name:</label>
+        <input type="text" name="name" value="{{ user.username }}"> <br><br>
+
+
+        <button type="submit">Update</button>
+    </form>
+</div>

@@ -16,6 +16,10 @@ urlpatterns = [
     path('email/',SendPasswordResetEmailView.as_view(),name="email"),
     path('reset_password/<uid>/<token>/',UserPasswordResetView.as_view(),name="email"),
     path('update-profile/', UpdateProfileView.as_view(), name='update-profile'),
-    path('book_list/', BookView.as_view(), name='book_list'),
-    path('borrow_request/', BorrowRequestView.as_view(), name='borrow_request'),
+    # path('book_list/', DashboardView.as_view(), name='book_list'),
+    # path('borrow_request/', BorrowRequestView.as_view(), name='borrow_request'),
+    path('borrow/<int:book_id>/', BorrowRequestView.as_view(), name='borrow_book'),
+    path('cancel_borrow_request/<int:pk>/', CancelBorrowRequestView.as_view(), name='cancel_borrow_request'),
+    path('return_book/<int:pk>/', ReturnBookView.as_view(), name='return_book'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
 ]
