@@ -72,7 +72,7 @@ class LoginView(APIView):
 
             if user:  # Checks if the user is authenticated
                 token=get_tokens_for_user(user)
-                
+               
                 return Response({
                     "refresh": str(token),  # Returns the refresh token as a string
                     
@@ -133,6 +133,7 @@ class ChangePasswordView(APIView):
             user.set_password(serializer.validated_data['new_password'])
             user.save()
             return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+        print("this",serializers.ErrorDetail)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class SendPasswordResetEmailView(APIView):

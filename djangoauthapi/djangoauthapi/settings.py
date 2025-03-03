@@ -31,7 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "app",
     "account",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     'rest_framework_simplejwt',
     "rest_framework",
@@ -132,7 +134,9 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default username-based auth
+]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 from datetime import timedelta
 ...
