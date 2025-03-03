@@ -5,14 +5,26 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from .models import BorrowRequest, Book
+from .models import BorrowRequest, Book,BookCopy
 from django.core.mail import send_mail
 from Newbook import settings
 from datetime import timezone
 
+@admin.register(BookCopy)
+class BookAdmin(admin.ModelAdmin):
+    list_display = ['id', 'book','copy_number','is_borrowed','borrowed_by']
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title','is_available']
+    list_display = ['id', 'title','is_available','quantity']
+    def save_model(self, request, obj, form, change):
+        """Overrides save_model to create BookCopy records when a new Book is added."""
+        is_new = obj.pk is None  # Check if the book is new
+        super().save_model(request, obj, form, change)  # Save the book first
+
+        if is_new:  # If it's a new book, create copies
+            book_copies = [BookCopy(book=obj, copy_number=i) for i in range(1, obj.quantity + 1)]
+            BookCopy.objects.bulk_create(book_copies)  # Bulk insert for efficiency
 
 @admin.register(BorrowRequest)
 class BorrowRequestAdmin(admin.ModelAdmin):
@@ -58,8 +70,20 @@ class BorrowRequestAdmin(admin.ModelAdmin):
 
     def accept_request(self, request, request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
-        book = borrow_request.book #get correct book
-        book.is_available = False
+        book = borrow_request.book 
+
+        available_copy = BookCopy.objects.filter(book=book, is_borrowed=False).first()
+        if available_copy:
+            available_copy.is_borrowed = True
+            available_copy.borrowed_by = borrow_request.user  
+            available_copy.save()
+        borrow_request.book_copy = available_copy
+        borrow_request.save()
+        if book.quantity > 0:  
+            book.is_available=True
+            book.quantity -= 1
+        if book.quantity == 0:
+            book.is_available = False
         book.save()
         return self.update_status(request, request_id, "accepted")
 
@@ -68,14 +92,17 @@ class BorrowRequestAdmin(admin.ModelAdmin):
     def accept_renewal(self, request, request_id):
         return self.update_status(request, request_id, "renew_accpect")  
     def reject_renewal(self, request, request_id):
+        borrow_request = BorrowRequest.objects.get(id=request_id)
+        book = borrow_request.book
+        book.quantity += 1
+        book.is_available = True 
+        book.save()
         return self.update_status(request, request_id, "renew_reject")
     def cancel_request(self,request,request_id):
         return self.update_status(request,request_id,'Cancel_Request')
     def book_returned(self,request,request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
         book = borrow_request.book
-        book.is_available = True 
-        book.save() 
         return self.update_status(request,request_id,'book_returned')
     
     def update_status(self, request, request_id, status):
@@ -85,13 +112,15 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         borrow_request.save()
 
         book = borrow_request.book #get correct book
-        if status in ["accepted", "renew_accpect"]:
-            book.is_available = False
+        # if status in ["accepted", "renew_accpect"]:
+        #     book.is_available = False
         # if borrow_request.Duedate and borrow_request.Duedate < timezone.now().date() and status == "renew_accpect" or status == "accepted":
         #     book.is_available = True
-        elif status in ["book_returned", "rejected"]:
-            book.is_available = True 
+        # elif status in ["book_returned", "rejected","renew_reject"]:
+        #     book.is_available = True 
         book.save()
+        print(f"Updating status to {status}: Quantity={book.quantity}, is_available={book.is_available}")
+
 
         subject = "Library Borrow Request Update"
         if status == "accepted":

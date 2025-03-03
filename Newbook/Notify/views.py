@@ -1,4 +1,3 @@
-# library/views.py
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import BorrowRequest, Book
@@ -11,6 +10,26 @@ from django.conf import settings
 from .admin import BorrowRequestAdmin
 from django.contrib import admin
 
+
+def search(request):
+    return render(request, 'user_dashboard.html')
+
+def search_results(request):
+    query = request.GET.get('q')
+    search_type = request.GET.get('search_type')
+    results = []
+    searched = False
+
+    if query:
+        searched = True;
+        if search_type == 'title':
+            results = Book.objects.filter(title__icontains=query)
+        elif search_type == 'author':
+            results = Book.objects.filter(author__icontains=query)
+        elif search_type == 'category':
+            results = Book.objects.filter(category__icontains=query)
+
+    return render(request, 'user_dashboard.html', {'results': results, 'searched': searched})
 @login_required
 def user_dashboard(request):
     borrow_requests = BorrowRequest.objects.filter(user=request.user)
@@ -69,6 +88,12 @@ def return_book(request,request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id, user=request.user)
     borrow_request.status = 'book_returned'
     borrow_request.save()
+    book=borrow_request.book
+    print(f"Before return: Quantity={book.quantity}, is_available={book.is_available}")
+    book.quantity += 1  
+    book.is_available = True  
+    book.save() 
+    print(f"After return: Quantity={book.quantity}, is_available={book.is_available}")
 
     from .admin import BorrowRequestAdmin
     admin_instance = BorrowRequestAdmin(BorrowRequest, admin.site)

@@ -8,4 +8,6 @@ urlpatterns = [
     path('request_renewal/<int:request_id>/', request_renewal, name='request_renewal'), 
     path('cancel_request/<int:request_id>/', cancel_book, name='cancel_book'), 
     path('return_book/<int:request_id>/', return_book, name='return_book'), 
+    path('search/', search, name='search'),
+    path('search_results/', search_results, name='search_results'),
 ]
