@@ -1,10 +1,20 @@
 # urls.py
 from django.urls import path
-from app.views import LoginView,LogoutView,AppUserListView,GetAccessTokenView
+from app.views import *
 
 urlpatterns = [
-    path("login/", LoginView.as_view(), name="login"),
+    # path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("app-users/", AppUserListView.as_view(), name="app-user-list"),
     path("get-access-token/", GetAccessTokenView.as_view(), name="get_access_token"),
+    path('register/', register_view, name='register'),
+    path('login/', login_view, name='login'),
+    path('dashboard/', dashboard_view, name='dashboard'),
+    path('profile/update/', profile_update_view, name='profile_update'),
+    path('request_book/<int:book_id>/', request_book, name='request_book'),
+    path('request_renewal/<int:request_id>/', request_renewal, name='request_renewal'), 
+    path('cancel_request/<int:request_id>/', cancel_book, name='cancel_book'), 
+    path('return_book/<int:request_id>/', return_book, name='return_book'), 
+    path('search/', search, name='search'),
+    path('search_results/', search_results, name='search_results'),
 ]

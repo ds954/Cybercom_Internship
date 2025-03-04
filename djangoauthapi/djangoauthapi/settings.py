@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "app",
     "account",
     "rest_framework_simplejwt.token_blacklist",
@@ -83,7 +84,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "djangoauthapi.wsgi.application"
-
+ASGI_APPLICATION = "djangoauthapi.asgi.application"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -120,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/kolkata"
 
 USE_I18N = True
 

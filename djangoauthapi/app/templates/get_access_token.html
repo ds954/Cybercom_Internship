@@ -15,7 +15,7 @@
         function getAccessToken() {
             const refreshToken = document.getElementById("refreshTokenInput").value;
 
-            fetch("/api/get-access-token/", {
+            fetch("/api/app/get-access-token/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
