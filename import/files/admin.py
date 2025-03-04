@@ -4,7 +4,17 @@ from django.shortcuts import render
 from django.urls import path
 from django.http import HttpResponseRedirect
 import pandas as pd
+from import_export import resources
 from .models import Book
+from import_export.admin import ExportMixin,ImportMixin
+from .resources import SampleResource
+
+class BookResource(resources.ModelResource):
+    class Meta:
+        model = Book
+        fields = ('id', 'title', 'author', 'description', 'category')  # Specify fields to export
+        export_order = ('id', 'title', 'author', 'description', 'category')  # Define export order
+        import_id_fields = ('id',)
 
 # Form for CSV File Upload in Django Admin
 class CSVImportForm(forms.Form):
@@ -14,13 +24,15 @@ class CSVImportForm(forms.Form):
     csv_file = forms.FileField()  # File upload field
 
 @admin.register(Book)
-class BookAdmin(admin.ModelAdmin):
+class BookAdmin(ImportMixin,ExportMixin,admin.ModelAdmin):
     """
     Custom Django Admin configuration for the `Book` model.
     Provides a CSV import functionality to add multiple books at once.
     """
+    resource_class = SampleResource
     list_display = ("title", "author", "category")  # Fields to display in admin panel
     change_list_template = "admin/book_changelist.html"  # Custom admin template for list view
+    list_template = "admin/import_export/change_list.html"
 
     def get_urls(self):
         """
