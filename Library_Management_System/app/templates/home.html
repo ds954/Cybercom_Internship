@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drop Down Menu</title>
+    <link rel="stylesheet" href="/static/home.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="#" alt="">
+        </div>
+        <div class="toggle-btn">
+            <div class="icon"></div>
+        </div>
+        <ul class="menu">
+            <li><a href="#">home</a></li>
+            <li><a href="#">About</a></li>
+            <li class="submenu-wrapper">
+                <img src="{{ user.profile_picture.url|default:'/static/img/default.jpg' }}" alt="Profile Photo" class="profile-photo">
+                <ul class="submenu">
+                    <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                    <li><a href="#">Borrow History</a></li>
+                    <li><a href="#">Notifications</a></li>
+                    <li><a href="#">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
+    <script>
+        const icon = document.querySelector('.icon');
+        const menu = document.querySelector('.menu');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const profilePhoto = document.querySelector('.profile-photo');
+        const submenu = document.querySelector('.submenu');
+    
+        // Toggle menu visibility
+        function toggleNavbar() {
+            menu.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+    
+        toggleBtn.addEventListener('click', function () {
+            toggleNavbar();
+        });
+    
+        // Toggle the profile dropdown
+        profilePhoto.addEventListener('click', function () {
+            submenu.classList.toggle('active');
+        });
+        </script>
+</body>
+</html>

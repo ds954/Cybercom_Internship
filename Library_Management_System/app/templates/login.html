@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    <div class="container">
+        <form class="login-form" method="post">
+            {% csrf_token %}
+            <h2>Login</h2>
+
+            <label for="email">Email:</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required>
+            <label class="show-password">
+                <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()">
+                Show Password
+            </label>
+            <button type="submit">Login</button>
+
+            <!-- Forgot Password & Register -->
+            <p class="forgot-password"><a href="{% url 'email' %}">Forgot Password?</a></p>
+            <p class="register-text">Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+        </form>
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    </div>
+</body>
+<script>
+    function togglePasswordVisibility() {
+        var passwordField = document.getElementById("password");
+        var confirmPasswordField = document.getElementById("confirm-password");
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+</script>
+</html>

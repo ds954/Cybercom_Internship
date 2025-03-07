@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/static/Edit_Profile.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Profile</h1>
+
+        <!-- Profile Photo Section -->
+        <div class="profile-photo-container">
+            <!-- Default Profile Photo -->
+            <img src="{{ user.profile_picture.url|default:'/static/img/default.jpg' }}" alt="Profile Photo" class="profile-photo" id="profile-photo">
+
+
+            <!-- Upload Photo Text -->
+            <label for="profile-photo-upload" class="upload-text">Upload Photo</label>
+
+            <!-- Remove Photo Button -->
+            <button id="remove-photo-btn" class="remove-photo-btn" style="display: none;">Remove Photo</button>
+            <!-- Hidden File Input -->
+            <input type="file" id="profile-photo-upload" name="profile-photo" style="display: none;" accept="image/*">
+            <input type="hidden" name="remove_picture" id="remove-picture" value="">
+        </div>
+
+
+
+        
+
+        <form method="post" class="edit-profile-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Username -->
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required value="{{ user.Username }}" placeholder="Enter your username">
+
+            <!-- First Name -->
+            <label for="first-name">First Name</label>
+            <input type="text" id="first-name" name="first_name" required value="{{ user.firstname }}" placeholder="Enter your first name">
+
+            <!-- Last Name -->
+            <label for="last-name">Last Name</label>
+            <input type="text" id="last-name" name="last_name" required value="{{ user.lastname }}" placeholder="Enter your last name">
+
+            <!-- Phone Number -->
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone_number" required value="{{ user.phone }}"  placeholder="Enter your phone Number">
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+    <script>
+        // JavaScript to trigger file input when clicking on "Upload Photo"
+        const uploadText = document.querySelector('.upload-text');
+        const fileInput = document.getElementById('profile-photo-upload');
+        const removeButton = document.getElementById('remove-photo-btn');
+        const profilePhoto = document.getElementById('profile-photo');
+        const removePictureInput = document.getElementById('remove-picture');
+    
+        // Open the file input dialog when "Upload Photo" is clicked
+        uploadText.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default label behavior
+            fileInput.click();
+        });
+    
+        // Handle file selection
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Display the selected image as the profile photo
+                const reader = new FileReader();
+                reader.onload = () => {
+                    profilePhoto.src = reader.result;
+                    removeButton.style.display = 'block';  // Show the remove button
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    
+       // Handle remove photo button click
+       removeButton.addEventListener('click', () => {
+                profilePhoto.src = '/static/img/default.jpg';  // Reset to default image
+                removeButton.style.display = 'none';  
+                fileInput.value = '';  
+                removePictureInput.value = 'true';  // Set hidden input to true
+            });
+
+</script>
+    
+    
+
+</body>
+</html>
