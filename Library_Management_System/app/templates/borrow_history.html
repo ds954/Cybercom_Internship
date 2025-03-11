@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Borrow History Page{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'borrow_history.css' %}"> 
+{% endblock %}
+
+{% block content %}
+    <div class="borrow-history-container">
+        <h1>Borrow History</h1>
+        <table class="borrow-history-table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Action</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            {% for request in borrow_requests %}
+            <tr id="request-{{ request.id }}">
+                <td>{{ request.book.title }}</td>
+                <td class="status">{{ request.book.author }}</td>
+                <td>{{ request.IssuedDate }}</td>
+                <td>{{ request.Duedate }}</td>
+                <td>
+                    {% if request.status == 'accepted' or request.status == 'renew_accpect' %}
+                        {% if request.Duedate < today and request.book.is_available %}
+                            <form method="post" action="{% url 'request_renewal' request.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn">Request Renewal</button>
+                            </form>
+                        {% endif %}
+                    {% if request.Duedate > today and request.status == 'accepted' or request.status == 'renew_accpect' %}
+                        <form method="post" action="{% url 'return_book' request.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn">Return</button>
+                        </form>
+                   
+                        {% endif %}
+                    {% endif %}
+                    {% if request.status == 'pending' %}
+                    <form method="post" action="{% url 'cancel_book' request.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn">Cancel</button>
+                    </form>
+                {% endif %}
+    
+                </td>
+                <td>
+                    {{ request.status }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}

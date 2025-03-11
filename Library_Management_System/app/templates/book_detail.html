@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} {{ book.title }} {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="book-detail-card">
+            <h2>{{ book.title }}</h2>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Category:</strong> {{ book.category }}</p>
+            <p><strong>Description:</strong> {{ book.description }}</p>
+            <p><strong>Availability:</strong> 
+                {% if book.is_available %}
+                    <span class="available">Available</span>
+                {% else %}
+                    <span class="not-available">Not Available</span>
+                {% endif %}
+            </p>
+            <p><strong>Quantity:</strong> {{ book.quantity }}</p>
+            {% if book.is_available %}
+                <button class="request-btn">Request</button>
+            {% else %}
+                <button class="request-btn disabled" disabled>Out of Stock</button>
+            {% endif %}
+            <br>
+            <a href="{% url 'home' %}" class="back-btn">Back to Home</a>
+        </div>
+    </div>
+{% endblock %}

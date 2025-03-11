@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Website{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}"> 
+    <!-- <link rel="stylesheet" href="/Library_Management_System/app/static/home.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- ======= HEADER START ======= -->
+<div class="page-container">
+    <header>
+    <nav class="navbar">
+        <div class="logo">
+                <img src="/static/logo.png" alt="Logo">
+        </div>
+
+        <div class="toggle-btn">
+            <div class="icon"></div>
+        </div>
+        <ul class="menu">
+          
+                <!-- <li class="search-container">
+                  <i class="fas fa-search search-icon" id="search-icon"></i>
+                  <input type="text" name="search" placeholder="Search..." class="search-input" id="search-input">
+                </li>
+               -->
+               <li class="search-container">
+                <form action="{% url 'search_books' %}" method="get" style="display: flex; align-items: center;">
+                  <i class="fas fa-search search-icon" id="search-icon"></i>
+                  <input type="text" name="q" placeholder="Search..." class="search-input" id="search-input">
+                  <button type="submit" style="border: none; background: none;">
+                    <!-- <i class="fas fa-arrow-right"></i> -->
+                  </button>
+                </form>
+              </li>
+              
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li class="submenu-wrapper">
+
+                {% if profile_user and profile_user.profile_picture %}
+                    <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" id="profile-photo" class="profile-photo">
+                {% else %}
+                    <img src="{% static 'default.jpg' %}" alt="Default Picture" id="profile-photo" class="profile-photo">
+                {% endif %}
+              
+                <ul class="submenu">
+                    <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
+                    <li><a href="{% url 'borrow_history' %}">Borrow History</a></li>
+                    <li><a href="{% url 'returned_books' %}">Returned Book</a></li>
+                    <li><a href="{% url 'canceled_books' %}">Cancled Book</a></li>
+                    <li><a href="{% url 'renewal_books' %}">Renewal Book</a></li>
+                    <li><a href="#">Notifications</a></li>
+                    <li><a href="#">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+        
+        
+    </nav>
+</header>
+    <!-- ======= HEADER END ======= -->
+
+    <!-- ======= PAGE CONTENT START ======= -->
+    <main>
+        {% block content %}
+        <!-- Page-specific content will go here -->
+        {% endblock %}
+    </main>
+    <!-- ======= PAGE CONTENT END ======= -->
+
+    <!-- ======= FOOTER START ======= -->
+    <footer>
+        <div class="footer-container">
+            <div class="logo">
+                <img src="/static/logo.png" alt="logo">
+            </div>
+            <div class="quick-links">
+                <a href="#">Home</a>
+                <!-- <a href="#">Search</a> -->
+                <a href="#">My Profile</a>
+                <a href="#">Borrowing History</a>
+                <a href="#">Notifications</a>
+            </div>
+            <div class="other-links">
+                <a href="#">About Us</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <!-- <p>&copy; 2024 Your Library Name. All Rights Reserved.</p> -->
+    </footer>
+    
+    
+</div>
+    <!-- ======= FOOTER END ======= -->
+
+    <!-- ======= SCRIPTS ======= -->
+    <script>
+   
+        const icon = document.querySelector('.icon');
+        const menu = document.querySelector('.menu');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        const profilePhoto = document.querySelector('.profile-photo');
+        const submenu = document.querySelector('.submenu');
+
+        function toggleNavbar() {
+            menu.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        toggleBtn.addEventListener('click', toggleNavbar);
+
+        profilePhoto.addEventListener('click', function () {
+            submenu.classList.toggle('active');
+        });
+        
+        const searchIcon = document.getElementById('search-icon');
+        const searchInput = document.getElementById('search-input');
+
+        searchIcon.addEventListener('click', () => {
+        searchInput.classList.toggle('expanded');
+        if (searchInput.classList.contains('expanded')) {
+            searchInput.focus();
+        }
+        });
+
+        // Optional: Collapse when clicking outside
+        document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+            searchInput.classList.remove('expanded');
+        }
+});
+
+
+    </script>
+
+    {% block extra_scripts %}
+    <!-- Additional scripts can be added from child templates -->
+    {% endblock %}
+</body>
+</html>

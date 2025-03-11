@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otp Verification</title>
-    <link rel="stylesheet" href="/static/otp.css">
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Login Page {% endblock %}
 
-</head>
-<body>
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'otp.css' %}"> 
+{% endblock %}
+
+{% block content %}
 
 <div class="container">
     <form class="otp-form" method="post">
@@ -20,5 +19,5 @@
     <p style="color: red;">{{ error }}</p>
 {% endif %}
 </div>
-</body>
-</html>
+
+{% endblock %}

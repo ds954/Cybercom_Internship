@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email</title>
-    <link rel="stylesheet" href="/static/email.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Login Page {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'email.css' %}"> 
+{% endblock %}
+
+{% block content %}
     <div class="container">
     <form method="post" class="email-form">
         {% csrf_token %}
@@ -18,5 +18,4 @@
     <p style="color: red;">{{ error }}</p>
 {% endif %}
 </div>
-</body>
-</html>
+{% endblock %}

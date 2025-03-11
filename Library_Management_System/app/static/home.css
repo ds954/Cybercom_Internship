@@ -1,182 +1,144 @@
-*,
-::before,
-::after{
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+.container {
+    width: 90%;
+    margin: auto;
+    margin-top: 150px;
+    height: calc(100vh - 140px); /* Adjust to prevent overlap with footer */
 }
 
-html{
-    font-size:13px;
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-body{
-    font-family: "Poppins", sans-serif;
-    font-size:1rem;
-    color:#d6e0f9;
-}
-
-.navbar{
-    width:100%;
-    position:fixed;
-    top:0;
-    left:0;
-    background: aqua;
-    padding-right:2%;
-    display:flex;
-    align-items: center;
+/* Make books display in a grid */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: space-between;
+    max-height: calc(100vh - 100px); /* Ensure books do not overlap the footer */
+    /* overflow-y: auto;  */
+    padding-bottom: 20px; 
+  
 }
 
-.logo{
-    width:5rem
+/* Column structure (3 books per row) */
+.col-md-4 {
+    flex: 1 1 calc(33.333% - 20px); /* 3 columns */
+    max-width: 32%;
 }
 
-.logo img{
-    width:100%;
-}
-
-.menu{
-    list-style: none;
-}
-
-.menu li{
-    position: relative;
-    float:left;
-}
-
-.menu li a{
-    font-family: "Poppins", sans-serif;
-    font-size:1.2rem;
-    color:black;
-    display:block;
-    text-decoration: none;
-    padding:1rem 1.5rem;
-}
-
-
-
-.submenu {
-    margin-right: 10px;
-    position: absolute;
-    /* left: 0; */
-    top: 100%;
-    /* height: 100vh; */
-    width: 30vh;
-    right: -1px;
-    background-color: white;
+/* Styling for book cards */
+.book-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+}
+
+.book-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.book-author, .book-category, .book-description, .book-availability, .book-quantity {
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.available {
+    color: green;
+    font-weight: bold;
+}
+
+.not-available {
+    color: red;
+    font-weight: bold;
+}
+
+.request-btn {
+    background: #9C6B4A;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
     border-radius: 5px;
-    display: none; /* Initially hidden */
-    transition: all 0.3s ease-in-out;
+    margin-top: 10px;
 }
 
-.submenu.active {
-    display: block; /* Show the submenu when active */
+.request-btn:hover {
+    background: #875A3E;
 }
 
-.submenu-wrapper img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    object-fit: cover;
+.request-btn.disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+
+/* Responsive: Stack on smaller screens */
+@media (max-width: 992px) {
+    .col-md-4 {
+        flex: 1 1 calc(50% - 20px); /* 2 books per row on medium screens */
+        max-width: 48%;
+    }
+}
+
+@media (max-width: 768px) {
+    .col-md-4 {
+        flex: 1 1 100%; /* 1 book per row on small screens */
+        max-width: 100%;
+    }
+    .row{
+    margin-top: 700px;
+    }
+    /* h2{
+        margin-top: 500px;
+    } */
+
+}
+
+.view-details {
+    display: inline-block;
+    margin-top: 10px;
+    color: blue;
+    text-decoration: underline;
     cursor: pointer;
-    margin-left: 1rem;
-    margin-top: 0.5rem;
 }
 
-.submenu-wrapper img:hover {
-    transform: scale(1.1); /* Slight zoom effect on hover */
-}
-.submenu li{
-    width:100%;
-    list-style: none;
+.view-details:hover {
+    color: darkblue;
 }
 
-.toggle-btn {
-    display: none; 
-    z-index:1000;
+/* Book Detail Page Styling */
+.book-detail-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+    text-align: left;
+}
+.book-detail-card p{
+    padding: 10px;
 }
 
-.icon {
-    position: relative;
-    width: 1.5rem;
-    height: .8rem;
-    cursor: pointer;
-    z-index:100;
+.back-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: gray;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
 }
 
-.icon::before {
-    top: 0;
-    right:0;
-    content: '';
-    position: absolute;
-    width: 2rem;
-    height: .2rem;
-    background-color: #d6e0f9;
-    transition: all 0.3s ease-in-out;
-}
-
-.icon::after {
-    bottom: 0;
-    right:0;
-    content: '';
-    position: absolute;
-    width: 1.5rem;
-    height: .2rem;
-    background-color: #d6e0f9;
-    transition: transform 0.3s ease-in-out;
-}
-
-
-.icon.active::before {
-    width:1.5rem;
-    transform: rotate(-45deg) translate(-0.21rem, 0.21rem);
-}
-
-.icon.active::after {
-    transform: rotate(45deg) translate(-0.21rem, -0.21rem);
-}
-
-
-@media (max-width: 991px){
-    .toggle-btn{
-        display: block;
-    }
-
-    .menu{
-        width:100%;
-        position:absolute;
-        top:100%;
-        left:0;
-        background: white;
-        border-top: .1rem solid #222f37;
-        display:none;
-    }
-
-    .menu.active{
-        display:initial
-    }
-
-    .menu li{
-        width:100%;
-        border-top: .1rem solid #222f37;
-    }
-
-    .submenu{
-        position: relative;
-        width:100%;
-    }
-
-    .submenu li{
-        background: white;
-        border-top: .1rem solid #101d23;
-    }
-    .menu li a{
-        color: black;
-    }
-    .submenu li a{
-        padding-left:2rem;
-        color :black;
-    }
+.back-btn:hover {
+    background: darkgray;
 }

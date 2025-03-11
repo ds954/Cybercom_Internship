@@ -1,95 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile</title>
-    <link rel="stylesheet" href="/static/Edit_Profile.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Edit Profile</h1>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'Edit_Profile.css' %}"> 
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Profile</h1>
+
+    <form method="post" class="edit-profile-form" enctype="multipart/form-data">
+        {% csrf_token %}
 
         <!-- Profile Photo Section -->
         <div class="profile-photo-container">
-            <!-- Default Profile Photo -->
-            <img src="{{ user.profile_picture.url|default:'/static/img/default.jpg' }}" alt="Profile Photo" class="profile-photo" id="profile-photo">
-
+            <!-- Dynamically display existing profile picture or default -->
+            <img 
+                src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'default.jpg' %}{% endif %}" 
+                alt="Profile Photo" 
+                class="defaultImg" 
+                id="profile-photo"
+            >
 
             <!-- Upload Photo Text -->
             <label for="profile-photo-upload" class="upload-text">Upload Photo</label>
 
-            <!-- Remove Photo Button -->
-            <button id="remove-photo-btn" class="remove-photo-btn" style="display: none;">Remove Photo</button>
             <!-- Hidden File Input -->
-            <input type="file" id="profile-photo-upload" name="profile-photo" style="display: none;" accept="image/*">
+            <input type="file" id="profile-photo-upload" name="profile_picture" style="display: none;" accept="image/*">
+
+            <!-- Remove Photo Button (show if profile picture exists) -->
+            <button type="button" id="remove-photo-btn" class="remove-photo-btn 
+            {% if user.profile_picture %}
+                show-button
+            {% else %}
+                hide-button
+            {% endif %}">
+            Remove Photo
+        </button>
+
+
+            <!-- Hidden field to indicate photo removal -->
             <input type="hidden" name="remove_picture" id="remove-picture" value="">
         </div>
 
+        <!-- Username -->
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required value="{{ user.username }}" placeholder="Enter your username">
 
+        <!-- First Name -->
+        <label for="first-name">First Name</label>
+        <input type="text" id="first-name" name="first_name" required value="{{ user.first_name }}" placeholder="Enter your first name">
 
-        
+        <!-- Last Name -->
+        <label for="last-name">Last Name</label>
+        <input type="text" id="last-name" name="last_name" required value="{{ user.last_name }}" placeholder="Enter your last name">
 
-        <form method="post" class="edit-profile-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <!-- Username -->
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required value="{{ user.Username }}" placeholder="Enter your username">
+        <!-- Phone Number -->
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone_number" required value="{{ user.phone }}" placeholder="Enter your phone number">
 
-            <!-- First Name -->
-            <label for="first-name">First Name</label>
-            <input type="text" id="first-name" name="first_name" required value="{{ user.firstname }}" placeholder="Enter your first name">
+        <!-- Submit -->
+        <button type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}
 
-            <!-- Last Name -->
-            <label for="last-name">Last Name</label>
-            <input type="text" id="last-name" name="last_name" required value="{{ user.lastname }}" placeholder="Enter your last name">
+{% block extra_scripts %}
 
-            <!-- Phone Number -->
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone_number" required value="{{ user.phone }}"  placeholder="Enter your phone Number">
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const uploadText = document.querySelector('.upload-text');
+    const fileInput = document.getElementById('profile-photo-upload');
+    const removeButton = document.getElementById('remove-photo-btn');
+    const profilePhoto = document.getElementById('profile-photo');
+    const removePictureInput = document.getElementById('remove-picture');
 
-            <button type="submit">Update</button>
-        </form>
-    </div>
-    <script>
-        // JavaScript to trigger file input when clicking on "Upload Photo"
-        const uploadText = document.querySelector('.upload-text');
-        const fileInput = document.getElementById('profile-photo-upload');
-        const removeButton = document.getElementById('remove-photo-btn');
-        const profilePhoto = document.getElementById('profile-photo');
-        const removePictureInput = document.getElementById('remove-picture');
-    
-        // Open the file input dialog when "Upload Photo" is clicked
-        uploadText.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default label behavior
-            fileInput.click();
-        });
-    
-        // Handle file selection
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                // Display the selected image as the profile photo
-                const reader = new FileReader();
-                reader.onload = () => {
-                    profilePhoto.src = reader.result;
-                    removeButton.style.display = 'block';  // Show the remove button
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    
-       // Handle remove photo button click
-       removeButton.addEventListener('click', () => {
-                profilePhoto.src = '/static/img/default.jpg';  // Reset to default image
-                removeButton.style.display = 'none';  
-                fileInput.value = '';  
-                removePictureInput.value = 'true';  // Set hidden input to true
-            });
+    if (!uploadText || !fileInput || !removeButton || !profilePhoto || !removePictureInput) {
+        console.error('One or more elements not found.');
+        return;
+    }
 
+    uploadText.addEventListener('click', (event) => {
+        event.preventDefault();
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                profilePhoto.src = reader.result;
+                removeButton.style.display = 'block';
+                removePictureInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeButton.addEventListener('click', () => {
+        profilePhoto.src = "{% static 'default.jpg' %}"; // use your path here
+        removeButton.style.display = 'none';
+        fileInput.value = '';
+        removePictureInput.value = 'true';
+    });
+});
 </script>
-    
-    
 
-</body>
-</html>
+
+{% endblock %}

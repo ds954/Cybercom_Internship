@@ -1,55 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drop Down Menu</title>
-    <link rel="stylesheet" href="/static/home.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="logo">
-            <img src="#" alt="">
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Home Page {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'home.css' %}"> 
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Available Books</h2>
+        <div class="row">
+            {% for book in books %}
+            <div class="col-md-4">
+                <div class="book-card">
+                    <div class="card-body">
+                        <h5 class="book-title">{{ book.title }}</h5>
+                        <p class="book-author"><strong>Author:</strong> {{ book.author }}</p>
+                        <p class="book-category"><strong>Category:</strong> {{ book.category }}</p>
+                        <p class="book-description"><strong>Description:</strong> {{ book.description|truncatewords:15 }}</p>
+                        <p class="book-availability">
+                            <strong>Availability:</strong> 
+                            {% if book.is_available %}
+                                <span class="available">Available</span>
+                            {% else %}
+                                <span class="not-available">Not Available</span>
+                            {% endif %}
+                        </p>
+                        <p class="book-quantity"><strong>Quantity:</strong> {{ book.quantity }}</p>
+                        {% if book.is_available  %}
+
+                            <form method="post" action="{% url 'request_book' book.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="request-btn">Request Book</button>
+                            </form>
+                        {% else %}
+                            <button class="request-btn disabled" disabled>Out of Stock</button>
+                        {% endif %}
+                        <a href="{% url 'book_detail' book.id %}" class="view-details">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        <div class="toggle-btn">
-            <div class="icon"></div>
-        </div>
-        <ul class="menu">
-            <li><a href="#">home</a></li>
-            <li><a href="#">About</a></li>
-            <li class="submenu-wrapper">
-                <img src="{{ user.profile_picture.url|default:'/static/img/default.jpg' }}" alt="Profile Photo" class="profile-photo">
-                <ul class="submenu">
-                    <li><a href="{% url 'edit_profile' %}">Edit Profile</a></li>
-                    <li><a href="#">Borrow History</a></li>
-                    <li><a href="#">Notifications</a></li>
-                    <li><a href="#">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-    
-    <script>
-        const icon = document.querySelector('.icon');
-        const menu = document.querySelector('.menu');
-        const toggleBtn = document.querySelector('.toggle-btn');
-        const profilePhoto = document.querySelector('.profile-photo');
-        const submenu = document.querySelector('.submenu');
-    
-        // Toggle menu visibility
-        function toggleNavbar() {
-            menu.classList.toggle('active');
-            icon.classList.toggle('active');
-        }
-    
-        toggleBtn.addEventListener('click', function () {
-            toggleNavbar();
-        });
-    
-        // Toggle the profile dropdown
-        profilePhoto.addEventListener('click', function () {
-            submenu.classList.toggle('active');
-        });
-        </script>
-</body>
-</html>
+    </div>
+
+{% endblock %}

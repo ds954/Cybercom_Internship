@@ -34,6 +34,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    'channels',
+    'import_export',
     "app",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -70,14 +73,19 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'app.context_processors.user_profile',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = "Library_Management_System.wsgi.application"
-
-
+ASGI_APPLICATION = 'Library_Management_System.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
