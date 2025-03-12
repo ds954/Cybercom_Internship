@@ -32,10 +32,11 @@ html, body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;  /* Centers horizontally */
-    align-items: center;      /* Centers vertically */
-    background-color: #FDF9F6; /* Light background */
+    justify-content: center;  
+    align-items: center;      
+    background-color: #FDF9F6; 
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .navbar{
@@ -51,11 +52,12 @@ html, body {
 }
 
 .logo {
-    width: 60px; /* Adjust size as needed */
+    width: 80px; /* Adjust size as needed */
     overflow: hidden; /* Ensures the image doesn’t overflow */
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 2px;
 }
 .logo img{
     width: 100%; 
@@ -174,14 +176,13 @@ html, body {
 
  main {
     flex: 1; /* Pushes the footer to the bottom */
-    overflow-y: auto; /* Allows scrolling */
     padding: 20px; /* Add spacing */
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 60px);
+    /* min-height: calc(100vh - 60px); */
     width: 100%;
-    margin-top: 250px;
+    /* margin-top: 250px; */
 } 
 footer {
     width: 100vw;  /* Ensures it spans the full viewport width */
@@ -193,12 +194,12 @@ footer {
     color: #333;
 }
 
-.footer-container {
+/* .footer-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
     align-items: start;
-}
+} */
 
 footer .quick-links,
 footer .other-links {
@@ -217,9 +218,9 @@ footer a:hover {
 }
 
 footer p {
-    margin-top: 20px;
+    /* margin-top: 20px; */
     font-size: 14px;
-    color: #777;
+    color: #000000;
     text-align: center;
 }
 
@@ -294,6 +295,10 @@ footer p {
     color: #333;
     margin-right: 8px;
     margin-top: 10px;
+  }
+  .bell{
+    margin-top: 2px;
+    margin-right: 10px;
   }
   
   /* Search Input */

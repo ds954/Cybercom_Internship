@@ -1,47 +1,165 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %} Home Page {% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'home.css' %}"> 
+    {% block title %}Library Sidebar{% endblock %}
+    
+    
+    {% block extra_head %}
+    <style>
+        
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #cea387;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            margin-top: 50px;
+        }
+        .sidebar h2 {
+            text-align: center;
+            border-bottom: 1px solid gray;
+            padding-bottom: 10px;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar-menu li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .sidebar-menu li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+        .sidebar-menu li:hover {
+            background-color: #e3c09f;
+        }
+        .editable {
+            border: none;
+            background: none;
+            color: white;
+            width: 100%;
+            font-size: 16px;
+        }
+        main{
+            max-height: 400px;
+            height: 300px;
+            width: 1000px;
+        }
+.dashboard-content {
+    flex: 1;
+    padding: 20px;
+    align-items: start;
+}
+.Welcome{
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+.summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.card {
+    border: solid 1px black;
+    padding: 20px;
+    flex: 1;
+    text-align: center;
+}
+
+.overdue {
+    border: solid 1px black;
+    color: black;
+}
+
+.renewals {
+    border: solid 1px black;
+    color: black;
+}
+
+.returned{
+    border: solid 1px black;
+    color: black;
+}
+
+
+
+ .notifications {
+    border: solid 1px black;
+    margin-top: 30px;
+    padding: 10px;
+    width: 50%;
+    text-align: center;
+
+}
+
+ .notifications ul {
+    list-style: none;
+    padding: 0;
+}
+footer{
+    position: fixed;
+}
+
+    </style>
 {% endblock %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">Available Books</h2>
-        <div class="row">
-            {% for book in books %}
-            <div class="col-md-4">
-                <div class="book-card">
-                    <div class="card-body">
-                        <h5 class="book-title">{{ book.title }}</h5>
-                        <p class="book-author"><strong>Author:</strong> {{ book.author }}</p>
-                        <p class="book-category"><strong>Category:</strong> {{ book.category }}</p>
-                        <p class="book-description"><strong>Description:</strong> {{ book.description|truncatewords:15 }}</p>
-                        <p class="book-availability">
-                            <strong>Availability:</strong> 
-                            {% if book.is_available %}
-                                <span class="available">Available</span>
-                            {% else %}
-                                <span class="not-available">Not Available</span>
-                            {% endif %}
-                        </p>
-                        <p class="book-quantity"><strong>Quantity:</strong> {{ book.quantity }}</p>
-                        {% if book.is_available  %}
-
-                            <form method="post" action="{% url 'request_book' book.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="request-btn">Request Book</button>
-                            </form>
-                        {% else %}
-                            <button class="request-btn disabled" disabled>Out of Stock</button>
-                        {% endif %}
-                        <a href="{% url 'book_detail' book.id %}" class="view-details">View Details</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    {% block search-content %}
+    {% endblock %}
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <ul class="sidebar-menu">
+            <!-- <li><a href="{% url 'book' %}">Books</a></li>
+            <li><a href="{% url 'borrow_history' %}">History</a></li> -->
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+        </ul>
     </div>
+    <div class="dashboard-content">
+        <section class="Welcome"> <h1>Welcome, {{ user.firstname }}</h1></section>
+       
+       
 
-{% endblock %}
+        <section class="summary">
+            <div class="card">
+                <a href="{% url 'borrow_history' %}" style="text-decoration: none; color: black;"><h3>My Books</h3></a>
+                <p>15</p>
+                <p>{{ borrowed_count }}</p>
+            </div>
+            <div class="card overdue">
+                <h3>Overdue Books</h3>
+                <p>15</p>
+                <p>{{ overdue_count }}</p>
+            </div>
+            <div class="card renewals">
+                <h3>Pending Renewals</h3>
+                <p>15</p>
+                <p>{{ renewal_count }}</p>
+            </div>
+            <div class="card returned">
+                <h3>Returned books</h3>
+                <p>2</p>
+                <p>{{ renewal_count }}</p>
+
+            </div>
+        </section>
+        
+        
+        <section class="notifications">
+            <h2>Notifications</h2>
+            <p>1</p>
+           
+        </section>
+        </div>
+    {% endblock %}
+
+

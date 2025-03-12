@@ -9,7 +9,6 @@
 
 {% block content %}
 <div class="container">
-    <h1>Edit Profile</h1>
 
     <form method="post" class="edit-profile-form" enctype="multipart/form-data">
         {% csrf_token %}
@@ -47,15 +46,15 @@
 
         <!-- Username -->
         <label for="username">Username</label>
-        <input type="text" id="username" name="username" required value="{{ user.username }}" placeholder="Enter your username">
+        <input type="text" id="username" name="username" required value="{{ user.Username }}" placeholder="Enter your username">
 
         <!-- First Name -->
         <label for="first-name">First Name</label>
-        <input type="text" id="first-name" name="first_name" required value="{{ user.first_name }}" placeholder="Enter your first name">
+        <input type="text" id="first-name" name="first_name" required value="{{ user.firstname }}" placeholder="Enter your first name">
 
         <!-- Last Name -->
         <label for="last-name">Last Name</label>
-        <input type="text" id="last-name" name="last_name" required value="{{ user.last_name }}" placeholder="Enter your last name">
+        <input type="text" id="last-name" name="last_name" required value="{{ user.lastname }}" placeholder="Enter your last name">
 
         <!-- Phone Number -->
         <label for="phone">Phone Number</label>

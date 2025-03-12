@@ -36,6 +36,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 INSTALLED_APPS = [
     "daphne",
     'channels',
+    'background_task',
     'import_export',
     "app",
     "django.contrib.admin",

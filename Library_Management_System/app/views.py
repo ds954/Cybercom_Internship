@@ -9,13 +9,18 @@ from .models import UserInfo
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import Book,BorrowRequest
+from .models import Book,BorrowRequest,Notification
 from .forms import ProfileForm
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib import messages
 from django.contrib import admin
 from django.utils import timezone
+from app.decoraters import session_login_required
+from django.contrib.auth.decorators import login_required
+from .tasks import send_due_date_notifications
+
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -78,6 +83,7 @@ def login_view(request):
 
     return render(request, 'login.html')
 
+@login_required(login_url='/login/')
 def home(request):
     from .models import UserInfo
     user_id = request.session.get('user_id')
@@ -145,7 +151,18 @@ def reset_password(request, user_id):
 
     return render(request, 'reset_password.html', {'user_id': user_id})
 
+@session_login_required
+def view_profile(request):
+    user_id = request.session.get('user_id')
 
+    # Fetch the user from the database
+    user = get_object_or_404(UserInfo, id=user_id)
+
+    
+
+    return render(request, 'view_profile.html', { 'user': user})
+
+@session_login_required
 def edit_profile(request):
     user_id = request.session.get('user_id')
     user, created = UserInfo.objects.get_or_create(id=user_id)
@@ -157,10 +174,11 @@ def edit_profile(request):
         phone = request.POST.get('phone_number')
         remove_picture = request.POST.get('remove_picture')
 
+
         # Update basic fields
-        user.username = username
-        user.first_name = firstname
-        user.last_name = lastname
+        user.Username = username
+        user.firstname = firstname
+        user.lastname = lastname
         user.phone = phone
 
         # Handle form for file upload
@@ -192,14 +210,23 @@ def edit_profile(request):
 
     return render(request, 'Edit_Profile.html', {'form': form, 'user': user})
 
+@session_login_required
+def home(request):
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(UserInfo, id=user_id)
+    return render(request,'home.html',{'user':user})
+
+@session_login_required
 def book_list(request):
     books = Book.objects.all()  # Fetch all books from the database
-    return render(request, 'home.html', {'books': books})
+    return render(request, 'book.html', {'books': books})
 
+@session_login_required
 def book_detail(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     return render(request, 'book_detail.html', {'book': book})
 
+@session_login_required
 def search_books(request):
     query = request.GET.get('q', '').strip()  # get search query from URL params
     books = []
@@ -222,7 +249,7 @@ def search_books(request):
         'profile_user': profile_user,
     })
 
-
+@session_login_required
 def borrow_history(request):
     print(request.user)
     print(request.session.get('user_id'))
@@ -236,7 +263,7 @@ def borrow_history(request):
     # print(borrow_requests)
     return render(request, 'borrow_history.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
    
-
+@session_login_required
 def request_book(request, book_id):
         if request.method == "POST":
             user_id = request.session.get('user_id')
@@ -245,7 +272,7 @@ def request_book(request, book_id):
 
             if not book.is_available:
                 messages.error(request, "This book is not available right now.")
-                return redirect('home')
+                return redirect('book')
 
             borrow_request = BorrowRequest.objects.create(
                 user=user,
@@ -254,8 +281,9 @@ def request_book(request, book_id):
                 status="pending"
             )
             messages.success(request, "Your request has been submitted.")
-        return redirect('borrow_history')
+        return redirect('notification')
 
+@session_login_required
 def returned_books(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id)
@@ -266,6 +294,8 @@ def returned_books(request):
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()
     })
+
+@session_login_required
 def canceled_books(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id)
@@ -277,6 +307,7 @@ def canceled_books(request):
         'today': timezone.now().date()
     })
 
+@session_login_required
 def renewal_books(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id)
@@ -288,6 +319,7 @@ def renewal_books(request):
         'today': timezone.now().date()
     })
 
+@session_login_required
 def request_renewal(request,request_id):
     borrow_request = BorrowRequest.objects.get(id=request_id)
     borrow_request.status = 'renewal_requested'
@@ -300,7 +332,7 @@ def request_renewal(request,request_id):
     )
     return redirect('borrow_history')   
 
-
+@session_login_required
 def cancel_book(request,request_id):
      print(f"Cancelling request {request_id}") 
      cancel_request=BorrowRequest.objects.get(id=request_id)
@@ -313,18 +345,18 @@ def cancel_book(request,request_id):
          {"type":"cancel_request","status":cancel_request.status, "book":cancel_request.book.title}
      )
 
-    #  subject = "Library Borrow Request Canceled"
-    #  message = f"Your borrow request for '{cancel_request.book. title}' has been canceled."
-    #  recipient_email = cancel_request.user.email  
+     subject = "Library Borrow Request Canceled"
+     message = f"Your borrow request for '{cancel_request.book. title}' has been canceled."
+     recipient_email = cancel_request.user.email  
         
-    #  send_mail(subject, message, settings.EMAIL_HOST_USER, [recipient_email])
+     send_mail(subject, message, settings.EMAIL_HOST_USER, [recipient_email])
 
         # Display message on the screen
      messages.success(request, f"Borrow request for '{cancel_request.book.title}' has been canceled successfully.")
 
-     return redirect('borrow_history')
+     return redirect('notification')
 
-
+@session_login_required
 def return_book(request,request_id):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id) 
@@ -351,4 +383,25 @@ def return_book(request,request_id):
     )
     messages.success(request, f"You have successfully returned '{borrow_request.book.title}' book.")
 
-    return redirect('borrow_history')
+    return redirect('notification')
+
+@session_login_required
+def notification(request):
+    """Triggers Celery task and returns due books for the user."""
+
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(UserInfo, id=user_id) 
+    print(user)
+    # send_due_date_notifications.delay(user.id)
+    send_due_date_notifications(user.id,repeat=60)
+    print(f"Task sent for user: {user.id}")
+    today = timezone.now().date()
+    Duedate = BorrowRequest.objects.filter(user=user, Duedate=today + timezone.timedelta(days=3))
+    user_notifications = Notification.objects.filter(user=user).order_by('-timestamp')[:50]
+    
+    return render(request, "notification.html", {"due_books": Duedate,'user_notifications': user_notifications})
+
+def logout_view(request):
+    a=request.session.flush()  # Clears all session data
+    print(a)
+    return redirect('login')

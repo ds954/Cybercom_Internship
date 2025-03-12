@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserInfo, Book, BookCopy,BorrowRequest
+from .models import UserInfo, Book, BookCopy,BorrowRequest,Notification
 from import_export.admin import ImportExportModelAdmin
 from .resources import BookResource
 from django.contrib import messages
@@ -14,7 +14,7 @@ from datetime import timezone
 
 # Register your models
 admin.site.register(UserInfo)
-
+admin.site.register(Notification)
 
 @admin.register(BookCopy)
 class BookCopyAdmin(admin.ModelAdmin):
@@ -150,22 +150,29 @@ class BorrowRequestAdmin(admin.ModelAdmin):
             message = f"You returned '{borrow_request.book.title}'."
 
 
-        # print('Sending mail')
-        # send_mail(
-        #     subject,
-        #     message,
-        #     settings.EMAIL_HOST_USER,  
-        #     [borrow_request.user.email],  
-        #     fail_silently=False,
-        # )
-
+        print('Sending mail')
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,  
+            [borrow_request.user.email],  
+            fail_silently=False,
+        )
+        Notification.objects.create(
+        user=borrow_request.user,
+        message=message
+        )
         # Send real-time notification to user
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f"user_{borrow_request.user.id}",
-            {"type": "status_update", "status": borrow_request.status, "book": borrow_request.book.title}
+            {"type": "status_update", "status": borrow_request.status, "book": borrow_request.book.title,"message": message}
         )
         print("see message")
         messages.success(request, f"Request {status} successfully!")
+        messages.success(request, message)
+
+        
+        # return redirect('user_notifications')
         return redirect('/admin/app/borrowrequest/')
         

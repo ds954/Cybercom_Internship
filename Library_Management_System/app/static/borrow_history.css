@@ -1,13 +1,12 @@
 .borrow-history-container {
     width: 80%;
     margin: auto;
-    background: white;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
-
+main{
+    margin-top: 80px;
+}
 .borrow-history-table {
     width: 100%;
     border-collapse: collapse;

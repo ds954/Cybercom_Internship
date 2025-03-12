@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}view Profile{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'view_profile.css' %}"> 
+    <style>
+        footer{
+            position: fixed;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding: 40px;
+            gap: 20px;
+        }
+
+        .left-section,
+        .right-section {
+            padding: 20px;
+        }
+
+        .left-section {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        .right-section {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-photo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .defaultImg {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            margin-bottom: 15px;
+        }
+
+        
+
+        .edit-profile-link {
+            text-align: center;
+        }
+
+        .edit-profile-link a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .edit-profile-link a:hover {
+            text-decoration: underline;
+        }
+        .left-section p{
+            margin-top: 7px;
+            font-size:large ;
+        }
+
+       
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class="left-section">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Username -->
+         <p>Username: {{user.Username}}</p>
+        
+        
+        <!-- First Name -->
+        
+        <p>First name: {{ user.firstname }}</p>
+        
+        <!-- Last Name -->
+        <p>Last name: {{ user.lastname }}</p>
+        
+        
+        <!-- Phone Number -->
+        <p>Phone Number: {{ user.phone }}</p>
+        
+
+        <!-- Submit -->
+        <!-- <button type="submit">Update</button> -->
+    </form>
+</div>
+
+    <!-- Right Section - Profile Photo and Edit Profile Link -->
+    <div class="right-section">
+        <div class="profile-photo-container">
+            <!-- Dynamically display existing profile picture or default -->
+            <img 
+                src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'default.jpg' %}{% endif %}" 
+                alt="Profile Photo" 
+                class="defaultImg" 
+                id="profile-photo"
+            >
+            </div>
+
+           
+        <!-- Edit Profile Link -->
+        <div class="edit-profile-link">
+            <a href="{% url 'edit_profile' %}">Edit Profile</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

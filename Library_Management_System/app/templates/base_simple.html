@@ -8,7 +8,11 @@
     <link rel="stylesheet" href="{% static 'base.css' %}"> 
     <!-- <link rel="stylesheet" href="/Library_Management_System/app/static/home.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <style>
+        main{
+            width: 700px;
+        }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -30,28 +34,13 @@
                   <input type="text" name="search" placeholder="Search..." class="search-input" id="search-input">
                 </li>
                -->
-                {% block search-content %}
-               <li class="search-container">
-                <form action="{% url 'search_books' %}" method="get" style="display: flex; align-items: center;">
-                  <i class="fas fa-search search-icon" id="search-icon"></i>
-                  <input type="text" name="q" placeholder="Search..." class="search-input" id="search-input">
-                  <button type="submit" style="border: none; background: none;">
-                    <!-- <i class="fas fa-arrow-right"></i> -->
-                  </button>
-                </form>
-              </li>
-              {% endblock %}
-            <li><a href="{% url 'home' %}">Home</a></li>
+               
+              
+            <!-- <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'book' %}">Books</a></li>
-            <li><a href="{% url 'borrow_history' %}">History</a></li>
-            <li><a href="#">About</a></li>
-
-            <li class="bell">
-                <a href="{% url 'notification' %}">
-                <img src="{% static 'bell.png' %}" alt="" style="height: 20px; width: 20px;" >
-                </a>
-            </li>
-            <li class="submenu-wrapper">
+            <li><a href="{% url 'borrow_history' %}">History</a></li> -->
+            <!-- <li><a href="#">About</a></li> -->
+            <!-- <li class="submenu-wrapper">
 
                 {% if profile_user and profile_user.profile_picture %}
                     <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" id="profile-photo" class="profile-photo">
@@ -61,15 +50,15 @@
               
                 <ul class="submenu">
                     <li><a href="{% url 'view_profile' %}">Profile</a></li>
-                    <!-- <li><a href="{% url 'borrow_history' %}">History</a></li>
+                     <li><a href="{% url 'borrow_history' %}">History</a></li>
                     <li><a href="{% url 'returned_books' %}">Returned Book</a></li>
                     <li><a href="{% url 'canceled_books' %}">Cancled Book</a></li>
                     <li><a href="{% url 'renewal_books' %}">Renewal Book</a></li> -->
                     <!-- <li><a href="#">Notifications</a></li> -->
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    <!-- <li><a href="{% url 'login' %}">Logout</a></li>
                 </ul>
             </li>
-        </ul>
+        </ul> -->
         
         
     </nav>
@@ -85,10 +74,10 @@
     <!-- ======= PAGE CONTENT END ======= -->
 
     <!-- ======= FOOTER START ======= -->
-    <footer>
+    <!-- <footer>
         <div class="footer-container">
             <p style="color: black;">&copy; 2025 Library Management System </p>
-            <p>version 1.0.0</p> 
+            <p>version 1.0.0</p>  -->
             <!-- <div class="logo">
                 <img src="/static/logo.png" alt="logo">
             </div> -->
@@ -105,9 +94,9 @@
                 <a href="#">Privacy Policy</a>
                 <a href="#">Terms of Service</a>
             </div> -->
-        </div>
+        <!-- </div> -->
         <!-- <p>&copy; 2024 Your Library Name. All Rights Reserved.</p> -->
-    </footer>
+    <!-- </footer> -->
     
     
 </div>

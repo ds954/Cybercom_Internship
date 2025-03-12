@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Home Page {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'home.css' %}"> 
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Available Books</h2>
+        <div class="row">
+            {% for book in books %}
+            <div class="col-md-4">
+                <div class="book-card">
+                    <div class="card-body">
+                        <h5 class="book-title">{{ book.title }}</h5>
+                        <p class="book-author"><strong>Author:</strong> {{ book.author }}</p>
+                        <p class="book-category"><strong>Category:</strong> {{ book.category }}</p>
+                        <p class="book-description"><strong>Description:</strong> {{ book.description|truncatewords:15 }}</p>
+                        <p class="book-availability">
+                            <strong>Availability:</strong> 
+                            {% if book.is_available %}
+                                <span class="available">Available</span>
+                            {% else %}
+                                <span class="not-available">Not Available</span>
+                            {% endif %}
+                        </p>
+                        <p class="book-quantity"><strong>Quantity:</strong> {{ book.quantity }}</p>
+                        {% if book.is_available  %}
+
+                            <form method="post" action="{% url 'request_book' book.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="request-btn">Request Book</button>
+                            </form>
+                        {% else %}
+                            <button class="request-btn disabled" disabled>Out of Stock</button>
+                        {% endif %}
+                        <a href="{% url 'book_detail' book.id %}" class="view-details">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

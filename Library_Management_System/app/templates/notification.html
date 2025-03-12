@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} notification Page {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'borrow_history.css' %}"> 
+    <style>
+        
+        main{
+            align-items: start;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+           
+        }
+        .alert {
+            padding: 10px;
+            background-color: #efe7e7;
+            color: black;
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+{% block search-content %}
+{% endblock %}
+
+<div class="container">
+    <h2>Notifications</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
+    {% endif %}
+    {% for notification in user_notifications %}
+        <div class="alert">
+            <strong></strong> {{ notification.message }}
+        </div>
+    {% empty %}
+        <p>No notifications found.</p>
+    {% endfor %}
+    <div id="notification-box"></div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+    <script>
+    var socket = new WebSocket("ws://localhost:8000/ws/notifications/");
+
+    socket.onopen = function() {
+        console.log("Connected to WebSocket");
+    };
+    
+    socket.onmessage = function(event) {
+        console.log(" Message received:", event.data);
+        var data = JSON.parse(event.data);
+        var notificationBox = document.getElementById("notification-box");
+        var newNotification = document.createElement("div");
+        newNotification.classList.add("alert");
+        newNotification.innerHTML = `<strong>Reminder:</strong> ${data.message}`;
+        notificationBox.appendChild(newNotification);
+    };
+    
+    socket.onerror = function(error) {
+        console.error("WebSocket Error:", error);
+    };
+    
+    socket.onclose = function(e) {
+        console.warn("WebSocket closed unexpectedly:", e);
+    };
+</script>
+    
+{% endblock %}
+    

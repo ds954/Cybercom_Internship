@@ -14,13 +14,12 @@ body {
     height: 100vh;
 }
 
+
 /* Container */
 .container {
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 800px;
+    width: 300px;
     text-align: center;
 }
 
@@ -113,6 +112,5 @@ body {
     .container {
         width: 90%;
         padding: 20px;
-        margin-top: 150px;
     }
 }

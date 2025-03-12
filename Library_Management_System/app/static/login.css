@@ -24,15 +24,10 @@ html, body {
 }
 /* Container */
 .container {
-    flex: 1;  /* Expands to push footer down */
-    overflow-y: auto; /* Makes it scrollable */
-    padding: 20px;
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;  /* Expands to push footer down */   
     width: 100%;
     max-width: 400px;
+    width: 200px;
     text-align: center;
 }
 
@@ -89,7 +84,7 @@ html, body {
 
 /* Login Button */
 .login-form button {
-    background: #C9A38D;
+    background: #9C6B4A;
     color: white;
     padding: 12px;
     border: none;
