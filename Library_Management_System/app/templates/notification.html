@@ -15,12 +15,30 @@
             padding: 20px;
            
         }
-        .alert {
-            padding: 10px;
-            background-color: #efe7e7;
-            color: black;
-            margin-bottom: 10px;
+        .notification{
+            margin-bottom: 20px;
         }
+        .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background: none;
+        color: black;
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .alert {
+        position: relative;
+        padding: 10px;
+        background-color: #efe7e7;
+        color: black;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
     </style>
 {% endblock %}
 
@@ -29,15 +47,20 @@
 {% endblock %}
 
 <div class="container">
-    <h2>Notifications</h2>
+    <h2 class="notification">Notifications</h2>
     {% if messages %}
         {% for message in messages %}
             <p>{{message}}</p>
         {% endfor %}
     {% endif %}
     {% for notification in user_notifications %}
-        <div class="alert">
+        <!-- <div class="alert">
             <strong></strong> {{ notification.message }}
+            <button class="close-btn" onclick="removeNotification(this)">Close</button>
+        </div> -->
+        <div class="alert" id="notification-{{ notification.id }}">
+            <strong></strong> {{ notification.message }}
+            <button class="close-btn" onclick="removeNotification('{{ notification.id }}')">&times;</button>
         </div>
     {% empty %}
         <p>No notifications found.</p>
@@ -59,9 +82,11 @@
     socket.onmessage = function(event) {
         console.log(" Message received:", event.data);
         var data = JSON.parse(event.data);
+        var message = data['message'];
         var notificationBox = document.getElementById("notification-box");
         var newNotification = document.createElement("div");
         newNotification.classList.add("alert");
+        newNotification.innerText = message
         newNotification.innerHTML = `<strong>Reminder:</strong> ${data.message}`;
         notificationBox.appendChild(newNotification);
     };
@@ -73,6 +98,32 @@
     socket.onclose = function(e) {
         console.warn("WebSocket closed unexpectedly:", e);
     };
+ 
+    document.addEventListener("DOMContentLoaded", function() {
+        let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications")) || [];
+        
+        // Hide notifications that were previously closed
+        hiddenNotifications.forEach(notificationId => {
+            let notification = document.getElementById(`notification-${notificationId}`);
+            if (notification) {
+                notification.style.display = "none";
+            }
+        });
+    });
+
+    function removeNotification(notificationId) {
+        let notification = document.getElementById(`notification-${notificationId}`);
+        if (notification) {
+            notification.style.display = "none";
+
+            // Store hidden notification in localStorage
+            let hiddenNotifications = JSON.parse(localStorage.getItem("hiddenNotifications")) || [];
+            if (!hiddenNotifications.includes(notificationId)) {
+                hiddenNotifications.push(notificationId);
+                localStorage.setItem("hiddenNotifications", JSON.stringify(hiddenNotifications));
+            }
+        }
+    }
 </script>
     
 {% endblock %}

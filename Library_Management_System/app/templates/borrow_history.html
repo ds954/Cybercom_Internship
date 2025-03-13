@@ -5,7 +5,15 @@
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'borrow_history.css' %}"> 
 {% endblock %}
-
+{% block submenu %}
+<ul class="submenu">
+    <li><a href="{% url 'view_profile' %}">Profile</a></li>
+    <li><a href="{% url 'returned_books' %}">Returned Book</a></li>
+    <li><a href="{% url 'canceled_books' %}">Cancled Book</a></li>
+    <li><a href="{% url 'renewal_books' %}">Renewal Book</a></li> 
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+</ul>
+{% endblock %}
 {% block content %}
 {% block search-content %}
 {% endblock %}

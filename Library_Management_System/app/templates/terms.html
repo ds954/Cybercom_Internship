@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service{% endblock %}
+
+{% block extra_head %}
+<style>
+    main {
+        padding-top: 100px;
+        padding-bottom: 200px;
+        padding-right: 150px;
+        padding-left: 150px;
+        display: block;
+        /* overflow-y: scroll; */
+    }
+
+    /* body {
+        
+    } */
+
+    footer {
+        position: fixed;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    .main-container {
+        width: 100%;
+        margin: auto;
+        margin-top: 100px;
+    }
+
+    .container {
+        margin-bottom: 20px;
+    }
+
+    .container li {
+        /* margin-left: 50px; */
+        list-style: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% block search-content %}
+{% endblock %}
+<div class="main-container">
+    <div class="container">
+        <h1>Library Management System - Terms of Service</h1>
+    </div>
+
+    <div class="container">
+        <h3>Acceptance of Terms</h3>
+        <p>By accessing and using our Library Management System, you agree to comply with and be bound by these Terms of Service.</p>
+    </div>
+
+    <div class="container">
+        <h3>Borrowing Policy</h3>
+        <ul>
+
+            <li>The borrowing period is 60 days, with one renewal option if no reservations are pending.</li>
+            <li>Books must be returned on or before the due date.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h3>Late Returns</h3>
+        <ul>
+            <li>Failure to return books within 30 days of the due date may result in suspension of borrowing privileges.</li>
+        </ul>
+    </div>
+
+    <!-- <div class="container">
+        <h3>4. Lost or Damaged Items</h3>
+        <ul>
+            <li>Users are responsible for the replacement cost of any lost or damaged items.</li>
+        </ul>
+    </div> -->
+
+    <div class="container">
+        <h3>User Accounts</h3>
+        <ul>
+            <li>Each user is responsible for maintaining the confidentiality of their account information.</li>
+            <li>Accounts may be suspended or terminated for violation of these terms.</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h3>Privacy Policy</h3>
+        <p>We respect your privacy and are committed to protecting your personal information. Refer to our Privacy Policy for details.</p>
+    </div>
+
+    <div class="container">
+        <h3>Changes to the Terms</h3>
+        <p>We reserve the right to modify these Terms at any time. We will notify users of any significant changes.</p>
+    </div>
+
+    <div class="container">
+        <h3>Contact Us</h3>
+        <p>If you have any questions about these Terms, please contact us at .</p>
+    </div>
+</div>
+{% endblock %}

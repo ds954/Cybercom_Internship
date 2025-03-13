@@ -214,7 +214,17 @@ def edit_profile(request):
 def home(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id)
-    return render(request,'home.html',{'user':user})
+
+    borrowed_count = BorrowRequest.objects.filter(user=user, status__in=['accepted','renew_accpect']).count()
+    overdue_count = BorrowRequest.objects.filter(user=user, Duedate__lt=timezone.now(), status='accepted').count()
+    renewal_count = BorrowRequest.objects.filter(user=user, status='renewal_requested').count()
+    returned_count = BorrowRequest.objects.filter(user=user, status='book_returned').count()
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+
+    return render(request,'home.html',{'user':user,'borrowed_count': borrowed_count,
+            'overdue_count': overdue_count,
+            'renewal_count': renewal_count,
+            'returned_count': returned_count,'notification_count': notification_count})
 
 @session_login_required
 def book_list(request):
@@ -262,6 +272,50 @@ def borrow_history(request):
     borrow_requests = BorrowRequest.objects.filter(user=user)
     # print(borrow_requests)
     return render(request, 'borrow_history.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+
+@session_login_required
+def user_book(request):
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirect if user is not logged in
+
+    user = get_object_or_404(UserInfo, id=user_id)
+    borrow_requests = BorrowRequest.objects.filter(user=user)
+    return render(request, 'user_book.html', {'borrow_requests': borrow_requests})
+
+@session_login_required
+def user_duebook(request):
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirect if user is not logged in
+
+    user = get_object_or_404(UserInfo, id=user_id)
+    borrow_requests = BorrowRequest.objects.filter(user=user)
+    return render(request, 'user_duebook.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+
+@session_login_required
+def pending_renewal(request):
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirect if user is not logged in
+
+    user = get_object_or_404(UserInfo, id=user_id)
+    borrow_requests = BorrowRequest.objects.filter(user=user)
+    return render(request, 'pending_renewals.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+
+@session_login_required
+def returned_book(request):
+
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')  # Redirect if user is not logged in
+
+    user = get_object_or_404(UserInfo, id=user_id)
+    borrow_requests = BorrowRequest.objects.filter(user=user)
+    return render(request, 'return_books.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
    
 @session_login_required
 def request_book(request, book_id):
@@ -392,16 +446,32 @@ def notification(request):
     user_id = request.session.get('user_id')
     user = get_object_or_404(UserInfo, id=user_id) 
     print(user)
-    # send_due_date_notifications.delay(user.id)
-    send_due_date_notifications(user.id,repeat=60)
+    send_due_date_notifications(user.id)
     print(f"Task sent for user: {user.id}")
     today = timezone.now().date()
     Duedate = BorrowRequest.objects.filter(user=user, Duedate=today + timezone.timedelta(days=3))
-    user_notifications = Notification.objects.filter(user=user).order_by('-timestamp')[:50]
+    user_notifications_queryset = Notification.objects.filter(user=user).order_by('-timestamp')
+
     
+    unread_notifications = user_notifications_queryset.filter(is_read=False)
+    unread_notifications.update(is_read=True)
+    user_notifications = user_notifications_queryset[:50]
+
     return render(request, "notification.html", {"due_books": Duedate,'user_notifications': user_notifications})
 
 def logout_view(request):
     a=request.session.flush()  # Clears all session data
     print(a)
     return redirect('login')
+
+def about(request):
+    return render(request,'about.html')
+
+def privacy(request):
+    return render(request,'privacy.html')
+
+def terms(request):
+    return render(request,'terms.html')
+
+def contact(request):
+    return render(request,'contactus.html')

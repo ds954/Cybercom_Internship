@@ -36,7 +36,7 @@ html, body {
     align-items: center;      
     background-color: #FDF9F6; 
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .navbar{
@@ -50,7 +50,24 @@ html, body {
     align-items: center;
     justify-content: space-between;
 }
-
+.notification-count {
+    position: absolute;
+    top: 5px;
+    right: 12px;
+    background-color: white;
+    color: black;
+    /* font-size: 12px; */
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 18px;
+    height: 15px;
+    width: 10px;
+    /* height: 18px; */
+}
 .logo {
     width: 80px; /* Adjust size as needed */
     overflow: hidden; /* Ensures the image doesn’t overflow */

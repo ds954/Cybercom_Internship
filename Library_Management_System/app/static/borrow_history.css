@@ -1,3 +1,7 @@
+.html,body{
+    overflow-y: scroll;
+}
+
 .borrow-history-container {
     width: 80%;
     margin: auto;
@@ -5,7 +9,7 @@
     text-align: center;
 }
 main{
-    margin-top: 80px;
+    margin-top: 200px;
 }
 .borrow-history-table {
     width: 100%;

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} About Us {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'about.css' %}">
+{% endblock %}
+
+{% block content %}
+{% block search-content %}
+{% endblock %}
+<div class="container">
+    <h2 class="text-center">Welcome to the Digital Library!</h2>
+    <p class="text">
+        Welcome to the <strong>Library Management System</strong>, your one-stop destination for accessing a vast collection of books and resources. 
+        Whether you’re a passionate reader, a student, or a researcher, our library is designed to make borrowing books easier and more efficient.
+    </p>
+
+    <div class="features">
+        <h4>What You Can Do:</h4>
+        <ul>
+            <li>Browse books by title, author, or category.</li>
+            <li>Borrow books online and track your borrowing history.</li>
+            <li>Request book renewals with ease.</li>
+            <li>Receive email notifications for due dates and approvals.</li>
+        </ul>
+    </div>
+
+    <div class="getting-started">
+        <h4>To access our library services, you’ll need:</h4>
+        <ul>
+            <li>A registered <strong>Library Account</strong> with verified email.</li>
+        </ul>
+    </div>
+
+   
+
+    <h3 class="text-center"> Ready to dive into the world of knowledge? Start exploring today! </h3>
+</div>
+{% endblock %}

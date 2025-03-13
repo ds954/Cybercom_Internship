@@ -10,7 +10,7 @@
 {% if borrow_requests %}
     <ul>
     {% for request in borrow_requests %}
-        <li>
+        <li style="list-style: none; margin-bottom: 10px;">
             <strong>Book:</strong> {{ request.book.title }}<br>
             <strong>Renewal Date:</strong> {{ request.renewal_date|default:"N/A" }}<br>
             <strong>Status:</strong> {{ request.status }}

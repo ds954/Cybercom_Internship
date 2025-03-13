@@ -1,0 +1,31 @@
+.container {
+    max-width: 800px;
+    padding: 20px;
+    font-size: 13px;
+    /* font-size: medium; */
+}
+.main{
+    margin-top: 20px;
+}
+
+h2, h3, h4 {
+    color: #000000;
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+
+ul {
+    padding: 0;
+}
+
+ul li{
+    margin-left: 40px;
+}
+
+.text-center {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+

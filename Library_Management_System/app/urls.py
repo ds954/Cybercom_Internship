@@ -25,8 +25,15 @@ urlpatterns=[
     path('renewal-books/', views.renewal_books, name='renewal_books'),
     path('home/',views.home,name='home'),
     path('logout/',views.logout_view,name='logout'),
-    path('notification/',views.notification,name='notification')
-
+    path('notification/',views.notification,name='notification'),
+    path('about/',views.about,name='about'),
+    path('privacy/',views.privacy,name='privacy'),
+    path('terms/',views.terms,name='terms'),
+    path('contact/',views.contact,name='contactus'),
+    path('user_book/',views.user_book,name='user_book'),
+    path('user_duebook/',views.user_duebook,name='user_duebook'),
+    path('pending_renewal/',views.pending_renewal,name='pending_renewal'),
+    path('returned_books/',views.returned_book,name='returned_books'),
 
 ]
 

@@ -4,11 +4,11 @@ from celery import shared_task
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Book,UserInfo,BorrowRequest
+from .models import Book,UserInfo,BorrowRequest,Notification
 from background_task import background
+from datetime import timedelta
 
-# @shared_task
-@background(schedule=30)
+@background(schedule=timedelta(days=1))
 def send_due_date_notifications(user_id):
     print(user_id)
     print(type(user_id))
@@ -44,6 +44,10 @@ def send_due_date_notifications(user_id):
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 "notifications", {"type": "send_notification", "message": message}
+            )
+            Notification.objects.create(
+                user=user,  
+                message=message,  
             )
             print(f"WebSocket notification sent for")
     else:

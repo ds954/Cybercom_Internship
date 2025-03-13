@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %} Privacy Policy {% endblock %}
+
+{% block extra_head %}
+<style>
+    main{
+        padding-top: 350px;
+        padding-bottom: 150px;
+        padding-right: 150px;
+        padding-left: 200px;
+        display: block;
+    }
+    body{
+        overflow-y: scroll;
+    }
+    footer{
+        position: fixed;
+    }
+    h1{
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .main-container{
+        width: 90%;
+    margin: 100;
+    margin-top: 100px;
+    
+    }
+    .container{
+        margin-bottom: 20px;
+    }
+    .container li{
+        margin-left: 50px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+{% block search-content %}
+{% endblock %}
+<div class="main-container">
+    <div class="container">
+<h1>Privacy Policy</h1>
+
+
+<p>Welcome to our Library Management System! We are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our system.</p>
+</div>
+<div class="container">
+    <h2>Information We Collect</h2>
+    <p>When you register or use our Library Management System, we collect the following personal information:</p>
+    <ul>
+        <li>Username</li>
+        <li>Email address</li>
+        <li>OTP for email verification</li>
+        <li>Password (hashed and securely stored)</li>
+        <li>First Name and Last Name</li>
+        <li>Phone Number</li>
+        <li>Profile Picture (optional)</li>
+        <li>Borrowing and request history</li>
+    </ul>
+</div>
+
+<div class="container">
+<h2>How We Use Your Information</h2>
+<p>We use the collected information to:</p>
+<ul>
+    <li>Register and manage user accounts</li>
+    <li>Process book borrowing requests</li>
+    <li>Send notifications and alerts (e.g., due date reminders, OTP for verification)</li>
+    <li>Ensure the security of user accounts</li>
+    <li>Improve our services and user experience</li>
+</ul>
+</div>
+
+<div class="container">
+<h2>How We Protect Your Information</h2>
+<p>We implement security measures to protect your personal data, including:</p>
+<ul>
+    <li>Secure password storage using hashing (no plain text storage)</li>
+</ul>
+</div>
+
+<div class="container">
+<h2>Sharing of Information</h2>
+<p>We do not share your personal information with third parties, except:</p>
+<ul>
+    <li>When required by law or legal processes</li>
+    <li>To protect the rights and safety of our users and the system</li>
+</ul>
+</div>
+<!-- <h2>Data Retention</h2>
+<p>We retain your personal data as long as your account is active or as needed to provide our services. You can request deletion of your account by contacting us.</p> -->
+
+<div class="container">
+<h2>Your Privacy Rights</h2>
+<p>You have the right to:</p>
+<ul>
+    <li>Access the personal data we hold about you</li>
+    <li>Request corrections or updates to your data</li>
+</ul>
+</div>
+
+<!-- <h2>Cookies and Tracking Technologies</h2> -->
+<!-- <p>We may use cookies to improve user experience. You can manage cookie preferences through your browser settings.</p> -->
+
+<!-- <h2>8. Changes to This Privacy Policy</h2>
+<p>We may update this Privacy Policy from time to time. We encourage you to review this page periodically for any changes. Changes are effective immediately upon posting.</p> -->
+
+<!-- <h2>9. Contact Us</h2>
+<p>If you have any questions about this Privacy Policy, please contact us at:</p>
+<p>Email:</p> -->
+</div>
+{% endblock %}

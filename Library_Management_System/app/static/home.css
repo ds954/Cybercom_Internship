@@ -1,19 +1,26 @@
 html,body{
-    overflow-y: auto;
+    overflow-y: visible;
 }
 main{
     margin-bottom: 80px;
+    width: 1600px;
+
 }
 footer{
-    position: fixed;
+    position:absolute;
 }
 .container {
     width: 90%;
     margin: auto;
-    margin-top: 150px;
-    height: calc(100vh - 140px); /* Adjust to prevent overlap with footer */
+    margin-top: 100px;
+    height: calc(100vh - 1000px); /* Adjust to prevent overlap with footer */
 }
-
+hr {
+    margin: 20px auto;
+    border: none;
+    border-top: 1px solid #0c0c0c;
+    width: 60%;
+}
 h2 {
     text-align: center;
     margin-bottom: 20px;
@@ -22,10 +29,12 @@ h2 {
 /* Make books display in a grid */
 .row {
     display: flex;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
+    flex-direction: column;
     gap: 20px;
-    justify-content: space-between;
-    max-height: calc(100vh - 100px); /* Ensure books do not overlap the footer */
+    align-items: center;
+    /* justify-content: space-between; */
+    /* Ensure books do not overlap the footer */
     /* overflow-y: auto;  */
     padding-bottom: 20px; 
   
@@ -33,20 +42,18 @@ h2 {
 
 /* Column structure (3 books per row) */
 .col-md-4 {
-    flex: 1 1 calc(33.333% - 20px); /* 3 columns */
-    max-width: 32%;
+    flex: 1 1 100%; /* 3 columns */
+    max-width: 100%;
+    width: 60%;
 }
 
 /* Styling for book cards */
 .book-card {
-    background: white;
-    /* border: solid 1px black; */
-    padding: 20px;
+    display: flex;
+    align-items: flex-start;
 }
 
-.book-card:hover {
-    transform: translateY(-5px);
-}
+
 
 .book-title {
     font-size: 18px;
