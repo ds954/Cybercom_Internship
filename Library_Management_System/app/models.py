@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 class UserInfo(models.Model):
     Username=models.CharField(max_length=50)
@@ -65,7 +66,7 @@ class BorrowRequest(models.Model):
     
     def get_due_date():
         return timezone.now().date() + timedelta(days=60)
-    Duedate=models.DateField(default=get_due_date())
+    Duedate=models.DateField(default=get_due_date)
 
 
     def __str__(self):
@@ -79,3 +80,24 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.user} - {self.message[:20]}'
+
+class RenewalRequests(models.Model):
+    borrow_id = models.ForeignKey(BorrowRequest, on_delete=models.CASCADE)
+    request_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
+    admin_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    processed_date = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Renewal for {self.borrow_id} - {self.status}"
+    
+class AdminActions(models.Model):
+    admin_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    action_type = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.admin_id} - {self.action_type}"

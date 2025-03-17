@@ -1,0 +1,10 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+  <h1>Library Reports</h1>
+  <ul>
+    <li><a href="{% url 'borrowed_books_report' %}">Borrowed Books Report</a></li>
+    <li><a href="{% url 'overdue_books_report' %}">Overdue Books Report</a></li>
+    <li><a href="{% url 'member_activities_report' %}">Member Activities Report</a></li>
+  </ul>
+{% endblock %}

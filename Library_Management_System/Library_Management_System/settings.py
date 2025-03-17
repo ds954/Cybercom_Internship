@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,6 +35,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework_simplejwt',
     "daphne",
     'channels',
     'background_task',
@@ -46,6 +49,12 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     'django_password_validators'
+]
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'accept',
+    'x-csrftoken',
 ]
 
 MIDDLEWARE = [
@@ -98,7 +107,25 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'app.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
+JWT_AUTH = {
+    'JWT_SECRET_KEY': SECRET_KEY,  
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
+    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(minutes=1),
+    'JWT_ALLOW_REFRESH': True,
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

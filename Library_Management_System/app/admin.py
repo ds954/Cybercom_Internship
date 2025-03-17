@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserInfo, Book, BookCopy,BorrowRequest,Notification
+from .models import UserInfo, Book, BookCopy,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions
 from import_export.admin import ImportExportModelAdmin
 from .resources import BookResource
 from django.contrib import messages
@@ -10,11 +10,15 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from Library_Management_System import settings
-from datetime import timezone
+from datetime import timezone,datetime
+from django.contrib.auth.models import User
 
 # Register your models
+admin.site.register(AdminActions)
+admin.site.register(RenewalRequests)
 admin.site.register(UserInfo)
 admin.site.register(Notification)
+admin.site.register(RefreshTokenStore)
 
 @admin.register(BookCopy)
 class BookCopyAdmin(admin.ModelAdmin):
@@ -31,17 +35,27 @@ class BookAdmin(ImportExportModelAdmin):
     list_display = ("id", "title", "author", "category", "is_available", "quantity")
     search_fields = ("title", "author", "category")
 
-    def save_model(self, request, obj, form, change):
-        """
-        Overrides save_model to create BookCopy records when a new Book is added.
-        """
-        super().save_model(request, obj, form, change)
+    # 
+    # In BookAdmin (admin.py)
 
-        if not change:
-            book_copies = [
-                BookCopy(book=obj, copy_number=i) for i in range(1, obj.quantity + 1)
-            ]
-            BookCopy.objects.bulk_create(book_copies)
+def save_model(self, request, obj, form, change):
+    super().save_model(request, obj, form, change)
+    if not change:
+        AdminActions.objects.create(
+            admin_id=request.user,
+            action_type="Add Book",
+            description=f"Added book: {obj.title}"
+        )
+        book_copies = [
+            BookCopy(book=obj, copy_number=i) for i in range(1, obj.quantity + 1)
+        ]
+        BookCopy.objects.bulk_create(book_copies)
+    else:
+        AdminActions.objects.create(
+            admin_id=request.user,
+            action_type="Edit Book",
+            description=f"Edited book: {obj.title}"
+        )
 
 @admin.register(BorrowRequest)
 class BorrowRequestAdmin(admin.ModelAdmin):
@@ -104,18 +118,55 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         if book.quantity == 0:
             book.is_available = False
         book.save()
+        AdminActions.objects.create(
+        admin_id=request.user,
+        action_type="Approve Borrow Request",
+        description=f"Approved request for {borrow_request.book.title} by {borrow_request.user.Username}"
+        )
         return self.update_status(request, request_id, "accepted")
 
     def reject_request(self, request, request_id):
+        borrow_request = BorrowRequest.objects.get(id=request_id)
+        AdminActions.objects.create(
+            admin_id=request.user,
+            action_type="Reject Borrow Request",
+            description=f"Rejected request for {borrow_request.book.title} by {borrow_request.user.Username}"
+        )
         return self.update_status(request, request_id, "rejected")
     def accept_renewal(self, request, request_id):
+        borrow_request = BorrowRequest.objects.get(id=request_id)
+        borrow_request1 = BorrowRequest.objects.get(pk=request_id)
+        admin_user = request.user
+        renewal_request = RenewalRequests(
+        borrow_id=borrow_request1,
+        admin_id=admin_user,
+        status='Approved',
+        processed_date=datetime.now()
+        )
+        renewal_request.save()
+        AdminActions.objects.create(
+        admin_id=request.user,
+        action_type="Approve Renewal Request",
+        description=f"Approved renewal for {borrow_request.book.title} by {borrow_request.user.Username}"
+        )
         return self.update_status(request, request_id, "renew_accpect")  
     def reject_renewal(self, request, request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
+        renewal_request = RenewalRequests.objects.get(borrow_id=borrow_request)
+        renewal_request.status = 'rejected'
+        renewal_request.admin_id = request.user
+        renewal_request.processed_date = datetime.now()
+        renewal_request.save()
+        
         book = borrow_request.book
         book.quantity += 1
         book.is_available = True 
         book.save()
+        AdminActions.objects.create(
+        admin_id=request.user,
+        action_type="Reject Renewal Request",
+        description=f"Rejected renewal for {borrow_request.book.title} by {borrow_request.user.Username}"
+        )
         return self.update_status(request, request_id, "renew_reject")
     def cancel_request(self,request,request_id):
         return self.update_status(request,request_id,'Cancel_Request')
@@ -175,4 +226,3 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         
         # return redirect('user_notifications')
         return redirect('/admin/app/borrowrequest/')
-        

@@ -2,10 +2,12 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
 
 urlpatterns=[
     path('register/',views.register_view,name='register'),
-    path('',views.login_view,name='login'),
+    path('refresh-token/', views.refresh_token_view, name='refresh_token'),
+    path('login/',views.login_view,name='login'),
     path('otp/<int:user_id>',views.verify_otp,name='verify-otp'),
     path('book/', views.book_list, name='book'),
     path('email/',views.email,name='email'),
@@ -34,6 +36,11 @@ urlpatterns=[
     path('user_duebook/',views.user_duebook,name='user_duebook'),
     path('pending_renewal/',views.pending_renewal,name='pending_renewal'),
     path('returned_books/',views.returned_book,name='returned_books'),
+    # path('', lambda request: render(request, 'login.html'), name='login'),
+    # path('home/', lambda request: render(request, 'home.html'), name='home'),
+    # path('login/', views.login_view, name='login'),
+    # path('refresh-token/', views.refresh_token_view, name='refresh-token'),
+    path('logout/', views.logout_view, name='logout'),
 
 ]
 

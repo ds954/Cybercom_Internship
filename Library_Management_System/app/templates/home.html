@@ -5,6 +5,7 @@
     
     
     {% block extra_head %}
+    <script src="{% static 'js/auth.js' %}" defer></script>
     <style>
         
         .sidebar {
@@ -164,4 +165,32 @@ footer{
         </div>
     {% endblock %}
 
+    {% block extra_scripts %}
 
+    <!-- <script>
+    
+        async function refreshToken() {
+            try {
+                const response = await fetch('/refresh-token/', {
+                    method: 'GET',
+                    credentials: 'include'  // Send cookies (important!)
+                });
+    
+                if (response.ok) {
+                    console.log("Access token refreshed.");
+                    window.location.reload();  // Reload page to apply new token
+                } else {
+                    console.log("Refresh token expired. Redirecting to login.");
+                    window.location.href = '/login/';  // Redirect if refresh fails
+                }
+            } catch (error) {
+                console.error("Error refreshing token:", error);
+                window.location.href = '/login/';
+            }
+        }
+    
+        
+    </script>
+{% endblock %}    
+
+ -->
