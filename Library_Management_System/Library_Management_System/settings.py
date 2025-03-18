@@ -35,13 +35,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Application definition
 
 INSTALLED_APPS = [
+    "app",
     'rest_framework',
     'rest_framework_simplejwt',
     "daphne",
     'channels',
     'background_task',
     'import_export',
-    "app",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -58,6 +58,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 MIDDLEWARE = [
+    
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -65,6 +66,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'app.middleware.RefreshTokenMiddleware',
+    'app.middleware.AuthenticationRedirectMiddleware',
 ]
 
 ROOT_URLCONF = "Library_Management_System.urls"
@@ -122,8 +125,8 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,  
     'JWT_ALGORITHM': 'HS256',
-    'JWT_ACCESS_TOKEN_LIFETIME': timedelta(seconds=30),
-    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(minutes=1),
+    'JWT_ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'JWT_ALLOW_REFRESH': True,
 }
 # Password validation
@@ -165,7 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/kolkata"
 
 USE_I18N = True
 

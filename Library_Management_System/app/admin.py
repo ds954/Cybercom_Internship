@@ -10,15 +10,27 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.core.mail import send_mail
 from Library_Management_System import settings
-from datetime import timezone,datetime
+from datetime import timezone,datetime,timedelta
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 
 # Register your models
-admin.site.register(AdminActions)
-admin.site.register(RenewalRequests)
+
+
 admin.site.register(UserInfo)
 admin.site.register(Notification)
 admin.site.register(RefreshTokenStore)
+
+@admin.register(RenewalRequests)
+class RenewalRequestsAdmin(admin.ModelAdmin):
+    list_display = ('borrow_id', 'admin_id', 'created_at', 'updated_at', 'current_status')
+    list_filter = ('created_at', 'updated_at')
+    search_fields = ('borrow_id__user__Username', 'borrow_id__book__title')
+    readonly_fields = ('created_at', 'updated_at')
+
+@admin.register(AdminActions)
+class AdminActionsAdmin(admin.ModelAdmin):
+    list_display = ('admin_id', 'action_type', 'timestamp')
 
 @admin.register(BookCopy)
 class BookCopyAdmin(admin.ModelAdmin):
@@ -60,7 +72,7 @@ def save_model(self, request, obj, form, change):
 @admin.register(BorrowRequest)
 class BorrowRequestAdmin(admin.ModelAdmin):
     list_display = ('user', 'book','IssuedDate','Duedate', 'status', 'action_buttons')
-
+   
     def action_buttons(self, obj):
         if obj.status == "pending":
             return format_html(
@@ -121,7 +133,7 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Approve Borrow Request",
-        description=f"Approved request for {borrow_request.book.title} by {borrow_request.user.Username}"
+        description=f"Approved request for {borrow_request.book.title} and user is {borrow_request.user.Username}"
         )
         return self.update_status(request, request_id, "accepted")
 
@@ -130,33 +142,28 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         AdminActions.objects.create(
             admin_id=request.user,
             action_type="Reject Borrow Request",
-            description=f"Rejected request for {borrow_request.book.title} by {borrow_request.user.Username}"
+            description=f"Rejected request for {borrow_request.book.title} and user is {borrow_request.user.Username}"
         )
         return self.update_status(request, request_id, "rejected")
     def accept_renewal(self, request, request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
-        borrow_request1 = BorrowRequest.objects.get(pk=request_id)
-        admin_user = request.user
-        renewal_request = RenewalRequests(
-        borrow_id=borrow_request1,
-        admin_id=admin_user,
-        status='Approved',
-        processed_date=datetime.now()
-        )
-        renewal_request.save()
+
+        # Update status directly on BorrowRequest
+        borrow_request.status = 'renew_accpect'
+        borrow_request.Duedate = datetime.now().date() + timedelta(days=60)
+        borrow_request.save()
+        
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Approve Renewal Request",
-        description=f"Approved renewal for {borrow_request.book.title} by {borrow_request.user.Username}"
+        description=f"Approved renewal for {borrow_request.book.title} and user is {borrow_request.user.Username}"
         )
         return self.update_status(request, request_id, "renew_accpect")  
     def reject_renewal(self, request, request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
-        renewal_request = RenewalRequests.objects.get(borrow_id=borrow_request)
-        renewal_request.status = 'rejected'
-        renewal_request.admin_id = request.user
-        renewal_request.processed_date = datetime.now()
-        renewal_request.save()
+
+        borrow_request.status = 'renew_reject'
+        borrow_request.save()
         
         book = borrow_request.book
         book.quantity += 1
@@ -165,7 +172,7 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Reject Renewal Request",
-        description=f"Rejected renewal for {borrow_request.book.title} by {borrow_request.user.Username}"
+        description=f"Rejected renewal for {borrow_request.book.title} and user is {borrow_request.user.Username}"
         )
         return self.update_status(request, request_id, "renew_reject")
     def cancel_request(self,request,request_id):
@@ -226,3 +233,4 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         
         # return redirect('user_notifications')
         return redirect('/admin/app/borrowrequest/')
+    

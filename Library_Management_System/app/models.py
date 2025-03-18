@@ -84,14 +84,16 @@ class Notification(models.Model):
 class RenewalRequests(models.Model):
     borrow_id = models.ForeignKey(BorrowRequest, on_delete=models.CASCADE)
     request_date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')], default='Pending')
     admin_id = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    processed_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def current_status(self):
+        return self.borrow_id.status
 
     def __str__(self):
-        return f"Renewal for {self.borrow_id} - {self.status}"
+        return f"Renewal for {self.borrow_id} - Status: {self.current_status}"
     
 class AdminActions(models.Model):
     admin_id = models.ForeignKey(User, on_delete=models.CASCADE)

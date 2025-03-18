@@ -7,7 +7,7 @@ from django.shortcuts import render
 urlpatterns=[
     path('register/',views.register_view,name='register'),
     path('refresh-token/', views.refresh_token_view, name='refresh_token'),
-    path('login/',views.login_view,name='login'),
+    path('',views.login_view,name='login'),
     path('otp/<int:user_id>',views.verify_otp,name='verify-otp'),
     path('book/', views.book_list, name='book'),
     path('email/',views.email,name='email'),

@@ -25,9 +25,14 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .authentication import JWTAuthentication
 from django.http import JsonResponse
-
+import time
+from django.urls import reverse
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
 
 def register_view(request):
+    print("inside register view")
     if request.method == 'POST':
         username=request.POST.get('username')
         email=request.POST.get('email')
@@ -58,7 +63,7 @@ def register_view(request):
     return render(request,'register.html')
 
 def verify_otp(request, user_id):
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
 
     if request.method == 'POST':
         email_otp = request.POST.get('email_otp','').strip()  
@@ -87,8 +92,15 @@ def verify_otp(request, user_id):
 #             return render(request, 'login.html', {'error': 'User does not exist'})
 
 #     return render(request, 'login.html')
+
+@csrf_exempt
 def login_view(request):
+    print("Inside login_view")
+    print(request.COOKIES)  
+    print(request.session.items()) 
+    print(f"Request Path: {request.path}")
     if request.method == 'POST':
+        print("post request")
         email = request.POST.get('email')
         password = request.POST.get('password')
 
@@ -98,14 +110,14 @@ def login_view(request):
                 access_token_payload = {
                     'email': user.email,
                     'exp': datetime.now() + settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'],
-                    'iat': datetime.now(),
+                    'iat': int(time.time()),
                 }
                 access_token = jwt.encode(access_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
 
                 refresh_token_payload = {
                     'email': user.email,
                     'exp': datetime.now() + settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'],
-                    'iat': datetime.now(),
+                    'iat': int(time.time()),
                 }
                 refresh_token = jwt.encode(refresh_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
 
@@ -117,10 +129,15 @@ def login_view(request):
                 response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'].total_seconds())
                 return response
             else:
-                return render(request, 'login.html', {'error': 'Invalid credentials'})
+                html_content = render_to_string('login.html', {'error': 'Invalid credentials'})  
+                return HttpResponse(html_content)
+                
         except UserInfo.DoesNotExist:
-            return render(request, 'login.html', {'error': 'User not found'})
-    return render(request, 'login.html')
+            html_content = render_to_string('login.html', {'error': 'User not found'})  
+            return HttpResponse(html_content)
+        
+    html_content = render_to_string('login.html')  
+    return HttpResponse(html_content)
 
 # def refresh_token_view(request):
 #     refresh_token = request.COOKIES.get('refresh_token')
@@ -188,7 +205,7 @@ def refresh_token_view(request):
         access_token_payload = {
             'email': user.email,
             'exp': datetime.now() + settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'],
-            'iat': datetime.now(),
+           'iat': int(time.time()),
         }
         access_token = jwt.encode(
             access_token_payload, 
@@ -219,14 +236,14 @@ def refresh_token_view(request):
 
 
 # @login_required(login_url='/login/')
-def home(request):
-    from .models import UserInfo
-    user_id = request.session.get('user_id')
-    profile_user = None
-    if user_id:
-        profile_user = UserInfo.objects.get(id=user_id)
+# def home(request):
+#     from .models import UserInfo
+#     user_id = request.session.get('user_id')
+#     profile_user = None
+#     if user_id:
+#         profile_user = UserInfo.objects.get(id=user_id)
 
-    return render(request, 'home.html', {'profile_user': profile_user})
+#     return render(request, 'home.html', {'profile_user': profile_user})
 
 
 def email(request):
@@ -249,12 +266,14 @@ def email(request):
             )
             return redirect('otp', user_id=user.id)  
         else:
-            return render(request,'email.html', {'error': 'Email does not exist. Register first.'})
+            html_content = render_to_string('login.html',{'error': 'Email does not exist. Register first.'})  
+            return HttpResponse(html_content)
 
-    return render(request,'email.html')
+    html_content = render_to_string('email.html')  
+    return HttpResponse(html_content)
 
 def otp_password(request, user_id):
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
 
     if request.method == 'POST':
         email_otp = request.POST.get('email_otp','').strip()  
@@ -262,45 +281,55 @@ def otp_password(request, user_id):
         if verifyotp(email_otp, user.email_otp): 
             return redirect('reset_password', user_id=user.id)  
         else:
-            return render(request, 'otp.html', {'error': 'Invalid OTP', 'user_id': user_id})  
-
-    return render(request, 'otp.html', {'user_id': user_id})  
+            html_content = render_to_string('otp.html',{'error': 'Invalid OTP', 'user_id': user_id})  
+            return HttpResponse(html_content)
+         
+    html_content = render_to_string('otp.html',{'user_id': user_id})  
+    return HttpResponse(html_content)
+   
 
 
 def reset_password(request, user_id):
-    user = get_object_or_404(UserInfo, id=user_id)  
+    user = request.user  
     if request.method == 'POST':
         password = request.POST.get('password') 
         confirm_password = request.POST.get('check-password')  
         try:
             validate_password(password)  # Check password strength
         except ValidationError as e:
-            return render(request, 'reset_password.html', {'error': e.messages, 'user_id': user_id})
+            html_content = render_to_string('reset_password.html', {'error': e.messages, 'user_id': user_id})  
+            return HttpResponse(html_content)
 
         if password == confirm_password:  
             user.password = make_password(password)  
             user.save()  
             return redirect('/login/')  
         else:
-            return render(request, 'reset_password.html', {'error': 'Passwords do not match or must be new.', 'user_id': user_id})
+            html_content = render_to_string('reset_password.html', {'error': 'Passwords do not match or must be new.', 'user_id': user_id})  
+            return HttpResponse(html_content)
 
-    return render(request, 'reset_password.html', {'user_id': user_id})
+    html_content = render_to_string('reset_password.html', {'user_id': user_id})  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def view_profile(request):
-    user_id = request.session.get('user_id')
+    user = JWTAuthentication().authenticate(request)
+    print("data",user)
+    if not user:
+        return redirect('login')
+   
+    html_content = render_to_string('view_profile.html', { 'user': user})  
+    return HttpResponse(html_content)
 
-    # Fetch the user from the database
-    user = get_object_or_404(UserInfo, id=user_id)
 
-    
-
-    return render(request, 'view_profile.html', { 'user': user})
 
 # @session_login_required
 def edit_profile(request):
-    user_id = request.session.get('user_id')
-    user, created = UserInfo.objects.get_or_create(id=user_id)
+    user = JWTAuthentication().authenticate(request)
+    print("data",user)
+    if not user:
+        return redirect('login')
+   
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -342,15 +371,20 @@ def edit_profile(request):
 
     else:
         form = ProfileForm(instance=user)
+        
+    html_content = render_to_string('Edit_Profile.html', {'form': form, 'user': user})  
+    return HttpResponse(html_content)
 
-    return render(request, 'Edit_Profile.html', {'form': form, 'user': user})
 
 # @session_login_required
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+@csrf_exempt
 def home(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id)
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    user, _ = user_data
+   
 
     borrowed_count = BorrowRequest.objects.filter(user=user, status__in=['accepted','renew_accpect']).count()
     overdue_count = BorrowRequest.objects.filter(user=user, Duedate__lt=timezone.now(), status='accepted').count()
@@ -358,23 +392,39 @@ def home(request):
     returned_count = BorrowRequest.objects.filter(user=user, status='book_returned').count()
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
 
-    return render(request,'home.html',{'user':user,'borrowed_count': borrowed_count,
+    html_content = render_to_string('home.html',{'user':user,'borrowed_count': borrowed_count,
             'overdue_count': overdue_count,
             'renewal_count': renewal_count,
-            'returned_count': returned_count,'notification_count': notification_count})
+            'returned_count': returned_count,'notification_count': notification_count})  
+    return HttpResponse(html_content)
+  
 
 # @session_login_required
 def book_list(request):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     books = Book.objects.all()  # Fetch all books from the database
-    return render(request, 'book.html', {'books': books})
+    html_content = render_to_string('book.html', {'books': books})  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def book_detail(request, book_id):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     book = get_object_or_404(Book, id=book_id)
-    return render(request, 'book_detail.html', {'book': book})
+    html_content = render_to_string('book_detail.html', {'book': book})  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def search_books(request):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     query = request.GET.get('q', '').strip()  # get search query from URL params
     books = []
 
@@ -390,14 +440,18 @@ def search_books(request):
     if user_id:
         profile_user = UserInfo.objects.get(id=user_id)
 
-    return render(request, 'search_results.html', {
+    html_content = render_to_string('search_results.html', {
         'books': books,
         'query': query,
-        'profile_user': profile_user,
-    })
+        'profile_user': profile_user})  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def borrow_history(request):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     print(request.user)
     print(request.session.get('user_id'))
 
@@ -405,60 +459,84 @@ def borrow_history(request):
     if not user_id:
         return redirect('login')  # Redirect if user is not logged in
 
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
     borrow_requests = BorrowRequest.objects.filter(user=user)
     # print(borrow_requests)
-    return render(request, 'borrow_history.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+    html_content = render_to_string('reset_password.html', 'borrow_history.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    return HttpResponse(html_content)
+
 
 # @session_login_required
 def user_book(request):
-
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')  # Redirect if user is not logged in
 
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    return render(request, 'user_book.html', {'borrow_requests': borrow_requests})
+    html_content = render_to_string('user_book.html', {'borrow_requests': borrow_requests})  
+    return HttpResponse(html_content)
+
 
 # @session_login_required
 def user_duebook(request):
-
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')  # Redirect if user is not logged in
 
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    return render(request, 'user_duebook.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+    html_content = render_to_string('user_duebook.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def pending_renewal(request):
-
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')  # Redirect if user is not logged in
 
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    return render(request, 'pending_renewals.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+    html_content = render_to_string('pending_renewals.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    return HttpResponse(html_content)
+
 
 # @session_login_required
 def returned_book(request):
-
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
     if not user_id:
         return redirect('login')  # Redirect if user is not logged in
 
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    return render(request, 'return_books.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})
+    html_content = render_to_string('return_books.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    return HttpResponse(html_content)
    
 # @session_login_required
 def request_book(request, book_id):
+        user_data = JWTAuthentication().authenticate(request)
+        print("data",user_data)
+        if not user_data:
+            return redirect('login')
         if request.method == "POST":
             user_id = request.session.get('user_id')
-            user = get_object_or_404(UserInfo, id=user_id)  
+            user = request.user  
             book = get_object_or_404(Book, id=book_id)
 
             if not book.is_available:
@@ -476,42 +554,60 @@ def request_book(request, book_id):
 
 # @session_login_required
 def returned_books(request):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='book_returned')
 
-    return render(request, 'returned_books.html', {
+    html_content = render_to_string('returned_books.html', {
         'borrow_requests': borrow_requests,
-        'today': timezone.now().date()
-    })
+        'today': timezone.now().date()})
+    return HttpResponse(html_content)
+   
 
 # @session_login_required
 def canceled_books(request):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id)
+    user = request.user
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='Cancel_Request')
 
-    return render(request, 'canceled_books.html', {
+    html_content = render_to_string('canceled_books.html', {
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()
-    })
+    })  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def renewal_books(request):
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id)
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    user,_=user_data
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='renew_accpect')
     print(borrow_requests)
-    return render(request, 'renewal_books.html', {
+    html_content = render_to_string( 'renewal_books.html', {
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()
-    })
+    })  
+    return HttpResponse(html_content)
 
 # @session_login_required
 def request_renewal(request,request_id):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     borrow_request = BorrowRequest.objects.get(id=request_id)
     borrow_request.status = 'renewal_requested'
     borrow_request.save()
@@ -529,6 +625,10 @@ def request_renewal(request,request_id):
 
 # @session_login_required
 def cancel_book(request,request_id):
+     user_data = JWTAuthentication().authenticate(request)
+     print("data",user_data)
+     if not user_data:
+        return redirect('login')
      print(f"Cancelling request {request_id}") 
      cancel_request=BorrowRequest.objects.get(id=request_id)
      cancel_request.status='Cancel_Request'
@@ -553,8 +653,12 @@ def cancel_book(request,request_id):
 
 # @session_login_required
 def return_book(request,request_id):
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
     user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id) 
+    user = request.user 
     borrow_request = get_object_or_404(BorrowRequest, id=request_id, user=user)
     borrow_request.status = 'book_returned'
     borrow_request.save()
@@ -583,9 +687,11 @@ def return_book(request,request_id):
 # @session_login_required
 def notification(request):
     """Triggers Celery task and returns due books for the user."""
-
-    user_id = request.session.get('user_id')
-    user = get_object_or_404(UserInfo, id=user_id) 
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    user, _ = user_data
     print(user)
     send_due_date_notifications(user.id)
     print(f"Task sent for user: {user.id}")
@@ -598,26 +704,47 @@ def notification(request):
     unread_notifications.update(is_read=True)
     user_notifications = user_notifications_queryset[:50]
 
-    return render(request, "notification.html", {"due_books": Duedate,'user_notifications': user_notifications})
+    html_content = render_to_string("notification.html", {"due_books": Duedate,'user_notifications': user_notifications})  
+    return HttpResponse(html_content)
 
-# def logout_view(request):
-#     a=request.session.flush()  # Clears all session data
-#     print(a)
-#     return redirect('login')
+
 def logout_view(request):
-    response = redirect('login')
+    # request.session.flush()
+    response = redirect(reverse('login'))
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     return response
 
 def about(request):
-    return render(request,'about.html')
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    html_content = render_to_string('about.html')  
+    return HttpResponse(html_content)
 
 def privacy(request):
-    return render(request,'privacy.html')
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    html_content = render_to_string('privacy.html')  
+    return HttpResponse(html_content)
 
 def terms(request):
-    return render(request,'terms.html')
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    html_content = render_to_string('terms.html')  
+    return HttpResponse(html_content)
+
 
 def contact(request):
-    return render(request,'contactus.html')
+    user_data = JWTAuthentication().authenticate(request)
+    print("data",user_data)
+    if not user_data:
+        return redirect('login')
+    html_content = render_to_string('contactus.html')  
+    return HttpResponse(html_content)
+    
