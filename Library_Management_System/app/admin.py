@@ -14,6 +14,35 @@ from datetime import timezone,datetime,timedelta
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 
+
+from django.contrib.admin import AdminSite
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+
+class CustomAdminSite(AdminSite):
+
+    def index(self, request, extra_context=None):
+        """Render default Django Admin index page using render_to_string()"""
+        extra_context = extra_context or {}
+        extra_context['user_id'] = request.user.id  
+
+        html_content = render_to_string('admin/index.html', extra_context, request=request)
+        return HttpResponse(html_content)
+
+    def login(self, request, extra_context=None):
+        """Render default Django Admin login page using render_to_string()"""
+        extra_context = extra_context or {}
+        html_content = render_to_string('admin/login.html', extra_context, request=request)
+        return HttpResponse(html_content)
+
+    def logout(self, request, extra_context=None):
+        """Render default Django Admin logout page using render_to_string()"""
+        extra_context = extra_context or {}
+        html_content = render_to_string('admin/logout.html', extra_context, request=request)
+        return HttpResponse(html_content)
+
+custom_admin_site = CustomAdminSite(name="custom_admin")
+
 # Register your models
 
 

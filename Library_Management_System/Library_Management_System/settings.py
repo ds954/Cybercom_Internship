@@ -32,23 +32,24 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
+AUTH_USER_MODEL = 'auth.User'
 # Application definition
 
 INSTALLED_APPS = [
-    "app",
-    'rest_framework',
-    'rest_framework_simplejwt',
-    "daphne",
-    'channels',
-    'background_task',
-    'import_export',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "daphne",
     "django.contrib.staticfiles",
-    'django_password_validators'
+    'django_password_validators',
+    "app",
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'channels',
+    'background_task',
+    'import_export',
 ]
 CORS_ALLOW_HEADERS = [
     'authorization',
@@ -56,6 +57,12 @@ CORS_ALLOW_HEADERS = [
     'accept',
     'x-csrftoken',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend', 
+    
+]
+
 
 MIDDLEWARE = [
     
@@ -78,7 +85,7 @@ STATICFILES_DIRS = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -115,6 +122,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'app.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -125,8 +134,8 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,  
     'JWT_ALGORITHM': 'HS256',
-    'JWT_ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'JWT_ACCESS_TOKEN_LIFETIME': timedelta(minutes=25),
+    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(minutes=50),
     'JWT_ALLOW_REFRESH': True,
 }
 # Password validation

@@ -2,7 +2,28 @@
 
 {% block title %}Search Results{% endblock %}
 
+{% block extra_head %}
+<style>
+    li{
+        list-style: none;
+    }
+    .container{
+        width: 70%;
+        padding: 80px;
+    }
+    h2{
+        margin-bottom: 30px;
+    }
+    h3,p{
+        margin-bottom: 10px;
+    }
+</style>
+
+{% endblock %}
+
 {% block content %}
+{% block search-content %}
+{% endblock %}
 <div class="container">
     <h2>Search Results for "{{ query }}"</h2>
 

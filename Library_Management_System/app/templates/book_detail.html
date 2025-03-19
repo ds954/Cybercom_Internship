@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block content %}
+{% block search-content %}
+{% endblock %}
     <div class="container">
         <div class="book-detail-card">
             <h2>{{ book.title }}</h2>
@@ -22,7 +24,10 @@
             </p>
             <p><strong>Quantity:</strong> {{ book.quantity }}</p>
             {% if book.is_available %}
-                <button class="request-btn">Request</button>
+            <form method="post" action="{% url 'request_book' book.id %}">
+                {% csrf_token %}
+                <button type="submit" class="request-btn">Borrow Book</button>
+            </form>
             {% else %}
                 <button class="request-btn disabled" disabled>Out of Stock</button>
             {% endif %}

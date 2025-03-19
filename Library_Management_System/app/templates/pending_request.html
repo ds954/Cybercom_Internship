@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Borrow History Page{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'borrow_history.css' %}">
+    <style>
+        main{
+            margin-top: 0;
+        }
+    </style> 
+{% endblock %}
+{% block submenu %}
+<ul class="submenu">
+    <li><a href="{% url 'view_profile' %}">Profile</a></li>
+    <li><a href="{% url 'returned_books' %}">Returned Book</a></li>
+    <li><a href="{% url 'canceled_books' %}">Cancled Book</a></li>
+    <li><a href="{% url 'renewal_books' %}">Renewal Book</a></li> 
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+</ul>
+{% endblock %}
+{% block content %}
+{% block search-content %}
+{% endblock %}
+    <div class="borrow-history-container">
+        <h1>Pending Request</h1>
+        <table class="borrow-history-table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            {% for request in borrow_requests %}
+            {% if request.status == 'pending' %}
+            <tr id="request-{{ request.id }}">
+                <td>{{ request.book.title }}</td>
+                <td class="status">{{ request.book.author }}</td>
+                <td>{{ request.IssuedDate }}</td>
+                <td>{{ request.Duedate }}</td>
+                <td>
+                    {{ request.status }}
+                </td>
+            </tr>
+            {% endif %}
+           
+            {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}

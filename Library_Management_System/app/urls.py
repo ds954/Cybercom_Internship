@@ -3,6 +3,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
+from .admin import custom_admin_site
 
 urlpatterns=[
     path('register/',views.register_view,name='register'),
@@ -35,13 +36,10 @@ urlpatterns=[
     path('user_book/',views.user_book,name='user_book'),
     path('user_duebook/',views.user_duebook,name='user_duebook'),
     path('pending_renewal/',views.pending_renewal,name='pending_renewal'),
+    path('pending_request/',views.pending_request,name='pending_request'),
     path('returned_books/',views.returned_book,name='returned_books'),
-    # path('', lambda request: render(request, 'login.html'), name='login'),
-    # path('home/', lambda request: render(request, 'home.html'), name='home'),
-    # path('login/', views.login_view, name='login'),
-    # path('refresh-token/', views.refresh_token_view, name='refresh-token'),
     path('logout/', views.logout_view, name='logout'),
-
+    path('custom_admin_login/', views.custom_admin_login, name='custom_admin_login'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -66,6 +66,13 @@
     justify-content: space-between;
     gap: 20px;
 }
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-rows: repeat(2, auto); /* 2 rows */
+    gap: 20px;
+}
+
 
 .card {
     border: solid 1px black;
@@ -82,35 +89,37 @@
     color: black;
 }
 
-.renewals {
+.renewals, .pending{
     border: solid 1px black;
     color: black;
 }
 
-.returned{
+.returned,.notifications{
     border: solid 1px black;
     color: black;
 }
 
 
 
- .notifications {
+ /* .notifications {
     border-radius: 5px;
-    /* background-color: #fffafa; */
-    background-color: white;
+    background-color: #fffafa; 
+     background-color: white;
     box-shadow: 0 4px 8px rgb(0, 0, 0,0.1);
     border: solid 1px black;
     margin-top: 30px;
     padding: 10px;
-    width: 23.5%;
+    
     text-align: center;
+    border: solid 1px black;
+    color: black;
 
-}
+} */
 
- .notifications ul {
+ /* .notifications ul {
     list-style: none;
     padding: 0;
-}
+} */
 footer{
     position: fixed;
 }
@@ -134,17 +143,16 @@ footer{
     </div>
     <div class="dashboard-content">
         <section class="Welcome"> <h1>Welcome, {{ user.firstname }} </h1></section>
-        <h1>Welcome, {{ user.email }}!</h1>
-       
+        
 
         <section class="summary">
             <div class="card">
                 <a href="{% url 'user_book' %}" style="text-decoration: none; color: black;"><h3>My Books</h3></a>
                 <p>{{ borrowed_count }}</p>
             </div>
-            <div class="card overdue">
-                <a href="{% url 'user_duebook' %}" style="text-decoration: none; color: black;"><h3>Overdue Books</h3></a>
-                <p>{{ overdue_count }}</p>
+            <div class="card pending">
+                <a href="{% url 'pending_request' %}" style="text-decoration: none; color: black;"><h3>Pending Request</h3></a>
+                <p>{{ pending_count }}</p>
             </div>
             <div class="card renewals">
                 <a href="{% url 'pending_renewal' %}" style="text-decoration: none; color: black;"><h3>Pending Renewals</h3></a>
@@ -154,14 +162,22 @@ footer{
                 <a href="{% url 'returned_books' %}" style="text-decoration: none; color: black;"><h3>Returned books</h3></a>
                 <p>{{ returned_count }}</p>
             </div>
+            <div class="card overdue">
+                <a href="{% url 'user_duebook' %}" style="text-decoration: none; color: black;"><h3>Overdue Books</h3></a>
+                <p>{{ overdue_count }}</p>
+            </div>
+            <div class="card notifications">
+                <a href="{% url 'notification' %}" style="text-decoration: none; color: black;"><h3>Notifications</h3></a>
+                <p>{{notification_count}}</p>
+            </div>
         </section>
         
         
-        <section class="notifications">
+        <!-- <section class="notifications">
             <a href="{% url 'notification' %}" style="text-decoration: none; color: black;"><h3>Notifications</h3></a>
             <p>{{notification_count}}</p>
            
-        </section>
+        </section> -->
         </div>
     {% endblock %}
 
