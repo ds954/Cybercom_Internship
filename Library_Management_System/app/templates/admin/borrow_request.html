@@ -1,0 +1,28 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}borrow_request{% endblock %}
+
+
+
+
+{% block content %}
+
+<h2>Borrow Requests</h2>
+<ul>
+    {% for request in borrow_requests %}
+    <li style="border:1px solid #ccc; margin-bottom:10px; padding:10px;">
+        <p>User: {{ request.user.Username }}</p>
+        <p>Book: {{ request.book.title }}</p>
+        <p>Status: {{ request.status }}</p>
+        
+        <!-- Action Buttons -->
+        <div>
+            {% if request.status == "pending" %}
+                <a href="{% url 'admin:accept_request' request.id %}">Accept</a>
+                <a href="{% url 'admin:reject_request' request.id %}">Reject</a>
+           {% endif %}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

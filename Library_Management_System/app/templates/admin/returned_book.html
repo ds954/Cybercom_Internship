@@ -1,0 +1,36 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}returned_books{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<h2>Borrow Requests</h2>
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Book Name</th>
+            <th>Status</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        {% for request in borrow_requests %}
+        <tr>
+            <td>{{ request.user.Username }}</td>
+            <td>{{ request.book }}</td>
+            <td>{{ request.status }}</td>
+           
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No borrow requests found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

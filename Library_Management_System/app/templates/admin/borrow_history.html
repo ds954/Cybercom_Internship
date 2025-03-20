@@ -1,0 +1,37 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Issued_date{% endblock %}
+
+
+
+
+{% block content %}
+
+<div class="borrow-history-container">
+    <h1>Borrow History</h1>
+    <table class="borrow-history-table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        {% for request in borrow_requests %}
+        <tr id="request-{{ request.id }}">
+            <td>{{ request.book.title }}</td>
+            <td class="status">{{ request.book.author }}</td>
+            <td>{{ request.IssuedDate }}</td>
+            <td>{{ request.Duedate }}</td>
+           
+            <td>
+                {{ request.status }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endblock %}

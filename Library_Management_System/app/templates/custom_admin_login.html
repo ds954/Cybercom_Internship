@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Custom Admin Login</title>
+    <title>Admin Login</title>
 </head>
 <body>
+    <h1>Admin Login</h1>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     {{ login_page_html|safe }}
 </body>
 </html>

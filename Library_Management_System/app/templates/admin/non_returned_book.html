@@ -1,0 +1,41 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Issued_date{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<div class="borrow-history-container">
+    <h1>Overdue Book</h1>
+    <table class="borrow-history-table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        {% for request in borrow_requests %}
+            {% if request.status == 'accepted' or request.status == 'renew_accpect' or request.status == 'renewal_requested' %}  
+                    {% if request.Duedate < today %}
+                        <tr id="request-{{ request.id }}">
+                            <td>{{ request.book.title }}</td>
+                            <td class="status">{{ request.book.author }}</td>
+                            <td>{{ request.IssuedDate }}</td>
+                            <td>{{ request.Duedate }}</td>
+                            <td>
+                                {{ request.status }}
+                            </td>
+                        </tr>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </table>
+
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Books{% endblock %}
+
+
+
+
+{% block content %}
+<h2>Books</h2>
+
+<table >
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Category</th>
+        <th>Quantity</th>
+    </tr>
+    {% for book in books %}
+    <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.category }}</td>
+        <td>{{ book.quantity }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<button><a href="{% url 'custom_book_add' %}" style="text-decoration: none;">Add New Book</a></button>
+{% endblock %}

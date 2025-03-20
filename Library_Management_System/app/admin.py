@@ -46,7 +46,12 @@ custom_admin_site = CustomAdminSite(name="custom_admin")
 # Register your models
 
 
-admin.site.register(UserInfo)
+
+
+@admin.register(UserInfo)
+class UserInfoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'Username', 'email','firstname','lastname','phone']
+
 admin.site.register(Notification)
 admin.site.register(RefreshTokenStore)
 

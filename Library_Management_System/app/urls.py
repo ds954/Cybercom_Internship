@@ -3,7 +3,8 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
-from .admin import custom_admin_site
+# from app.admin import custom_admin
+
 
 urlpatterns=[
     path('register/',views.register_view,name='register'),
@@ -39,7 +40,27 @@ urlpatterns=[
     path('pending_request/',views.pending_request,name='pending_request'),
     path('returned_books/',views.returned_book,name='returned_books'),
     path('logout/', views.logout_view, name='logout'),
-    path('custom_admin_login/', views.custom_admin_login, name='custom_admin_login'),
+    # path('custom_admin_login/', views.custom_admin_login, name='custom_admin_login'),    
+    path('custom-admin/login/', views.custom_admin_login, name='custom_admin_login'),
+
+     path('custom-admin/dashboard/', views.custom_admin_dashboard, name='custom_admin_dashboard'),
+    path('custom-admin/books/', views.custom_books, name='custom_books'),
+    path('custom-admin/books/add/', views.custom_book_add, name='custom_book_add'),
+    path('custom-admin/borrow-request/<int:request_id>/update/', views.update_borrow_request_status, name='custom_borrow_request_update'),
+    path('custom-admin/borrow/',views.admin_borrow_request,name='admin_borrow_request'),
+    path('custom-admin/user/',views.admin_user,name='admin_user'),
+    path('custom-admin/notification/',views.admin_notification,name='admin_notification'),
+    path('custom-admin/issued_book/',views.admin_issued_book,name='admin_issued_book'),
+    path('custom-admin/returned_book/',views.admin_returned_book,name='admin_returned_book'),
+    path('custom-admin/non_returned_book/',views.admin_not_returned_book,name='admin_not_returned_book'),
+    path('custom-admin/pending_renewal/',views.admin_pending_renewal_request,name='admin_pending_renewal_request'),
+    path('custom-admin/borrow_history',views.admin_borrow_history,name='admin_borrow_history'),
+    # path('custom-admin/', custom_admin.urls),
+
+       path('custom-admin/members/', views.manage_members, name='manage_members'),
+    path('custom-admin/members/add/', views.add_member, name='add_member'),
+    path('admin/members/edit/<int:user_id>/', views.edit_member, name='edit_member'),
+    path('admin/members/delete/<int:user_id>/', views.delete_member, name='delete_member'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

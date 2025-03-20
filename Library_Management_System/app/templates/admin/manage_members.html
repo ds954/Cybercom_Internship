@@ -1,0 +1,28 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}manage_members{% endblock %}
+
+
+
+
+{% block content %}
+
+<h2>Manage Members</h2>
+<a href="{% url 'add_member' %}">Add Member</a>
+<table>
+    <tr><th>Username</th><th>Email</th><th>Phone</th><th>Actions</th></tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.Username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>
+            <button style="margin-right: 20px;"><a href="{% url 'edit_member' user.id %}">Edit</a> </button>   
+
+
+            <button><a href="{% url 'delete_member' user.id %}" onclick="return confirm('Are you sure?')">Delete</a></button>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

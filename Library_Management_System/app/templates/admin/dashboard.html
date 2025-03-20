@@ -1,0 +1,118 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div style="display: flex;">
+    <div style="width: 500px; height: 600px; background-color: #f0f0f0; padding: 20px;">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="{% url 'custom_admin_dashboard' %}">Dashboard</a></li>
+            <!-- <li><a href="{% url 'admin_user' %}">Members</a></li>
+            <li><a href="{% url 'custom_books' %}">Books</a></li> -->
+            <li><a href="{% url 'manage_members' %}">Manage Members</a></li>
+            <li><a href="{% url 'admin_issued_book' %}">Manage Books</a></li>
+            <li><a href="{% url 'admin_issued_book' %}">Issued</a></li>
+            <li><a href="{% url 'admin_returned_book' %}">Returned</a></li>
+            <li><a href="{% url 'admin_not_returned_book' %}">Not Returned</a></li>
+            <li><a href="{% url 'admin_not_returned_book' %}">Genrated_Reports</a></li>
+            <li><a href="{% url 'admin_not_returned_book' %}">Logout</a></li>
+           
+        </ul>
+    </div>
+
+    <div style="flex-grow: 1; padding: 20px;">
+        <h1>Welcome to Admin Dashboard</h1>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Members</h3>
+                <p>Total: {{ users|length }}</p>
+                <a href="{% url 'admin_user' %}">More info</a>
+            </div>
+            <div style="background-color: #e0f7fa; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Books</h3>
+                <p>Total: {{ books|length }}</p>
+                <a href="{% url 'custom_books' %}">More info</a>
+            </div>
+
+
+            
+            <div style="background-color: #e0f7fa; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>issued Book</h3>
+                <p>Total: {{total_issued_books}}</p>
+                <a href="{% url 'admin_issued_book' %}">More info</a>
+            </div>
+            <div style="background-color: #c8e6c9; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Returned Book</h3>
+                <p>Total: {{ total_returned_books}}</p>
+                <a href="{% url 'admin_returned_book' %}">More info</a>
+            </div>
+           
+            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Borrow Book History </h3>
+                <p>Total: {{ borrow_requests|length }}</p>
+                <a href="{% url 'admin_borrow_history' %}">More info</a>
+            </div>
+            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Pending Borrow Request</h3>
+                <p>Total: {{ total_pending_borrow_requests}}</p>
+                <a href="{% url 'admin_borrow_request' %}">More info</a>
+            </div>
+            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Pending Renewal Request</h3>
+                <p>Total: {{ total_pending_renewal_requests}}</p>
+                <a href="{% url 'admin_pending_renewal_request' %}">More info</a>
+            </div>
+            <div style="background-color: #ffcdd2; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Not Returned Book</h3>
+                <p>Total: {{ total_not_returned_books }}</p>
+                <a href="{% url 'admin_not_returned_book' %}">More info</a>
+            </div>
+            <div style="background-color: #fce4ec; padding: 20px; border-radius: 8px; width: 200px;">
+                <h3>Notifications</h3>
+                <p>Total: {{ notifications|length }}</p>
+                <a href="{% url 'admin_notification' %}">More info</a>
+            </div>
+        </div>
+<!-- 
+        <h2>Users</h2>
+        <ul>
+            {% for user in users %}
+            <li>{{ user.Username }} - {{ user.email }}</li>
+            {% empty %}
+            <li>No users found.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Books</h2>
+        <ul>
+            {% for book in books %}
+            <li>{{ book.title }} by {{ book.author }}</li>
+            {% empty %}
+            <li>No books found.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Borrow Requests</h2>
+        <ul>
+            {% for req in borrow_requests %}
+            <li>{{ req.user.username }} requested {{ req.book.title }}</li>
+            {% empty %}
+            <li>No borrow requests found.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Recent Notifications</h2>
+        <ul>
+            {% for note in notifications %}
+            <li>{{ note.message }} ({{ note.timestamp }})</li>
+            {% empty %}
+            <li>No notifications found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div> -->
+</div>
+</div>
+{% endblock %}

@@ -9,7 +9,7 @@ from .models import UserInfo
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import Book,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests
+from .models import Book,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions
 from .admin import BorrowRequestAdmin
 from .forms import ProfileForm
 from channels.layers import get_channel_layer
@@ -31,17 +31,238 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import render_to_string
-
+from django.contrib.auth import authenticate, login
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.messages import get_messages
+from .forms import UserForm
 
 @csrf_exempt
 def custom_admin_login(request):
-    form = AdminAuthenticationForm()
-    login_page_html = render_to_string('admin/login.html', {'form': form, 'site_header': 'Admin Site'})
-    html_content=render_to_string('custom_admin_login.html', {'login_page_html': login_page_html})
-    return HttpResponse(html_content)
+    storage = get_messages(request)
+    form = AuthenticationForm(request, data=request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                if user.is_staff:  # Only allow staff/admin users
+                    login(request, user)
+                    print('go to dashboard')
+                    return redirect('custom_admin_dashboard')
+                else:
+                    messages.error(request, "You are not authorized to access this page.")
+            else:
+                messages.error(request, "Invalid username or password.")
+
+    login_page_html = render_to_string('admin/login.html', {
+        'form': form,
+        'site_header': 'Admin Site',
+        
+    })
+
+    
+
+    return HttpResponse(login_page_html)
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def custom_admin_dashboard(request):
+    users = UserInfo.objects.all()
+    books = Book.objects.all()
+    borrow_requests = BorrowRequest.objects.select_related('user', 'book').all()
+    recent_notifications = Notification.objects.order_by('-timestamp')
+    total_issued_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect']).count()
+    total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending').count()
+    total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested').count()
+    total_returned_books = BorrowRequest.objects.filter(status='book_returned').count()
+    total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect']).count()
+
+    dashboard_html = render_to_string('admin/dashboard.html', {
+        'users': users,
+        'books': books,
+        'borrow_requests': borrow_requests,
+        'notifications': recent_notifications,
+        'total_issued_books':total_issued_books,
+        'total_not_returned_books':total_not_returned_books,
+        'total_pending_borrow_requests':total_pending_borrow_requests,
+        'total_pending_renewal_requests':total_pending_renewal_requests,
+        'total_returned_books':total_returned_books
+    })
+
+   
+
+    return HttpResponse(dashboard_html)
+
+def custom_books(request):
+    books = Book.objects.all()
+    books_html = render_to_string('admin/books.html', {'books': books})
+
+    return HttpResponse(books_html)
+
+@csrf_exempt
+def custom_book_add(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        category = request.POST.get('category')
+        description = request.POST.get('description')
+        quantity = int(request.POST.get('quantity', 0))
+
+        Book.objects.create(
+            title=title,
+            author=author,
+            category=category,
+            description=description,
+            quantity=quantity
+        )
+        return redirect('custom_books')
+
+    form_html = render_to_string('admin/book_add.html')
+    
+
+    return HttpResponse(form_html)
+
+def admin_borrow_request(request):
+    borrow_requests=BorrowRequest.objects.filter(status__in =['pending'])
+    borrow_request_html = render_to_string('admin/borrow_request.html', {
+        'borrow_requests': borrow_requests,
+       
+    })
+    return HttpResponse(borrow_request_html)
+def admin_pending_renewal_request(request):
+    borrow_requests=BorrowRequest.objects.filter(status__in =['renewal_requested'])
+    borrow_request_html = render_to_string('admin/borrow_request.html', {
+        'borrow_requests': borrow_requests,
+       
+    })
+    return HttpResponse(borrow_request_html)
+
+def admin_issued_book(request):
+    borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
+    borrow_request_html = render_to_string('admin/issued_book.html', {
+        'borrow_requests': borrow_requests,
+       
+    })
+    return HttpResponse(borrow_request_html)
+
+def admin_returned_book(request):
+    borrow_requests=BorrowRequest.objects.filter(status='book_returned')
+    borrow_request_html = render_to_string('admin/returned_book.html', {
+        'borrow_requests': borrow_requests,
+       
+    })
+    return HttpResponse(borrow_request_html)
+def admin_borrow_history(request):
+    borrow_requests=BorrowRequest.objects.all()
+    borrow_request_html = render_to_string('admin/borrow_history.html', {
+        'borrow_requests': borrow_requests,
+       
+    })
+    return HttpResponse(borrow_request_html)
+
+def admin_not_returned_book(request):
+    borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
+    borrow_request_html = render_to_string('admin/non_returned_book.html', {
+        'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+       
+    return HttpResponse(borrow_request_html)
+
+def admin_user(request):
+    users = UserInfo.objects.all()
+    user_html = render_to_string('admin/user.html', {
+        'users': users,
+       
+    })
+    return HttpResponse(user_html)
+@csrf_exempt
+def manage_members(request):
+    users = UserInfo.objects.all()
+    user_html = render_to_string('admin/manage_members.html', {'users': users})
+    return HttpResponse(user_html)
+
+@csrf_exempt
+def add_member(request):
+    if request.method == "POST":
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Member added successfully!")
+            return redirect('manage_members')
+    else:
+        form = UserForm()
+    user_html = render_to_string('admin/add_member.html', {'form': form})
+    return HttpResponse(user_html)
+
+@csrf_exempt
+def edit_member(request, member_id):
+    member = get_object_or_404(UserInfo, id=member_id)
+
+    if request.method == "POST":
+        form = UserForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_members')  # Redirect to members list after updating
+    else:
+        form = UserForm(instance=member)
+    user_html = render_to_string('admin/edit_member.html', {'form': form})
+    return HttpResponse(user_html)
+
+def delete_member(request, user_id):
+    user = get_object_or_404(UserInfo, id=user_id)
+    user.delete()
+    messages.success(request, "Member deleted successfully!")
+    return redirect('manage_members')
+
+
+def admin_notification(request):
+    recent_notifications = Notification.objects.order_by('-timestamp')
+    user_html = render_to_string('admin/notification.html', {
+        'notifications': recent_notifications
+       
+    })
+    return HttpResponse(user_html)
+
+
+@csrf_exempt
+def update_borrow_request_status(request, request_id):
+    borrow_request = get_object_or_404(BorrowRequest, id=request_id)
+
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        borrow_request.status = new_status
+        if new_status == 'accepted':
+            borrow_request.IssuedDate = timezone.now().date()
+        borrow_request.save()
+
+        Notification.objects.create(
+            user=borrow_request.user,
+            message=f"Your borrow request for '{borrow_request.book.title}' has been {new_status}"
+        )
+
+        AdminActions.objects.create(
+            admin_id=request.user,
+            action_type='Borrow Request Updated',
+            description=f"Updated borrow request {borrow_request.id} status to {new_status}"
+        )
+
+        return redirect('custom_admin_dashboard')
+
+    borrow_request_html = render_to_string('admin/borrow_request_update.html', {
+        'borrow_request': borrow_request,
+        'status_choices': BorrowRequest.STATUS_CHOICES
+    })
+
+    
+
+    return HttpResponse(borrow_request_html)
 
 @csrf_exempt
 def register_view(request):

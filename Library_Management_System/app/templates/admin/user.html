@@ -1,0 +1,33 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Members{% endblock %}
+
+
+
+
+{% block content %}
+<table >
+    <tr>
+        <th>username</th>
+        <th>email</th>
+        <th>firstname</th>
+        <th>lastname</th>
+        <th>phone</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.Username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.firstname}}</td>
+        <td>{{ user.lastname }}</td>
+        <td>{{ user.phone}}</td>
+    </tr>
+    {% empty %}
+    <li>No users found.</li>
+    {% endfor %}
+   
+</table>
+    
+    
+    
+{% endblock %}

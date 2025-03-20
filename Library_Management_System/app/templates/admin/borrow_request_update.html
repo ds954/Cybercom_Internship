@@ -1,0 +1,29 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Borrow_request_update{% endblock %}
+
+
+
+
+{% block content %}
+
+<h2>Update Borrow Request</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <label>Book:</label>
+    <p>{{ borrow_request.book.title }}</p>
+
+    <label>User:</label>
+    <p>{{ borrow_request.user.Username }}</p>
+
+    <label>Status:</label>
+    <select name="status">
+        {% for key, value in status_choices %}
+        <option value="{{ key }}" {% if key == borrow_request.status %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Update</button>
+</form>
+{% endblock %}
