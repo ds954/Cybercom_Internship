@@ -2,32 +2,91 @@
 
 {% block title %}Members{% endblock %}
 
-
-
-
 {% block content %}
-<table >
+
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .actions a {
+        margin-right: 8px;
+    }
+
+</style>
+
+<h1>Members</h1>
+
+<table>
     <tr>
-        <th>username</th>
-        <th>email</th>
-        <th>firstname</th>
-        <th>lastname</th>
-        <th>phone</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Phone</th>
+        <th>Registration Date</th>
+      
     </tr>
+
     {% for user in users %}
     <tr>
         <td>{{ user.Username }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.firstname}}</td>
+        <td>{{ user.firstname }}</td>
         <td>{{ user.lastname }}</td>
-        <td>{{ user.phone}}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.created_at}}</td>
+       
     </tr>
     {% empty %}
-    <li>No users found.</li>
+    <tr>
+        <td colspan="6">No users found.</td>
+    </tr>
     {% endfor %}
-   
 </table>
-    
-    
-    
+
+
 {% endblock %}

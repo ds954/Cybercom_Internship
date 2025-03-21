@@ -1,21 +1,70 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}returned_books{% endblock %}
-
-
-
+{% block title %}Returned Books{% endblock %}
 
 {% block content %}
 
+<style>
+    h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
 
-<h2>Borrow Requests</h2>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+        color: #333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    .actions a {
+        margin-right: 8px;
+    }
+</style>
+
+<h2>Returned Books</h2>
+
 <table>
     <thead>
         <tr>
             <th>User</th>
             <th>Book Name</th>
             <th>Status</th>
-           
         </tr>
     </thead>
     <tbody>
@@ -24,13 +73,13 @@
             <td>{{ request.user.Username }}</td>
             <td>{{ request.book }}</td>
             <td>{{ request.status }}</td>
-           
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4">No borrow requests found.</td>
+            <td colspan="3">No returned books found.</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}

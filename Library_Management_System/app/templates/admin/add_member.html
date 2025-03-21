@@ -1,15 +1,88 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}manage_members{% endblock %}
+{% block title %}Add Member{% endblock %}
 
 {% block content %}
 
+<style>
+    h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    form {
+        width: 100%;
+        max-width: 600px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #c0c4c6;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #a3a7a9;
+    }
+
+    a.back-link {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #c0c4c6;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    a.back-link:hover {
+        background-color: #a3a7a9;
+    }
+</style>
+
 <h2>Add Member</h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Add Member</button>
-</form>
-<br>
-<a href="{% url 'manage_members' %}">Back to Members</a>
+
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add Member</button>
+    </form>
+
+    <a href="{% url 'manage_members' %}" class="back-link">Back to Members</a>
+</div>
+
 {% endblock %}

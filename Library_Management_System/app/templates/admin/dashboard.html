@@ -8,21 +8,23 @@
         <h2>Menu</h2>
         <ul>
             <li><a href="{% url 'custom_admin_dashboard' %}">Dashboard</a></li>
-            <!-- <li><a href="{% url 'admin_user' %}">Members</a></li>
-            <li><a href="{% url 'custom_books' %}">Books</a></li> -->
             <li><a href="{% url 'manage_members' %}">Manage Members</a></li>
-            <li><a href="{% url 'admin_issued_book' %}">Manage Books</a></li>
+            <li><a href="{% url 'manage_books' %}">Manage Books</a></li>
             <li><a href="{% url 'admin_issued_book' %}">Issued</a></li>
             <li><a href="{% url 'admin_returned_book' %}">Returned</a></li>
             <li><a href="{% url 'admin_not_returned_book' %}">Not Returned</a></li>
-            <li><a href="{% url 'admin_not_returned_book' %}">Genrated_Reports</a></li>
-            <li><a href="{% url 'admin_not_returned_book' %}">Logout</a></li>
-           
+            <li><a href="{% url 'borrowed_books_report' %}">Borrowed Books Report</a></li>
+            <li><a href="{% url 'overdue_books_report' %}">Overdue Books Report</a></li>
+            <li><a href="{% url 'member_activities_report' %}">Member Activities Report</a></li>
+            <li><a href="{% url 'custom_admin_login' %}">Logout</a></li>
+                    
         </ul>
     </div>
 
     <div style="flex-grow: 1; padding: 20px;">
-        <h1>Welcome to Admin Dashboard</h1>
+        <!-- <h1>Welcome to Admin Dashboard</h1> -->
+        <h1>Welcome {{ admin_user.username }} to Admin Dashboard</h1>
+
 
         <div style="display: flex; flex-wrap: wrap; gap: 20px;">
             <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; width: 200px;">

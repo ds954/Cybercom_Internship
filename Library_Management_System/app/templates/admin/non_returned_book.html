@@ -1,18 +1,61 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}Issued_date{% endblock %}
-
-
-
+{% block title %}Non Returned Book{% endblock %}
 
 {% block content %}
 
+<style>
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .borrow-history-container {
+        margin: 20px 0;
+    }
+
+    .borrow-history-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .borrow-history-table th,
+    .borrow-history-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        color: #333;
+    }
+
+    .borrow-history-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .borrow-history-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .borrow-history-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .status {
+        color: #d9534f; /* Red text for overdue */
+        font-weight: bold;
+    }
+
+</style>
 
 <div class="borrow-history-container">
-    <h1>Overdue Book</h1>
+    <h1>Non Returned Books</h1>
+    
     <table class="borrow-history-table">
         <thead>
             <tr>
+                <th>User</th>
                 <th>Book Title</th>
                 <th>Author</th>
                 <th>Borrow Date</th>
@@ -20,22 +63,28 @@
                 <th>Status</th>
             </tr>
         </thead>
-        {% for request in borrow_requests %}
-            {% if request.status == 'accepted' or request.status == 'renew_accpect' or request.status == 'renewal_requested' %}  
+        <tbody>
+            {% for request in borrow_requests %}
+                {% if request.status == 'accepted' or request.status == 'renew_accpect' or request.status == 'renewal_requested' %}
                     {% if request.Duedate < today %}
                         <tr id="request-{{ request.id }}">
+                            <td>{{request.user.Username}}</td>
                             <td>{{ request.book.title }}</td>
-                            <td class="status">{{ request.book.author }}</td>
+                            <td>{{ request.book.author }}</td>
                             <td>{{ request.IssuedDate }}</td>
-                            <td>{{ request.Duedate }}</td>
-                            <td>
-                                {{ request.status }}
-                            </td>
+                            <td class="status">{{ request.Duedate }}</td>
+                            <td>{{ request.status|title }}</td>
                         </tr>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        {% endfor %}
+            {% empty %}
+                <tr>
+                    <td colspan="5">No overdue books found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
 </div>
+
 {% endblock %}

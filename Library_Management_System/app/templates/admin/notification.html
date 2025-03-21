@@ -1,17 +1,30 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}notifications{% endblock %}
-
-
-
+{% block title %}Notifications{% endblock %}
 
 {% block content %}
     <h2>Recent Notifications</h2>
-        <ul>
+
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #f2f2f2;">
+            <tr>
+                <th>User</th>
+                <th>Message</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for note in notifications %}
-            <li>{{ note.message }} ({{ note.timestamp }})</li>
+                <tr>
+                    <td>{{  note.user.Username }}</td>
+                    <td>{{ note.message }}</td>
+                    <td>{{ note.timestamp }}</td>
+                </tr>
             {% empty %}
-            <li>No notifications found.</li>
+                <tr>
+                    <td colspan="3" style="text-align: center;">No notifications found.</td>
+                </tr>
             {% endfor %}
-        </ul>
+        </tbody>
+    </table>
 {% endblock %}

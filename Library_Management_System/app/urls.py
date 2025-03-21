@@ -2,14 +2,12 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import render
-# from app.admin import custom_admin
 
 
 urlpatterns=[
+    path('',views.login_view,name='login'),
     path('register/',views.register_view,name='register'),
     path('refresh-token/', views.refresh_token_view, name='refresh_token'),
-    path('',views.login_view,name='login'),
     path('otp/<int:user_id>',views.verify_otp,name='verify-otp'),
     path('book/', views.book_list, name='book'),
     path('email/',views.email,name='email'),
@@ -40,10 +38,10 @@ urlpatterns=[
     path('pending_request/',views.pending_request,name='pending_request'),
     path('returned_books/',views.returned_book,name='returned_books'),
     path('logout/', views.logout_view, name='logout'),
-    # path('custom_admin_login/', views.custom_admin_login, name='custom_admin_login'),    
+   
+      
     path('custom-admin/login/', views.custom_admin_login, name='custom_admin_login'),
-
-     path('custom-admin/dashboard/', views.custom_admin_dashboard, name='custom_admin_dashboard'),
+    path('custom-admin/dashboard/', views.custom_admin_dashboard, name='custom_admin_dashboard'),
     path('custom-admin/books/', views.custom_books, name='custom_books'),
     path('custom-admin/books/add/', views.custom_book_add, name='custom_book_add'),
     path('custom-admin/borrow-request/<int:request_id>/update/', views.update_borrow_request_status, name='custom_borrow_request_update'),
@@ -55,12 +53,23 @@ urlpatterns=[
     path('custom-admin/non_returned_book/',views.admin_not_returned_book,name='admin_not_returned_book'),
     path('custom-admin/pending_renewal/',views.admin_pending_renewal_request,name='admin_pending_renewal_request'),
     path('custom-admin/borrow_history',views.admin_borrow_history,name='admin_borrow_history'),
-    # path('custom-admin/', custom_admin.urls),
 
-       path('custom-admin/members/', views.manage_members, name='manage_members'),
+
+    path('custom-admin/members/', views.manage_members, name='manage_members'),
     path('custom-admin/members/add/', views.add_member, name='add_member'),
-    path('admin/members/edit/<int:user_id>/', views.edit_member, name='edit_member'),
-    path('admin/members/delete/<int:user_id>/', views.delete_member, name='delete_member'),
+    path('custom-admin/members/edit/<int:member_id>/', views.edit_member, name='edit_member'),
+    path('custom-admin/members/delete/<int:user_id>/', views.delete_member, name='delete_member'),
+
+    path('custom-admin/manage_books/', views.manage_books, name='manage_books'),
+    path('custom-admin/manage_books/add/', views.add_book, name='add_book'),
+    path('custom-admin/manage_books/edit/<int:book_id>/', views.edit_book, name='edit_book'),
+    path('custom-admin/manage_books/delete/<int:book_id>/', views.delete_book, name='delete_book'),
+    path('custom-admin/manage_books/bulk_upload/', views.bulk_upload_books, name='bulk_upload_books'),
+
+    path('borrowed_books_report/', views.borrowed_books_report, name='borrowed_books_report'),
+    path('overdue_books_report/', views.overdue_books_report, name='overdue_books_report'),
+    path('member_activities_report/', views.member_activities_report, name='member_activities_report'),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

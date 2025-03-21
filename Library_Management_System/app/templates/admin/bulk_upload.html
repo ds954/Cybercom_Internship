@@ -1,6 +1,6 @@
 {% extends 'admin/base.html' %}
 
-{% block title %}Edit Member{% endblock %}
+{% block title %}Bulk Upload Books{% endblock %}
 
 {% block content %}
 
@@ -32,13 +32,13 @@
         color: #333;
     }
 
-    input, select, textarea {
+    input[type="file"] {
         width: 100%;
         padding: 10px;
-        margin-bottom: 15px;
         border: 1px solid #ccc;
         border-radius: 4px;
         font-size: 14px;
+        margin-bottom: 15px;
         box-sizing: border-box;
     }
 
@@ -66,23 +66,40 @@
         text-decoration: none;
         border-radius: 4px;
         transition: background-color 0.3s ease;
+        text-align: center;
     }
 
     a.back-link:hover {
         background-color: #a3a7a9;
     }
+
+    .message {
+        margin-top: 20px;
+        color: green;
+        text-align: center;
+        font-weight: bold;
+    }
 </style>
 
-<h2>Edit Member</h2>
+<h2>Upload Books</h2>
 
 <div class="form-container">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Update Member</button>
+        <label for="file">Upload CSV/Excel File:</label>
+        {{ form.file }}
+        <button type="submit">Upload</button>
     </form>
 
-    <a href="{% url 'manage_members' %}" class="back-link">Back to Members</a>
+    <a href="{% url 'manage_books' %}" class="back-link">Back to Manage Books</a>
+
+    {% if messages %}
+        <div class="message">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 
 {% endblock %}

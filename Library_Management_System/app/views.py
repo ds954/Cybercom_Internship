@@ -11,7 +11,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import Book,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions
 from .admin import BorrowRequestAdmin
-from .forms import ProfileForm
+from .forms import ProfileForm,UserForm,BookForm
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib import messages
@@ -38,7 +38,178 @@ from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.messages import get_messages
-from .forms import UserForm
+from .forms import BookBulkUploadForm
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from .models import BorrowRequest, UserInfo, Notification
+from django.utils.timezone import now
+from django.contrib.auth.models import User
+
+
+def borrowed_books_report(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="borrowed_books_report.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, height - 50, "Borrowed Books Report")
+
+    # Fetch data
+    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect'])
+
+    data = [['User', 'Book Title', 'Issued Date', 'Due Date']]
+    for req in borrowed_books:
+        data.append([req.user.Username, req.book.title, str(req.IssuedDate), str(req.Duedate)])
+
+    # Create table
+    table = Table(data, colWidths=[100, 200, 100, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    table.wrapOn(p, width, height)
+    table.drawOn(p, 50, height - 150)
+
+    p.showPage()
+    p.save()
+    return response
+
+def overdue_books_report(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="overdue_books_report.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, height - 50, "Overdue Books Report")
+
+    # Get overdue books (due date before today and not returned)
+    overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
+
+    data = [['User', 'Book Title', 'Issued Date', 'Due Date']]
+    for req in overdue_books:
+        data.append([req.user.Username, req.book.title, str(req.IssuedDate), str(req.Duedate)])
+
+    table = Table(data, colWidths=[100, 200, 100, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.red),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    table.wrapOn(p, width, height)
+    table.drawOn(p, 50, height - 150)
+
+    p.showPage()
+    p.save()
+    return response
+
+def member_activities_report(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="member_activities_report.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Title
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, height - 50, "Member Activities Report")
+
+    # First table: User basic details
+    users = UserInfo.objects.all()
+    user_data = [['Username', 'Email', 'Firstname', 'Lastname', 'Phone Number', 'Date of registration']]
+
+    for user in users:
+        user_data.append([
+            user.Username, user.email, user.firstname, user.lastname, user.phone, user.created_at.strftime('%Y-%m-%d')
+        ])
+
+    table = Table(user_data, colWidths=[50, 150, 50, 50, 80, 100])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    table.wrapOn(p, width - 100, height - 400)
+    table.drawOn(p, 50, height - 100 - 200)
+
+    # Second table: Borrow Requests and Notifications
+    data = [['Username', 'Email', 'Borrow Requests', 'Notifications']]
+    for user in users:
+        borrow_count = BorrowRequest.objects.filter(user=user).count()
+        notification_count = Notification.objects.filter(user=user).count()
+
+        data.append([user.Username, user.email, borrow_count, notification_count])
+
+    table1 = Table(data, colWidths=[100, 200, 100, 100])
+    table1.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    # Start a new page before drawing the second table
+    p.showPage()
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, height - 50, "Borrow and Notification Summary")
+
+    table1.wrapOn(p, width - 100, height - 400)
+    table1.drawOn(p, 50, height - 100 - 200)
+
+    # Third table: Detailed user activities (borrow history)
+    activity_data = [['Username', 'Book Title', 'Status', 'Issued Date', 'Due Date']]
+    borrow_requests = BorrowRequest.objects.all()
+
+    for request_obj in borrow_requests:
+        activity_data.append([
+            request_obj.user.Username,
+            request_obj.book.title,
+            request_obj.status,
+            request_obj.IssuedDate.strftime('%Y-%m-%d') if request_obj.IssuedDate else 'N/A',
+            request_obj.Duedate.strftime('%Y-%m-%d')
+        ])
+
+    table2 = Table(activity_data, colWidths=[50, 200, 100, 90, 90])
+    table2.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    # Start another page before drawing the third table
+    p.showPage()
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(200, height - 50, "Detailed Borrow Activity")
+
+    table2.wrapOn(p, width - 100, height - 400)
+    table2.drawOn(p, 50, height - 100 - 400)
+
+    p.save()
+    return response
 
 @csrf_exempt
 def custom_admin_login(request):
@@ -65,11 +236,7 @@ def custom_admin_login(request):
     login_page_html = render_to_string('admin/login.html', {
         'form': form,
         'site_header': 'Admin Site',
-        
-    })
-
-    
-
+      })
     return HttpResponse(login_page_html)
 
 @login_required
@@ -94,17 +261,14 @@ def custom_admin_dashboard(request):
         'total_not_returned_books':total_not_returned_books,
         'total_pending_borrow_requests':total_pending_borrow_requests,
         'total_pending_renewal_requests':total_pending_renewal_requests,
-        'total_returned_books':total_returned_books
+        'total_returned_books':total_returned_books,
+        'admin_user':request.user
     })
-
-   
-
     return HttpResponse(dashboard_html)
 
 def custom_books(request):
     books = Book.objects.all()
     books_html = render_to_string('admin/books.html', {'books': books})
-
     return HttpResponse(books_html)
 
 @csrf_exempt
@@ -126,62 +290,57 @@ def custom_book_add(request):
         return redirect('custom_books')
 
     form_html = render_to_string('admin/book_add.html')
-    
-
     return HttpResponse(form_html)
 
 def admin_borrow_request(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['pending'])
     borrow_request_html = render_to_string('admin/borrow_request.html', {
         'borrow_requests': borrow_requests,
-       
     })
     return HttpResponse(borrow_request_html)
+
 def admin_pending_renewal_request(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['renewal_requested'])
-    borrow_request_html = render_to_string('admin/borrow_request.html', {
-        'borrow_requests': borrow_requests,
-       
+    borrow_request_html = render_to_string('admin/pending_renewal.html', {
+        'borrow_requests': borrow_requests,   
     })
     return HttpResponse(borrow_request_html)
 
 def admin_issued_book(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
     borrow_request_html = render_to_string('admin/issued_book.html', {
-        'borrow_requests': borrow_requests,
-       
+        'borrow_requests': borrow_requests, 
     })
     return HttpResponse(borrow_request_html)
 
 def admin_returned_book(request):
     borrow_requests=BorrowRequest.objects.filter(status='book_returned')
     borrow_request_html = render_to_string('admin/returned_book.html', {
-        'borrow_requests': borrow_requests,
-       
+        'borrow_requests': borrow_requests,  
     })
     return HttpResponse(borrow_request_html)
+
 def admin_borrow_history(request):
-    borrow_requests=BorrowRequest.objects.all()
+    borrow_requests = BorrowRequest.objects.select_related('user').all()
     borrow_request_html = render_to_string('admin/borrow_history.html', {
-        'borrow_requests': borrow_requests,
-       
+        'borrow_requests': borrow_requests,  
     })
     return HttpResponse(borrow_request_html)
 
 def admin_not_returned_book(request):
-    borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
+    borrow_requests = BorrowRequest.objects.select_related('user').filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
     borrow_request_html = render_to_string('admin/non_returned_book.html', {
-        'borrow_requests': borrow_requests,'today': timezone.now().date()})  
-       
+        'borrow_requests': borrow_requests,'today': timezone.now().date()
+        })  
     return HttpResponse(borrow_request_html)
 
 def admin_user(request):
     users = UserInfo.objects.all()
     user_html = render_to_string('admin/user.html', {
         'users': users,
-       
     })
     return HttpResponse(user_html)
+    
 @csrf_exempt
 def manage_members(request):
     users = UserInfo.objects.all()
@@ -203,6 +362,7 @@ def add_member(request):
 
 @csrf_exempt
 def edit_member(request, member_id):
+    print(f"edit_member called with member_id: {member_id}")
     member = get_object_or_404(UserInfo, id=member_id)
 
     if request.method == "POST":
@@ -218,9 +378,64 @@ def edit_member(request, member_id):
 def delete_member(request, user_id):
     user = get_object_or_404(UserInfo, id=user_id)
     user.delete()
-    messages.success(request, "Member deleted successfully!")
     return redirect('manage_members')
 
+@csrf_exempt
+def manage_books(request):
+      print("manage books called")
+      books = Book.objects.all()
+      book_html = render_to_string('admin/manage_books.html', {'books':books})
+      return HttpResponse(book_html)
+
+@csrf_exempt
+def add_book(request):
+    print('inside add_book')
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_books')
+    else:
+        form = BookForm()
+    book_html = render_to_string('admin/add_book.html', {'form': form})
+    return HttpResponse(book_html)
+
+@csrf_exempt
+def edit_book(request, book_id):
+    print(f"edit_member called with member_id: {book_id}")
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.method == "POST":
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_books')  
+    else:
+        form = BookForm(instance=book)
+    book_html = render_to_string('admin/edit_book.html', {'form': form})
+    return HttpResponse(book_html)
+
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+    book.delete()
+   
+    return redirect('manage_books')
+
+@csrf_exempt
+def bulk_upload_books(request):
+    if request.method == "POST":
+        form = BookBulkUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                form.process_file()
+            except Exception as e:
+                messages.error(request, f"Error processing file: {e}")
+            return redirect('manage_books')
+    else:
+        form = BookBulkUploadForm()
+    storage = get_messages(request)
+    book_html = render_to_string('admin/bulk_upload.html', {'form': form, 'messages': storage})
+    return HttpResponse(book_html)
 
 def admin_notification(request):
     recent_notifications = Notification.objects.order_by('-timestamp')
