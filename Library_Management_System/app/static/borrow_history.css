@@ -2,18 +2,21 @@
     overflow-y: scroll;
 }
 
+main{
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* margin-top: 550px; */
+
+}
+
 .borrow-history-container {
     width: 80%;
-    margin: auto;
+    margin-left: 150px;
+    margin-top: 500px;
     padding: 20px;
     text-align: center;
 }
-main{
-    padding-top: auto;
-    margin-top: 500px;
-    /* max-height: 1200px;
-    height: 50%; */
-}
+
 .borrow-history-table {
     width: 100%;
     border-collapse: collapse;

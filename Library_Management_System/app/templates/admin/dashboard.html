@@ -1,23 +1,52 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/base_site.html' %}
 
 {% block title %}Admin Dashboard{% endblock %}
 
+
+{% block branding %}
+    <!-- Empty block, removes Django Admin title/logo -->
+{% endblock %}
+
+{% block nav-global %}
+    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
+    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- Empty block, removes breadcrumbs -->
+   
+{% endblock %}
+
+
+
+
+
+
+
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+     #header{
+        display: block;
+    }
+    ul li{
+        list-style: none;
+    }
+</style>
 <div style="display: flex;">
-    <div style="width: 500px; height: 600px; background-color: #f0f0f0; padding: 20px;">
+    <div style="width: 500px; height: 800px; background-color: #f0f0f0; padding: 20px;">
         <h2>Menu</h2>
-        <ul>
-            <li><a href="{% url 'custom_admin_dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'manage_members' %}">Manage Members</a></li>
-            <li><a href="{% url 'manage_books' %}">Manage Books</a></li>
-            <li><a href="{% url 'admin_issued_book' %}">Issued</a></li>
-            <li><a href="{% url 'admin_returned_book' %}">Returned</a></li>
-            <li><a href="{% url 'admin_not_returned_book' %}">Not Returned</a></li>
-            <li><a href="{% url 'borrowed_books_report' %}">Borrowed Books Report</a></li>
-            <li><a href="{% url 'overdue_books_report' %}">Overdue Books Report</a></li>
-            <li><a href="{% url 'member_activities_report' %}">Member Activities Report</a></li>
-            <li><a href="{% url 'custom_admin_login' %}">Logout</a></li>
-                    
+        <ul style="list-style: none; padding: 0;">
+            <li><a href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-dashboard"></i> Dashboard</a></li>
+            <li><a href="{% url 'manage_members' %}"><i class="fas fa-users"></i> Manage Members</a></li>
+            <li><a href="{% url 'manage_books' %}"><i class="fas fa-book"></i> Manage Books</a></li>
+            <li><a href="{% url 'admin_issued_book' %}"><i class="fas fa-book-reader"></i> Issued</a></li>
+            <li><a href="{% url 'admin_returned_book' %}"><i class="fas fa-undo"></i> Returned</a></li>
+            <li><a href="{% url 'admin_not_returned_book' %}"><i class="fas fa-exclamation-circle"></i> Not Returned</a></li>
+            <li><a href="{% url 'borrowed_books_report' %}"><i class="fas fa-file-alt"></i> Borrowed Books Report</a></li>
+            <li><a href="{% url 'overdue_books_report' %}"><i class="fas fa-clock"></i> Overdue Books Report</a></li>
+            <li><a href="{% url 'member_activities_report' %}"><i class="fas fa-user-clock"></i> Member Activities Report</a></li>
+            <li><a href="{% url 'custom_admin_login' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
 
@@ -115,6 +144,80 @@
         </ul>
     </div>
 </div> -->
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+    <div style="width: 400px; height: 300px;">
+        <h3>Book Status</h3>
+        <canvas id="bookStatusChart"></canvas>  </div>
+    <div style="width: 400px; height: 300px;">
+        <h3>Borrow Requests</h3>
+        <canvas id="borrowRequestChart"></canvas> </div>
 </div>
 </div>
+</div>
+<!-- This line includes the Chart.js library from a CDN (Content Delivery Network). Chart.js is a powerful JavaScript library for creating various types of charts. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+    // JavaScript code runs after the HTML document is fully loaded.
+    document.addEventListener('DOMContentLoaded', function() {
+        // Book Status Chart
+        // This gets the 2D drawing context of the canvas, allowing Chart.js to draw on it.
+        const bookStatusCtx = document.getElementById('bookStatusChart').getContext('2d');
+        new Chart(bookStatusCtx, { //This creates a new Chart.js chart.
+            type: 'pie',
+            data: {
+                labels: ['Returned', 'Not Returned'],
+                datasets: [{
+                    label: 'Book Status',
+                   
+                    data: [ '{{total_returned_books}}', '{{total_not_returned_books}}'],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 99, 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+
+        // Borrow Request Chart
+        const borrowRequestCtx = document.getElementById('borrowRequestChart').getContext('2d');
+        new Chart(borrowRequestCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'Accepted', 'Returned'],
+                datasets: [{
+                    label: 'Borrow Requests',
+                    data: ['{{ total_pending_borrow_requests }}', '{{ total_issued_books }}', '{{total_returned_books}}'],
+                    backgroundColor: [
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                 responsive: true,
+                maintainAspectRatio: false,
+            
+            }
+        });
+    });
+</script>
+
 {% endblock %}

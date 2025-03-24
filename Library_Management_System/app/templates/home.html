@@ -83,6 +83,33 @@
     flex: 1;
     text-align: center;
 }
+ /* Cards */
+ .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+
+    .card i {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .card img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+
+    .card a {
+        text-decoration: none;
+        font-weight: bold;
+    }
+
 
 .overdue {
     border: solid 1px black;
@@ -135,10 +162,13 @@ footer{
         <ul class="sidebar-menu">
             <!-- <li><a href="{% url 'book' %}">Books</a></li>
             <li><a href="{% url 'borrow_history' %}">History</a></li> -->
-            <li><a href="{% url 'about' %}">About Us</a></li>
-            <li><a href="{% url 'contactus' %}">Contact Us</a></li>
-            <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
-            <li><a href="{% url 'terms' %}">Terms of Service</a></li>
+            <li><a href="{% url 'home' %}"><i class="fa fa-tachometer"></i> Dashboard</a></li>
+            <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
+            <li><a href="{% url 'borrow_history' %}"><i class="fa fa-history"></i> History</a></li>
+            <li><a href="{% url 'about' %}"><i class="fas fa-info-circle" style=" margin-right: 10px;"></i>About Us</a></li>
+            <li><a href="{% url 'contactus' %}"><i class="fas fa-envelope" style=" margin-right: 10px;"></i>Contact Us</a></li>
+            <li><a href="{% url 'privacy' %}"><i class="fas fa-shield-alt" style=" margin-right: 10px;"></i>Privacy Policy</a></li>
+            <li><a href="{% url 'terms' %}"><i class="fas fa-file-alt" style=" margin-right: 10px;"></i>Terms of Service</a></li>
         </ul>
     </div>
     <div class="dashboard-content">
@@ -147,26 +177,32 @@ footer{
 
         <section class="summary">
             <div class="card">
+                <i class="fa fa-book"></i>
                 <a href="{% url 'user_book' %}" style="text-decoration: none; color: black;"><h3>My Books</h3></a>
                 <p>{{ borrowed_count }}</p>
             </div>
             <div class="card pending">
+                <i class="fa fa-clock"></i>
                 <a href="{% url 'pending_request' %}" style="text-decoration: none; color: black;"><h3>Pending Request</h3></a>
                 <p>{{ pending_count }}</p>
             </div>
             <div class="card renewals">
+                <i class="fa fa-refresh"></i>
                 <a href="{% url 'pending_renewal' %}" style="text-decoration: none; color: black;"><h3>Pending Renewals</h3></a>
                 <p>{{ renewal_count }}</p>
             </div>
             <div class="card returned">
+                <i class="fa fa-check-circle"></i>
                 <a href="{% url 'returned_books' %}" style="text-decoration: none; color: black;"><h3>Returned books</h3></a>
                 <p>{{ returned_count }}</p>
             </div>
             <div class="card overdue">
+                <i class="fa fa-exclamation-circle"></i>
                 <a href="{% url 'user_duebook' %}" style="text-decoration: none; color: black;"><h3>Overdue Books</h3></a>
                 <p>{{ overdue_count }}</p>
             </div>
             <div class="card notifications">
+                <i class="fa fa-bell"></i>
                 <a href="{% url 'notification' %}" style="text-decoration: none; color: black;"><h3>Notifications</h3></a>
                 <p>{{notification_count}}</p>
             </div>

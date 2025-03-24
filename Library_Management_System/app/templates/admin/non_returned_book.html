@@ -2,9 +2,26 @@
 
 {% block title %}Non Returned Book{% endblock %}
 
+{% block branding %}
+    <!-- Empty block, removes Django Admin title/logo -->
+{% endblock %}
+
+{% block nav-global %}
+    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
+    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- Empty block, removes breadcrumbs -->
+   
+{% endblock %}
+
 {% block content %}
 
 <style>
+     #header{
+        display: block;
+    }
     h1 {
         font-size: 24px;
         margin-bottom: 20px;

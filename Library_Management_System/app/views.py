@@ -50,6 +50,15 @@ from django.contrib.auth.models import User
 
 
 def borrowed_books_report(request):
+    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
+    
+    context = {
+        'borrowed_books': borrowed_books
+    }
+    html_content=render_to_string('admin/borrowed_books_report.html', context)
+    return HttpResponse(html_content)
+
+def download_borrowed_books_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="borrowed_books_report.pdf"'
 
@@ -58,6 +67,10 @@ def borrowed_books_report(request):
 
     p.setFont("Helvetica-Bold", 16)
     p.drawString(200, height - 50, "Borrowed Books Report")
+
+    generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+    p.setFont("Helvetica", 12)
+    p.drawString(200, height - 70, f"Generated on: {generated_time}")
 
     # Fetch data
     borrowed_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect'])
@@ -78,13 +91,24 @@ def borrowed_books_report(request):
     ]))
 
     table.wrapOn(p, width, height)
-    table.drawOn(p, 50, height - 150)
+    table.drawOn(p, 90, height - 200)
 
     p.showPage()
     p.save()
     return response
 
+
 def overdue_books_report(request):
+    overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
+    
+    context = {
+        'overdue_books': overdue_books
+    }
+    html_content=render_to_string('admin/overdue_books_report.html', context)
+    return HttpResponse(html_content)
+
+
+def download_overdue_books_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="overdue_books_report.pdf"'
 
@@ -94,6 +118,9 @@ def overdue_books_report(request):
     p.setFont("Helvetica-Bold", 16)
     p.drawString(200, height - 50, "Overdue Books Report")
 
+    generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+    p.setFont("Helvetica", 12)
+    p.drawString(200, height - 70, f"Generated on: {generated_time}")
     # Get overdue books (due date before today and not returned)
     overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
 
@@ -112,13 +139,34 @@ def overdue_books_report(request):
     ]))
 
     table.wrapOn(p, width, height)
-    table.drawOn(p, 50, height - 150)
+    table.drawOn(p, 50, height - 200)
 
     p.showPage()
     p.save()
     return response
 
 def member_activities_report(request):
+    users = UserInfo.objects.all()
+
+    user_data = []
+    for user in users:
+        borrow_count = BorrowRequest.objects.filter(user=user).count()
+        notification_count = Notification.objects.filter(user=user).count()
+        user_data.append({
+            'user': user,
+            'borrow_count': borrow_count,
+            'notification_count': notification_count
+        })
+
+    context = {
+        'users': users,
+        'user_data': user_data,
+        'borrow_requests': BorrowRequest.objects.all()
+    }
+    html_content=render_to_string('admin/member_activities_report.html', context)
+    return HttpResponse(html_content)
+
+def download_member_activities_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="member_activities_report.pdf"'
 
@@ -128,6 +176,10 @@ def member_activities_report(request):
     # Title
     p.setFont("Helvetica-Bold", 16)
     p.drawString(200, height - 50, "Member Activities Report")
+
+    generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
+    p.setFont("Helvetica", 12)
+    p.drawString(200, height - 70, f"Generated on: {generated_time}")
 
     # First table: User basic details
     users = UserInfo.objects.all()
@@ -149,7 +201,7 @@ def member_activities_report(request):
     ]))
 
     table.wrapOn(p, width - 100, height - 400)
-    table.drawOn(p, 50, height - 100 - 200)
+    table.drawOn(p, 50, height - 100 - 250)
 
     # Second table: Borrow Requests and Notifications
     data = [['Username', 'Email', 'Borrow Requests', 'Notifications']]

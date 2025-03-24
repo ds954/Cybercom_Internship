@@ -83,6 +83,19 @@
 
     <!-- ======= PAGE CONTENT START ======= -->
     <main>
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <!-- <li><a href="{% url 'book' %}">Books</a></li>
+                <li><a href="{% url 'borrow_history' %}">History</a></li> -->
+                <li><a href="{% url 'home' %}"><i class="fa fa-tachometer"></i> Dashboard</a></li>
+                <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
+                <li><a href="{% url 'borrow_history' %}"><i class="fa fa-history"></i> History</a></li>
+                <li><a href="{% url 'about' %}"><i class="fas fa-info-circle" style=" margin-right: 10px;"></i>About Us</a></li>
+                <li><a href="{% url 'contactus' %}"><i class="fas fa-envelope" style=" margin-right: 10px;"></i>Contact Us</a></li>
+                <li><a href="{% url 'privacy' %}"><i class="fas fa-shield-alt" style=" margin-right: 10px;"></i>Privacy Policy</a></li>
+                <li><a href="{% url 'terms' %}"><i class="fas fa-file-alt" style=" margin-right: 10px;"></i>Terms of Service</a></li>
+            </ul>
+        </div>
         {% block content %}
         <!-- Page-specific content will go here -->
         {% endblock %}
@@ -92,8 +105,7 @@
     <!-- ======= FOOTER START ======= -->
     <footer>
         <div class="footer-container">
-            <p style="color: black;">&copy; 2025 Library Management System </p>
-            <p>version 1.0.0</p> 
+            <p style="color: black;">&copy; 2025 Library Management System | version 1.0.0</p>
             <!-- <div class="logo">
                 <img src="/static/logo.png" alt="logo">
             </div> -->

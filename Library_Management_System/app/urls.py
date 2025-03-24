@@ -66,9 +66,12 @@ urlpatterns=[
     path('custom-admin/manage_books/delete/<int:book_id>/', views.delete_book, name='delete_book'),
     path('custom-admin/manage_books/bulk_upload/', views.bulk_upload_books, name='bulk_upload_books'),
 
-    path('borrowed_books_report/', views.borrowed_books_report, name='borrowed_books_report'),
+    path('custom-admin/borrowed_books_report/', views.borrowed_books_report, name='borrowed_books_report'),
+    path('download_borrowed_books_report/',views.download_borrowed_books_report,name='download_borrowed_books_report'),
+    path('download_overdue_books_report/',views.download_overdue_books_report,name='download_overdue_books_report'),
     path('overdue_books_report/', views.overdue_books_report, name='overdue_books_report'),
     path('member_activities_report/', views.member_activities_report, name='member_activities_report'),
+    path('download-member-activities/', views.download_member_activities_report, name='download_member_activities_report'),
 
 ]
 

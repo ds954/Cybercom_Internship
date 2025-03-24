@@ -1,0 +1,92 @@
+{% extends 'admin/base.html' %}
+
+{% block branding %}
+    <!-- Empty block, removes Django Admin title/logo -->
+{% endblock %}
+
+{% block nav-global %}
+    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
+    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
+{% endblock %}
+
+{% block breadcrumbs %}
+    <!-- Empty block, removes breadcrumbs -->
+   
+{% endblock %}
+
+{% block content %}
+<style>
+     #header{
+        display: block;
+    }
+</style>
+<h2>Member Activities Report</h2>
+
+
+<!-- User Details Table -->
+<h3>User Details</h3>
+<table border="1" class="table" style="margin-bottom: 50px;">
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+        <th>Phone</th>
+        <th>Registration Date</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.Username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.firstname }}</td>
+        <td>{{ user.lastname }}</td>
+        <td>{{ user.phone }}</td>
+        <td>{{ user.created_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Borrow Requests & Notifications Table -->
+<h3>Borrow Requests & Notifications</h3>
+<table border="1" style="margin-bottom: 50px;">
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Borrow Requests</th>
+        <th>Notifications</th>
+    </tr>
+    {% for user_data in user_data %}
+    <tr>
+        <td>{{ user_data.user.Username }}</td>
+        <td>{{ user_data.user.email }}</td>
+        <td>{{ user_data.borrow_count }}</td>
+        <td>{{ user_data.notification_count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Borrow History Table -->
+<h3>Borrow History</h3>
+<table border="1" >
+    <tr>
+        <th>Username</th>
+        <th>Book Title</th>
+        <th>Status</th>
+        <th>Issued Date</th>
+        <th>Due Date</th>
+    </tr>
+    {% for borrow in borrow_requests %}
+    <tr>
+        <td>{{ borrow.user.Username }}</td>
+        <td>{{ borrow.book.title }}</td>
+        <td>{{ borrow.status }}</td>
+        <td>{{ borrow.IssuedDate }}</td>
+        <td>{{ borrow.Duedate }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+<!-- Download PDF Button -->
+<button style="margin-top: 50px;"><a href="{% url 'download_member_activities_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
+{% endblock %}
