@@ -1,30 +1,18 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Add Book{% endblock %}
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
 
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-{% block content %}
+{% block admin_content %}
 
 <style>
+     body{
+        overflow-y: hidden;
+    }
     h2 {
         font-size: 24px;
-        margin-bottom: 10px;
+        margin: 0;
         color: #333;
         text-align: center;
-    }
-    #header{
-        display: block;
     }
 
     .form-container {
@@ -57,7 +45,6 @@
         border: 1px solid #ccc;
         border-radius: 4px;
         font-size: 14px;
-        margin-bottom: 5px;
         box-sizing: border-box;
     }
 

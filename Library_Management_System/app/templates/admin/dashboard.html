@@ -1,158 +1,189 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Admin Dashboard{% endblock %}
 
 
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
-
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
 
 
 
 
 
-
-
-{% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% block admin_content %}
 <style>
-     #header{
-        display: block;
-    }
-    ul li{
-        list-style: none;
-    }
+
+.main-div {
+        width: 500px !important; /* Override width */
+    }    
+/* Card Styles */
+.card {
+    height: 90px;
+    padding: 20px;
+
+    border-radius: 8px;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    
+}
+
+.card p{
+    border-radius: 50%; 
+    width: 30px;
+    height: 30px;
+     display: flex; 
+     align-items: center; 
+     justify-content: center; 
+     color: black;
+     margin: 0;
+     margin-top: 5px;
+}
+
+.card:hover{
+    transform: scale(1.07);
+}
+/* Different Colors for Each Card */
+.members-card { background-color:  #e8f5e9;  border: 1px solid #86da97 ;} /* Light Green */
+.books-card { background-color: #e0f7fa; border: 1px solid #81d4fa } /* Light Blue */
+.issued-books-card { background-color: #e0f7fa; border: 1px solid #81d4fa } /* Purple */
+.returned-books-card { background-color:  #c8e6c9; border: 1px solid #78c18a } /* Green */
+.borrow-history-card { background-color: #fff3e0; border: 1px solid #eed3a9 } /* Light Orange */
+.pending-requests-card { background-color:  #fff3e0; border: 1px solid #eed3a9} /* Yellow */
+.pending-renewals-card { background-color: #fff3e0; border: 1px solid #eed3a9 } /* Peach */
+.not-returned-books-card { background-color: #ffcdd2;border: 1px solid #ef9a9a } /* Light Red */
+.notifications-card { background-color: #fce4ec; border: 1px solid #f48fb1} /* Pink */
+
+.members-card p{ background-color:   #86da97; } /* Light Green */
+.books-card p{ background-color: #81d4fa; } /* Light Blue */
+.issued-books-card p{ background-color: #81d4fa; } /* Purple */
+.returned-books-card p{ background-color:  #78c18a; } /* Green */
+.borrow-history-card p{ background-color: #eed3a9; } /* Light Orange */
+.pending-requests-card p{ background-color:  #eed3a9; } /* Yellow */
+.pending-renewals-card p{ background-color: #eed3a9; } /* Peach */
+.not-returned-books-card p{ background-color: #ef9a9a; } /* Light Red */
+.notifications-card p{ background-color: #f48fb1; } /* Pink */
+
+
+.card h1{
+    font-size: 18px;
+    font-weight:600;
+    color: black;
+    margin: 0;
+}
+.div-card a{
+    text-decoration: none;
+}
+
+
+  
+
 </style>
-<div style="display: flex;">
-    <div style="width: 500px; height: 800px; background-color: #f0f0f0; padding: 20px;">
-        <h2>Menu</h2>
-        <ul style="list-style: none; padding: 0;">
-            <li><a href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-dashboard"></i> Dashboard</a></li>
-            <li><a href="{% url 'manage_members' %}"><i class="fas fa-users"></i> Manage Members</a></li>
-            <li><a href="{% url 'manage_books' %}"><i class="fas fa-book"></i> Manage Books</a></li>
-            <li><a href="{% url 'admin_issued_book' %}"><i class="fas fa-book-reader"></i> Issued</a></li>
-            <li><a href="{% url 'admin_returned_book' %}"><i class="fas fa-undo"></i> Returned</a></li>
-            <li><a href="{% url 'admin_not_returned_book' %}"><i class="fas fa-exclamation-circle"></i> Not Returned</a></li>
-            <li><a href="{% url 'borrowed_books_report' %}"><i class="fas fa-file-alt"></i> Borrowed Books Report</a></li>
-            <li><a href="{% url 'overdue_books_report' %}"><i class="fas fa-clock"></i> Overdue Books Report</a></li>
-            <li><a href="{% url 'member_activities_report' %}"><i class="fas fa-user-clock"></i> Member Activities Report</a></li>
-            <li><a href="{% url 'custom_admin_login' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-        </ul>
-    </div>
 
-    <div style="flex-grow: 1; padding: 20px;">
+    
+
+    <div style=" padding: 20px;">
         <!-- <h1>Welcome to Admin Dashboard</h1> -->
-        <h1>Welcome {{ admin_user.username }} to Admin Dashboard</h1>
+        <h1 style="font-weight: bolder;">Welcome {{ admin_user.username }}</h1>
 
+
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;" class="div-card">
+            <a href="{% url 'admin_user' %}" >
+                <div class="card members-card">
+                    <h1 >Members</h1>
+                    <div style="margin-bottom: 0px;">
+                    <p>{{ users|length }}</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'custom_books' %}">
+                <div class="card books-card">
+                    <h1>Books</h1>
+                    <p>{{ books|length }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_issued_book' %}">
+                <div class="card issued-books-card">
+                    <h1>Issued Books</h1>
+                    <p>{{ total_issued_books }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_returned_book' %}">
+                <div class="card returned-books-card">
+                    <h1>Returned Books</h1>
+                    <p>{{ total_returned_books }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_borrow_history' %}">
+                <div class="card borrow-history-card">
+                    <h1>Borrow Book History</h1>
+                    <p>{{ borrow_requests|length }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_borrow_request' %}">
+                <div class="card pending-requests-card">
+                    <h1>Pending Borrow Requests</h1>
+                    <p>{{ total_pending_borrow_requests }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_pending_renewal_request' %}">
+                <div class="card pending-renewals-card">
+                    <h1>Pending Renewal Requests</h1>
+                    <p>{{ total_pending_renewal_requests }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_not_returned_book' %}">
+                <div class="card not-returned-books-card">
+                    <h1>Not Returned Books</h1>
+                    <p>{{ total_not_returned_books }}</p>
+                </div>
+            </a>
+            
+            <a href="{% url 'admin_notification' %}">
+                <div class="card notifications-card">
+                    <h1>Notifications</h1>
+                    <p>{{ notifications|length }}</p>
+                </div>
+            </a>
+            
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <form method="POST">
+            {% csrf_token %}
+            <div style="width: 100%; display: flex; align-items: center; justify-content: flex-start; margin-top: 20px;">
+            <label for="start-date"  style="margin-right: 10px;">Start Date:</label>
+            <input type="date" id="start-date" name="start_date" value="{{ start_date }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;">
+            
+            <label for="end-date"  style="margin-right: 10px;">End Date:</label>
+            <input type="date"  id="end-date" name="end_date" value="{{ end_date }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px;" >
+        
+            <button type="submit" style="padding: 8px 16px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Filter</button>
+        </div>
+        </form>
+        </div>
 
         <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-            <div style="background-color: #e8f5e9; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Members</h3>
-                <p>Total: {{ users|length }}</p>
-                <a href="{% url 'admin_user' %}">More info</a>
+            <div style="width: 400px; height: 300px;">
+                <h3>Book Status</h3>
+                
+                
+                <canvas id="bookStatusChart"></canvas> 
             </div>
-            <div style="background-color: #e0f7fa; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Books</h3>
-                <p>Total: {{ books|length }}</p>
-                <a href="{% url 'custom_books' %}">More info</a>
-            </div>
-
-
-            
-            <div style="background-color: #e0f7fa; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>issued Book</h3>
-                <p>Total: {{total_issued_books}}</p>
-                <a href="{% url 'admin_issued_book' %}">More info</a>
-            </div>
-            <div style="background-color: #c8e6c9; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Returned Book</h3>
-                <p>Total: {{ total_returned_books}}</p>
-                <a href="{% url 'admin_returned_book' %}">More info</a>
-            </div>
-           
-            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Borrow Book History </h3>
-                <p>Total: {{ borrow_requests|length }}</p>
-                <a href="{% url 'admin_borrow_history' %}">More info</a>
-            </div>
-            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Pending Borrow Request</h3>
-                <p>Total: {{ total_pending_borrow_requests}}</p>
-                <a href="{% url 'admin_borrow_request' %}">More info</a>
-            </div>
-            <div style="background-color: #fff3e0; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Pending Renewal Request</h3>
-                <p>Total: {{ total_pending_renewal_requests}}</p>
-                <a href="{% url 'admin_pending_renewal_request' %}">More info</a>
-            </div>
-            <div style="background-color: #ffcdd2; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Not Returned Book</h3>
-                <p>Total: {{ total_not_returned_books }}</p>
-                <a href="{% url 'admin_not_returned_book' %}">More info</a>
-            </div>
-            <div style="background-color: #fce4ec; padding: 20px; border-radius: 8px; width: 200px;">
-                <h3>Notifications</h3>
-                <p>Total: {{ notifications|length }}</p>
-                <a href="{% url 'admin_notification' %}">More info</a>
+            <div style="width: 400px; height: 300px;">
+                <h3>Borrow Requests</h3>
+               
+                <canvas id="borrowRequestChart"></canvas> 
             </div>
         </div>
-<!-- 
-        <h2>Users</h2>
-        <ul>
-            {% for user in users %}
-            <li>{{ user.Username }} - {{ user.email }}</li>
-            {% empty %}
-            <li>No users found.</li>
-            {% endfor %}
-        </ul>
-
-        <h2>Books</h2>
-        <ul>
-            {% for book in books %}
-            <li>{{ book.title }} by {{ book.author }}</li>
-            {% empty %}
-            <li>No books found.</li>
-            {% endfor %}
-        </ul>
-
-        <h2>Borrow Requests</h2>
-        <ul>
-            {% for req in borrow_requests %}
-            <li>{{ req.user.username }} requested {{ req.book.title }}</li>
-            {% empty %}
-            <li>No borrow requests found.</li>
-            {% endfor %}
-        </ul>
-
-        <h2>Recent Notifications</h2>
-        <ul>
-            {% for note in notifications %}
-            <li>{{ note.message }} ({{ note.timestamp }})</li>
-            {% empty %}
-            <li>No notifications found.</li>
-            {% endfor %}
-        </ul>
     </div>
-</div> -->
-<div style="display: flex; flex-wrap: wrap; gap: 20px;">
-    <div style="width: 400px; height: 300px;">
-        <h3>Book Status</h3>
-        <canvas id="bookStatusChart"></canvas>  </div>
-    <div style="width: 400px; height: 300px;">
-        <h3>Borrow Requests</h3>
-        <canvas id="borrowRequestChart"></canvas> </div>
-</div>
-</div>
 </div>
 <!-- This line includes the Chart.js library from a CDN (Content Delivery Network). Chart.js is a powerful JavaScript library for creating various types of charts. -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -171,7 +202,7 @@
                 datasets: [{
                     label: 'Book Status',
                    
-                    data: [ '{{total_returned_books}}', '{{total_not_returned_books}}'],
+                    data: [ '{{filter_total_returned_books}}', '{{filter_total_not_returned_books}}'],
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(255, 99, 132, 0.2)'
@@ -185,7 +216,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false,     
             }
         });
 
@@ -197,7 +228,7 @@
                 labels: ['Pending', 'Accepted', 'Returned'],
                 datasets: [{
                     label: 'Borrow Requests',
-                    data: ['{{ total_pending_borrow_requests }}', '{{ total_issued_books }}', '{{total_returned_books}}'],
+                    data: ['{{ filter_total_pending_borrow_requests }}', '{{ filter_total_issued_books }}', '{{filter_total_returned_books}}'],
                     backgroundColor: [
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
@@ -211,13 +242,25 @@
                     borderWidth: 1
                 }]
             },
-            options: {
-                 responsive: true,
+                options: {
+                    scales: {
+                    x: {
+                        grid: {
+                            display: false // Removes grid lines from X-axis
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false // Removes grid lines from Y-axis
+                        }
+                    }
+                },
+            
+                responsive: true,
                 maintainAspectRatio: false,
             
             }
         });
     });
 </script>
-
-{% endblock %}
+{% endblock %} 

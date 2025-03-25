@@ -1,31 +1,14 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Issued Date{% endblock %}
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
 
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-{% block content %}
+{% block admin_content %}
 
 <style>
-     #header{
-        display: block;
+      h1{
+        font-weight: 500;
     }
-    h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
+   
     .borrow-history-container {
         margin: 20px 0;
     }
@@ -60,14 +43,19 @@
     .status {
         color: #555;
     }
-
+    .borrow-history-table th {
+        background-color: #89aec1; /* Light Green for Members (first column) */
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
 </style>
 
 <div class="borrow-history-container">
     <h1>Borrow Book History</h1>
     
     <table class="borrow-history-table">
-        <thead>
+        
             <tr>
                 <th>User</th>
                 <th>Book Title</th>
@@ -76,8 +64,7 @@
                 <th>Due Date</th>
                 <th>Status</th>
             </tr>
-        </thead>
-        <tbody>
+       
            
             {% for request in borrow_requests %}
             <tr id="request-{{ request.id }}">
@@ -95,7 +82,7 @@
                 <td colspan="5">No borrow history available.</td>
             </tr>
             {% endfor %}
-        </tbody>
+        
     </table>
 
 </div>

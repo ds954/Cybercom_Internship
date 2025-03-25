@@ -291,6 +291,7 @@ def custom_admin_login(request):
       })
     return HttpResponse(login_page_html)
 
+@csrf_exempt
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_admin_dashboard(request):
@@ -303,6 +304,19 @@ def custom_admin_dashboard(request):
     total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested').count()
     total_returned_books = BorrowRequest.objects.filter(status='book_returned').count()
     total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect']).count()
+    start_date = request.POST.get('start_date')
+    end_date = request.POST.get('end_date')
+
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+        filter_borrow_requests = borrow_requests.filter(IssuedDate__range=(start_date, end_date))
+        filter_total_issued_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'], IssuedDate__range=(start_date, end_date)).count()
+        filter_total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending', IssuedDate__range=(start_date, end_date)).count()
+        filter_total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested', IssuedDate__range=(start_date, end_date)).count()
+        filter_total_returned_books = BorrowRequest.objects.filter(status='book_returned', IssuedDate__range=(start_date, end_date)).count()
+        filter_total_not_returned_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'], IssuedDate__range=(start_date, end_date)).count()
 
     dashboard_html = render_to_string('admin/dashboard.html', {
         'users': users,
@@ -314,7 +328,14 @@ def custom_admin_dashboard(request):
         'total_pending_borrow_requests':total_pending_borrow_requests,
         'total_pending_renewal_requests':total_pending_renewal_requests,
         'total_returned_books':total_returned_books,
-        'admin_user':request.user
+        'admin_user':request.user,
+
+        'filter_borrow_requests': filter_borrow_requests,
+        'filter_total_issued_books':filter_total_issued_books,
+        'filter_total_not_returned_books':filter_total_not_returned_books,
+        'filter_total_pending_borrow_requests':filter_total_pending_borrow_requests,
+        'filter_total_pending_renewal_requests':filter_total_pending_renewal_requests,
+        'filter_total_returned_books':filter_total_returned_books,
     })
     return HttpResponse(dashboard_html)
 
@@ -841,7 +862,7 @@ def view_profile(request):
     return HttpResponse(html_content)
 
 
-
+@csrf_exempt
 # @session_login_required
 def edit_profile(request):
     user_data = JWTAuthentication().authenticate(request)
@@ -881,7 +902,11 @@ def edit_profile(request):
             user.profile_picture = request.FILES['profile_picture']
 
         # Save user info and profile picture
-        user.save()
+        # user.save()
+        if form.is_valid():
+            form.save()
+        else:
+            user.save() 
 
         if form.is_valid():
             form.save()

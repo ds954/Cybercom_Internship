@@ -1,38 +1,34 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Notifications{% endblock %}
 
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
 
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
 
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 <style>
-     #header{
-        display: block;
+      th {
+        background-color: #89aec1; /* Light Green for Members (first column) */
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    table{
+        width: 100%;
+    }
+    h1{
+        font-weight: 500;
     }
 </style>
-    <h2>Recent Notifications</h2>
+    <h1>Recent Notifications</h1>
 
     <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-        <thead style="background-color: #f2f2f2;">
+        
             <tr>
                 <th>User</th>
                 <th>Message</th>
                 <th>Timestamp</th>
             </tr>
-        </thead>
-        <tbody>
+       
             {% for note in notifications %}
                 <tr>
                     <td>{{  note.user.Username }}</td>
@@ -44,6 +40,6 @@
                     <td colspan="3" style="text-align: center;">No notifications found.</td>
                 </tr>
             {% endfor %}
-        </tbody>
+   
     </table>
 {% endblock %}

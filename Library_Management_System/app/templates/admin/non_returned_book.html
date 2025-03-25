@@ -1,31 +1,12 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Non Returned Book{% endblock %}
 
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
-
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 
 <style>
-     #header{
-        display: block;
-    }
-    h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #333;
+      h1{
+        font-weight: 500;
     }
 
     .borrow-history-container {
@@ -63,14 +44,19 @@
         color: #d9534f; /* Red text for overdue */
         font-weight: bold;
     }
-
+    .borrow-history-table th {
+        background-color: #89aec1; /* Light Green for Members (first column) */
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
 </style>
 
 <div class="borrow-history-container">
     <h1>Non Returned Books</h1>
     
     <table class="borrow-history-table">
-        <thead>
+        
             <tr>
                 <th>User</th>
                 <th>Book Title</th>
@@ -79,8 +65,7 @@
                 <th>Due Date</th>
                 <th>Status</th>
             </tr>
-        </thead>
-        <tbody>
+        
             {% for request in borrow_requests %}
                 {% if request.status == 'accepted' or request.status == 'renew_accpect' or request.status == 'renewal_requested' %}
                     {% if request.Duedate < today %}
@@ -99,7 +84,7 @@
                     <td colspan="5">No overdue books found.</td>
                 </tr>
             {% endfor %}
-        </tbody>
+       
     </table>
 
 </div>

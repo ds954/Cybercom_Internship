@@ -1,64 +1,64 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Edit Member{% endblock %}
 
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
-
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 
 <style>
-     #header{
-        display: block;
+
+    body{
+        overflow-y: hidden;
     }
-    h2 {
+ h2 {
         font-size: 24px;
-        margin-bottom: 20px;
+        margin: 0;
         color: #333;
         text-align: center;
     }
 
     .form-container {
+        font-weight: 500;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
     }
 
+    .profile-pic {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ccc;
+        margin-bottom: 15px;
+    } 
+    input #id_Username,#id_email, #id_firstname,#id_lastname,#id_phone,#id_profile_picture,#id_Username{
+        width: 100%;
+    }
+
     form {
         width: 100%;
         max-width: 600px;
-        margin-bottom: 20px;
     }
 
-    label {
+    
+
+    /* label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         font-weight: bold;
         color: #333;
-    }
-
+    } */
+/* 
     input, select, textarea {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
+        padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
         font-size: 14px;
         box-sizing: border-box;
-    }
-
+    } */
+  
     button[type="submit"] {
         display: inline-block;
         padding: 10px 20px;
@@ -87,18 +87,37 @@
 
     a.back-link:hover {
         background-color: #a3a7a9;
-    }
-</style>
+    } 
+    div.form-row{
+        margin-bottom: 10px;
+     }
+     #id_profile_picture{
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 5px 6px;
+     }
 
-<h2>Edit Member</h2>
+</style> 
 
+{% load static %}
 <div class="form-container">
+    {% if form.instance.profile_picture %}
+        <img src="{{ form.instance.profile_picture.url }}" class="profile-pic">
+    {% else %}
+        <img src="{% static 'default.jpg' %}" class="profile-pic">
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% for field in form %}
+            <div class="form-row">
+                {{ field.errors }}
+                {{ field.label_tag }}
+                {{ field }}
+            </div>
+        {% endfor %}
         <button type="submit">Update Member</button>
     </form>
-
     <a href="{% url 'manage_members' %}" class="back-link">Back to Members</a>
 </div>
 

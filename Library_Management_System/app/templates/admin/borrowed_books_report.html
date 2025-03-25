@@ -1,39 +1,33 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Borrowed Books Report{% endblock %}
 
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
-
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-
-{% block content %}
+{% block admin_content %}
 <style>
-     #header{
-        display: block;
+      h1{
+        font-weight: 500;
+    }
+      th {
+        background-color: #89aec1; /* Light Green for Members (first column) */
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    table{
+        width: 100%;
     }
 </style>
-<h2>Borrowed Books Report</h2>
+<h1>Borrowed Books Report</h1>
 
 <table border="1" cellpadding="5" cellspacing="0">
-    <thead>
+    
         <tr>
             <th>User</th>
             <th>Book Title</th>
             <th>Issued Date</th>
             <th>Due Date</th>
         </tr>
-    </thead>
-    <tbody>
+  
         {% for req in borrowed_books %}
         <tr>
             <td>{{ req.user.Username }}</td>
@@ -46,7 +40,7 @@
             <td colspan="4">No borrowed books found.</td>
         </tr>
         {% endfor %}
-    </tbody>
+  
 </table>
 
 <!-- Download PDF Button -->

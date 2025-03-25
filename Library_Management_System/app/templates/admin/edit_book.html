@@ -1,28 +1,16 @@
-{% extends 'admin/base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block title %}Edit Book{% endblock %}
-{% block branding %}
-    <!-- Empty block, removes Django Admin title/logo -->
-{% endblock %}
 
-{% block nav-global %}
-    <!-- Empty block, removes Django Admin navigation (Home, Documentation, etc.) -->
-    <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
-{% endblock %}
-
-{% block breadcrumbs %}
-    <!-- Empty block, removes breadcrumbs -->
-   
-{% endblock %}
-{% block content %}
+{% block admin_content %}
 
 <style>
-     #header{
-        display: block;
+      body{
+        overflow-y: hidden;
     }
     h2 {
         font-size: 24px;
-        margin-bottom: 20px;
+        margin:0;
         color: #333;
         text-align: center;
     }
@@ -37,16 +25,13 @@
     form {
         width: 100%;
         max-width: 600px;
-        margin-bottom: 20px;
+       
     }
 
-    form p {
-        margin-bottom: 15px;
-    }
 
     label {
         display: block;
-        margin-bottom: 6px;
+        margin-bottom: 2px;
         font-weight: bold;
         color: #333;
     }
@@ -57,11 +42,10 @@
     textarea,
     select {
         width: 100%;
-        padding: 10px;
+        padding: 8px;
         border: 1px solid #ccc;
         border-radius: 4px;
         font-size: 14px;
-        margin-bottom: 10px;
         box-sizing: border-box;
     }
 
