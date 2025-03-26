@@ -3,13 +3,109 @@
 
 {% block title %}Edit Profile{% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'Edit_Profile.css' %}"> 
-{% endblock %}
 
-{% block content %}
+
 {% block search-content %}
 {% endblock %}
+{% block user_content %}
+<style>
+   
+    .container{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* margin-left: 400px; */
+    }
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+    }
+    
+    /* Form Styling */
+    .edit-profile-form {
+        display: flex;
+        flex-direction: column;
+        width: 350px; /* Adjust width as needed */
+    }
+    
+    /* Align labels to the start (left) */
+    .edit-profile-form label {
+        text-align: left;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    /* Ensure inputs take full width */
+    .edit-profile-form input,
+    .edit-profile-form textarea,
+    .edit-profile-form button {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    
+    /* Focus Effect */
+    .edit-profile-form input:focus,
+    .edit-profile-form textarea:focus {
+        border-color: #2575fc;
+        outline: none;
+        box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+    }
+    
+    /* Center Profile Photo */
+    .profile-photo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    /* Profile Photo */
+    .defaultImg {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    /* Upload & Remove Buttons */
+    .upload-text {
+        font-size: 12px;
+        color: #2575fc;
+        cursor: pointer;
+    }
+    
+    #remove-photo-btn {
+        width: 30%;
+        color: black;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+    
+    #remove-photo-btn:hover {
+        background: #1a5bbf;
+    }
+    
+    /* Submit Button */
+    .edit-profile-form button {
+        width: 105%;
+        color: black;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    
+    
+    </style>
 <div class="container">
 
     <form method="post" class="edit-profile-form" enctype="multipart/form-data">
@@ -68,7 +164,7 @@
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
+{% block scripts %}
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

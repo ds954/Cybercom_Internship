@@ -146,7 +146,7 @@ JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,  
     'JWT_ALGORITHM': 'HS256',
     'JWT_ACCESS_TOKEN_LIFETIME': timedelta(minutes=25),
-    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(minutes=50),
+    'JWT_REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'JWT_ALLOW_REFRESH': True,
 }
 # Password validation

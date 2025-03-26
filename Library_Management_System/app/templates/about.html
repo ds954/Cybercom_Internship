@@ -2,14 +2,13 @@
 {% load static %}
 {% block title %} About Us {% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'about.css' %}">
-{% endblock %}
 
-{% block content %}
+
 {% block search-content %}
 {% endblock %}
-<div class="container">
+
+{% block user_content %}
+<div class="container" style="margin-left: 50px;">
     <h2 class="text-center">Welcome to the Digital Library!</h2>
     <p class="text">
         Welcome to the <strong>Library Management System</strong>, your one-stop destination for accessing a vast collection of books and resources. 

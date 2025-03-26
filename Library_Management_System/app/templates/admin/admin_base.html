@@ -69,7 +69,7 @@
         <div class="profile-menu">
             <img src="{% static 'default.jpg' %}" class="profile-icon">
             <div class="dropdown-menu">
-                <a href="#" style="color: #417893; text-decoration: none;"><i class="fas fa-user" style="margin-right: 5px; "></i>Profile</a>
+                <a href="{% url 'admin_profile' %}" style="color: #417893; text-decoration: none;"><i class="fas fa-user" style="margin-right: 5px; "></i>Profile</a>
                 <a href="{% url 'custom_admin_login' %}" style="color: #417893; text-decoration: none;"><i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>Logout</a>
             </div>
         </div>

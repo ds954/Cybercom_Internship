@@ -73,6 +73,8 @@ urlpatterns=[
     path('member_activities_report/', views.member_activities_report, name='member_activities_report'),
     path('download-member-activities/', views.download_member_activities_report, name='download_member_activities_report'),
 
+    path('custom-admin/profile/', views.admin_profile_view, name='admin_profile'),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

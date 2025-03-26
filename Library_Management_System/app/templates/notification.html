@@ -2,8 +2,14 @@
 {% load static %}
 {% block title %} notification Page {% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'borrow_history.css' %}"> 
+
+
+{% block search-content %}
+{% endblock %}
+
+{% block user_content %}
+
+<link rel="stylesheet" href="{% static 'borrow_history.css' %}"> 
     <style>
         
         main{
@@ -12,7 +18,7 @@
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            
            
         }
         .notification{
@@ -40,12 +46,6 @@
     }
 
     </style>
-{% endblock %}
-
-{% block content %}
-{% block search-content %}
-{% endblock %}
-
 <div class="container">
     <h2 class="notification">Notifications</h2>
     {% if messages %}
@@ -68,10 +68,9 @@
     <div id="notification-box"></div>
 </div>
 
-{% endblock %}
 
 
-{% block extra_scripts %}
+{% block scripts %}
     <script>
     var socket = new WebSocket("ws://localhost:8000/ws/notifications/");
 
@@ -128,3 +127,4 @@
     
 {% endblock %}
     
+{% endblock %}

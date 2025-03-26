@@ -2,13 +2,11 @@
 {% load static %}
 {% block title %} {{ book.title }} {% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'home.css' %}">
-{% endblock %}
 
-{% block content %}
+
 {% block search-content %}
 {% endblock %}
+{% block user_content %}
     <div class="container">
         <div class="book-detail-card">
             <h2>{{ book.title }}</h2>

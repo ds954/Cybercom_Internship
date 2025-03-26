@@ -3,11 +3,11 @@
 {% block title %} Returned Book {% endblock %}
 
 
-
-{% block content %}
-
 {% block search-content %}
 {% endblock %}
+
+{% block user_content %}
+
 {% if borrow_requests %}
     <ul>
     {% for request in borrow_requests %}

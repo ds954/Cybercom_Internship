@@ -3,81 +3,11 @@
 
 {% block title %}view Profile{% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'view_profile.css' %}"> 
-    <style>
-        footer{
-            position: fixed;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            padding: 40px;
-            gap: 20px;
-        }
 
-        .left-section,
-        .right-section {
-            padding: 20px;
-        }
-
-        .left-section {
-            flex: 2;
-            min-width: 300px;
-        }
-
-        .right-section {
-            flex: 1;
-            min-width: 250px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .profile-photo-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .defaultImg {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #ccc;
-            margin-bottom: 15px;
-        }
-
-        
-
-        .edit-profile-link {
-            text-align: center;
-        }
-
-        .edit-profile-link a {
-            color: #007BFF;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .edit-profile-link a:hover {
-            text-decoration: underline;
-        }
-        .left-section p{
-            margin-top: 7px;
-            font-size:large ;
-        }
-
-       
-    </style>
-{% endblock %}
-
-{% block content %}
 {% block search-content %}
 {% endblock %}
+
+{% block user_content %}
 <div class="left-section">
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

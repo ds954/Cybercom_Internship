@@ -1,0 +1,10 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block admin_content %}
+    <h2>Admin Profile</h2>
+    <p><strong>Username:</strong> {{ admin_profile.username }}</p>
+    <p><strong>Email:</strong> {{ admin_profile.email }}</p>
+    <p><strong>Full Name:</strong> {{ admin_profile.full_name }}</p>
+    <p><strong>Phone:</strong> {{ admin_profile.phone }}</p>
+    <p><strong>Joined On:</strong> {{ admin_profile.date_joined }}</p>
+{% endblock %}

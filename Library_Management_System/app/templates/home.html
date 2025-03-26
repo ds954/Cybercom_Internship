@@ -1,248 +1,138 @@
 {% extends "base.html" %}
 {% load static %}
 
-    {% block title %}Library Sidebar{% endblock %}
+{% block title %}Library Sidebar{% endblock %}
     
     
-    {% block extra_head %}
-    <!-- <script src="{% static 'js/auth.js' %}" defer></script> -->
-    <style>
-        
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #cea387;
-            color: white;
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            margin-top: 50px;
-        }
-        .sidebar h2 {
-            text-align: center;
-            border-bottom: 1px solid gray;
-            padding-bottom: 10px;
-        }
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar-menu li {
-            padding: 10px;
-            cursor: pointer;
-        }
-        .sidebar-menu li a {
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-        .sidebar-menu li:hover {
-            background-color: #e3c09f;
-        }
-        .editable {
-            border: none;
-            background: none;
-            color: white;
-            width: 100%;
-            font-size: 16px;
-        }
-        main{
-            max-height: 400px;
-            height: 300px;
-            width: 1000px;
-        }
-.dashboard-content {
-    flex: 1;
-    padding: 20px;
-    align-items: start;
-}
-.Welcome{
-    margin-bottom: 50px;
-    margin-top: 50px;
-}
-.summary {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-.summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: repeat(2, auto); /* 2 rows */
-    gap: 20px;
-}
-
-
-.card {
-    border: solid 1px black;
-    padding: 20px;
-    border-radius: 5px;
-    background-color: white;
-    box-shadow: 0 4px 8px rgb(0, 0, 0,0.1);
-    flex: 1;
-    text-align: center;
-}
- /* Cards */
- .card {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+{% block user_content %}
+    
+<style>
+    .card {
+        height: 90px;
         padding: 20px;
-        text-align: center;
-        transition: 0.3s;
-    }
-
-
-    .card i {
-        font-size: 30px;
-        margin-bottom: 10px;
-    }
-
-    .card img {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 10px;
-    }
-
-    .card a {
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-
-.overdue {
-    border: solid 1px black;
-    color: black;
-}
-
-.renewals, .pending{
-    border: solid 1px black;
-    color: black;
-}
-
-.returned,.notifications{
-    border: solid 1px black;
-    color: black;
-}
-
-
-
- /* .notifications {
-    border-radius: 5px;
-    background-color: #fffafa; 
-     background-color: white;
-    box-shadow: 0 4px 8px rgb(0, 0, 0,0.1);
-    border: solid 1px black;
-    margin-top: 30px;
-    padding: 10px;
     
-    text-align: center;
-    border: solid 1px black;
-    color: black;
+        border-radius: 8px;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        
+    }
+    
+    .card p{
+        border-radius: 50%; 
+        width: 30px;
+        height: 30px;
+         display: flex; 
+         align-items: center; 
+         justify-content: center; 
+         color: black;
+         margin: 0;
+         margin-top: 5px;
+    }
+    
+    .card:hover{
+        transform: scale(1.07);
+    }
+   
+ 
+    .books-card { background-color: #e0f7fa; border: 1px solid #81d4fa } /* Light Blue */
+   
+    .returned { background-color:  #c8e6c9; border: 1px solid #78c18a } /* Green */
+    
+    .pending-card { background-color:  #fff3e0; border: 1px solid #eed3a9} /* Yellow */
+    .renewals-card { background-color: #fff3e0; border: 1px solid #eed3a9 } /* Peach */
+    .overdue { background-color: #ffcdd2;border: 1px solid #ef9a9a } /* Light Red */
+    .notifications { background-color: #fce4ec; border: 1px solid #f48fb1} /* Pink */
+    
+   
+    .books-card p{ background-color: #81d4fa; } /* Light Blue */
+   
+    .returned p{ background-color:  #78c18a; } /* Green */
+   
+    .pending-card p{ background-color:  #eed3a9; } /* Yellow */
+    .renewals-card p{ background-color: #eed3a9; } /* Peach */
+    .overdue p{ background-color: #ef9a9a; } /* Light Red */
+    .notifications p{ background-color: #f48fb1; } /* Pink */
+    
+    
+    .card h1{
+        font-size: 18px;
+        font-weight:600;
+        color: black;
+        margin: 0;
+    }
+    .div-card a{
+        text-decoration: none;
+    }
+    
+  
+      
+    
+</style>
+        
 
-} */
 
- /* .notifications ul {
-    list-style: none;
-    padding: 0;
-} */
-footer{
-    position: fixed;
-}
 
-    </style>
-{% endblock %}
-
-{% block content %}
     {% block search-content %}
     {% endblock %}
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <ul class="sidebar-menu">
-            <!-- <li><a href="{% url 'book' %}">Books</a></li>
-            <li><a href="{% url 'borrow_history' %}">History</a></li> -->
-            <li><a href="{% url 'home' %}"><i class="fa fa-tachometer"></i> Dashboard</a></li>
-            <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
-            <li><a href="{% url 'borrow_history' %}"><i class="fa fa-history"></i> History</a></li>
-            <li><a href="{% url 'about' %}"><i class="fas fa-info-circle" style=" margin-right: 10px;"></i>About Us</a></li>
-            <li><a href="{% url 'contactus' %}"><i class="fas fa-envelope" style=" margin-right: 10px;"></i>Contact Us</a></li>
-            <li><a href="{% url 'privacy' %}"><i class="fas fa-shield-alt" style=" margin-right: 10px;"></i>Privacy Policy</a></li>
-            <li><a href="{% url 'terms' %}"><i class="fas fa-file-alt" style=" margin-right: 10px;"></i>Terms of Service</a></li>
-        </ul>
-    </div>
-    <div class="dashboard-content">
-        <section class="Welcome"> <h1>Welcome, {{ user.firstname }} </h1></section>
-        
+   
+   
+        <div style=" padding: 20px;">
+            <!-- <h1>Welcome to Admin Dashboard</h1> -->
+            <h1 style="font-weight: bolder;">Welcome {{ user.firstname }}</h1>
 
-        <section class="summary">
-            <div class="card">
-                <i class="fa fa-book"></i>
-                <a href="{% url 'user_book' %}" style="text-decoration: none; color: black;"><h3>My Books</h3></a>
-                <p>{{ borrowed_count }}</p>
-            </div>
-            <div class="card pending">
-                <i class="fa fa-clock"></i>
-                <a href="{% url 'pending_request' %}" style="text-decoration: none; color: black;"><h3>Pending Request</h3></a>
-                <p>{{ pending_count }}</p>
-            </div>
-            <div class="card renewals">
-                <i class="fa fa-refresh"></i>
-                <a href="{% url 'pending_renewal' %}" style="text-decoration: none; color: black;"><h3>Pending Renewals</h3></a>
-                <p>{{ renewal_count }}</p>
-            </div>
-            <div class="card returned">
-                <i class="fa fa-check-circle"></i>
-                <a href="{% url 'returned_books' %}" style="text-decoration: none; color: black;"><h3>Returned books</h3></a>
-                <p>{{ returned_count }}</p>
-            </div>
-            <div class="card overdue">
-                <i class="fa fa-exclamation-circle"></i>
-                <a href="{% url 'user_duebook' %}" style="text-decoration: none; color: black;"><h3>Overdue Books</h3></a>
-                <p>{{ overdue_count }}</p>
-            </div>
-            <div class="card notifications">
-                <i class="fa fa-bell"></i>
-                <a href="{% url 'notification' %}" style="text-decoration: none; color: black;"><h3>Notifications</h3></a>
-                <p>{{notification_count}}</p>
-            </div>
-        </section>
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;" class="div-card">
+                <a href="{% url 'user_book' %}" >
+                    <div class="card books-card">
+                        <h1 >My Books</h1>
+                        <div style="margin-bottom: 0px;">
+                        <p>{{ borrowed_count }}</p>
+                        </div>
+                    </div>
+                </a>
+                
+                <a href="{% url 'pending_request' %}">
+                    <div class="card pending-card">
+                        <h1>Pending Request</h1>
+                        <p>{{ pending_count }}</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'pending_renewal' %}">
+                    <div class="card renewals-card">
+                        <h1>Pending Renewals</h1>
+                        <p>{{ renewal_count }}</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'returned_books' %}">
+                    <div class="card returned">
+                        <h1>Returned Books</h1>
+                        <p>{{ returned_count }}</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'user_duebook' %}">
+                    <div class="card overdue">
+                        <h1>Overdue Books</h1>
+                        <p>{{ overdue_count }}</p>
+                    </div>
+                </a>
+                
+                <a href="{% url 'notification' %}">
+                    <div class="card notifications">
+                        <h1>Notifications</h1>
+                        <p>{{notification_count}}</p>
+                    </div>
+                </a>
+                
         
         
-        <!-- <section class="notifications">
-            <a href="{% url 'notification' %}" style="text-decoration: none; color: black;"><h3>Notifications</h3></a>
-            <p>{{notification_count}}</p>
-           
-        </section> -->
         </div>
     {% endblock %}
 
-    {% block extra_scripts %}
 
-    <!-- <script>
-    
-        async function refreshToken() {
-            try {
-                const response = await fetch('/refresh-token/', {
-                    method: 'GET',
-                    credentials: 'include'  // Send cookies (important!)
-                });
-    
-                if (response.ok) {
-                    console.log("Access token refreshed.");
-                    window.location.reload();  // Reload page to apply new token
-                } else {
-                    console.log("Refresh token expired. Redirecting to login.");
-                    window.location.href = '/login/';  // Redirect if refresh fails
-                }
-            } catch (error) {
-                console.error("Error refreshing token:", error);
-                window.location.href = '/login/';
-            }
-        }
-    
-        
-    </script>
-{% endblock %}    
-
- -->
+  

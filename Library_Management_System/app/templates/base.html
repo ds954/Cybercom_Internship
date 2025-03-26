@@ -1,138 +1,197 @@
+{% extends 'admin/base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="{% static 'logo.png' %}">
-    <title>{% block title %}My Website{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'base.css' %}"> 
-    <!-- <link rel="stylesheet" href="/Library_Management_System/app/static/home.css"> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    {% block extra_head %}{% endblock %}
-</head>
-<body>
-    <!-- ======= HEADER START ======= -->
+{% block title %}User Dashboard{% endblock %}
+
+{% block branding %}
+<!-- Remove default Django admin branding -->
+{% endblock %}
+
+{% block breadcrumbs %}
+<!-- Remove breadcrumbs if not needed -->
+{% endblock %}
+
+{% block nav-global %}
+<style>
+
+    #header {
+        padding: 2px 10px;
+        font-weight: 100;
+    }
+    nav.navbar{
+        font-size: x-large;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: black;
+    }
+
+
+
+    .profile-photo {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 1px solid black;
+        margin-top: 5px;
+        
+    }
+
+    img {
+        width: 40px;
+        height: 40px;
+    }
+
+
+    .sub-div {
+        display: flex;
+        align-items: center;
+        /* Align items vertically */
+        justify-content: space-between;
+        gap: 15px;
+        /* Add spacing between elements */
+        margin-right: 10px;
+    }
+
+    a img {
+        margin-top: 8px;
+    }
+
+    .menu {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        /* Adjust space between navbar items */
+    }
+  
+
+    .navbar a {
+        text-decoration: none;
+        color: black;
+        vertical-align: middle;
+    }
+    .submenu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 10px;
+    right: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    width: 20vh;
+    transition: all 0.3s ease-in-out;
+}
+
+.submenu a {
+    color: #417690 !important;
+    text-decoration: none;
+  
+}
+
+.submenu.active {
+    display: block;
+}
+
+.fa-bell {
+  color: white;
+}
+.notification-count {
+    position: absolute;
+    top: 8px;
+    right: 62px;
+    /* left: 500px; */
+    background-color: aqua;
+    color: black;
+    /* font-size: 12px; */
+    font-weight: bold;
+    /* padding: 2px 6px; */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 18px;
+    height: 15px;
+    width: 10px;
+    /* height: 18px; */
+}
+
+</style>
+
+<!-- ======= HEADER START ======= -->
 <div class="page-container">
-    <header>
-    <nav class="navbar">
-        <div class="logo">
+    
+        <nav class="navbar">
+            <div class="logo">
                 <img src="/static/logo.png" alt="Logo">
-        </div>
+            </div>
 
-        <div class="toggle-btn">
-            <div class="icon"></div>
-        </div>
-        <ul class="menu">
-          
-                <!-- <li class="search-container">
-                  <i class="fas fa-search search-icon" id="search-icon"></i>
-                  <input type="text" name="search" placeholder="Search..." class="search-input" id="search-input">
-                </li>
-               -->
-                {% block search-content %}
-               <li class="search-container">
-                <form action="{% url 'search_books' %}" method="get" style="display: flex; align-items: center;">
-                  <i class="fas fa-search search-icon" id="search-icon"></i>
-                  <input type="text" name="q" placeholder="Search..." class="search-input" id="search-input">
-                  <button type="submit" style="border: none; background: none;">
-                    <!-- <i class="fas fa-arrow-right"></i> -->
-                  </button>
-                </form>
-              </li>
-              {% endblock %}
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'book' %}">Books</a></li>
-            <li><a href="{% url 'borrow_history' %}">History</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
+            <div class="toggle-btn">
+                <div class="icon"></div>
+            </div>
 
-            <li class="bell">
-                <a href="{% url 'notification' %}">
-                <img src="{% static 'bell.png' %}" alt="" style="height: 20px; width: 20px;" >
-                </a>
-                {% if notification_count > 0 %}
-                    <span class="notification-count">{{ notification_count }}</span>
-                {% endif %}
+            <div class="sub-div">
+                <ul class="menu" style="margin-bottom: 4.8px;">
+
+                    {% block search-content %}
+                    <li class="search-container">
+                        <form action="{% url 'search_books' %}" method="get"
+                            style="display: flex; align-items: center;">
+                            <i class="fas fa-search search-icon" id="search-icon" style="color: white;"></i>
+                            <input type="text" name="q" placeholder="Search..." class="search-input" id="search-input">
+                            <button type="submit" style="border: none; background: none;">
+                                <!-- <i class="fas fa-arrow-right"></i> -->
+                            </button>
+                        </form>
+                    </li>
+
+                    {% endblock %}
+                    <li><a href="{% url 'home' %}" style="text-decoration: none; font-size: large; font-weight: 500;">Home</a></li>
+                    <li><a href="{% url 'book' %}" style="text-decoration: none; font-size: large;font-weight: 500;">Books</a></li>
+                    <li><a href="{% url 'borrow_history' %}" style="text-decoration: none;font-size: large;font-weight: 500;">History</a></li>
+                    <li><a href="{% url 'about' %}" style="text-decoration: none;font-size: large;font-weight: 500;">About</a></li>
+
+                    <li class="bell">
+                        <a href="{% url 'notification' %}" style="font-size: large;""><i class="fa fa-bell" ></i>
+                            
+                        </a>
+                        {% if notification_count > 0 %}
+                        <span class="notification-count" style="color: white;">{{ notification_count }}</span>
+                        {% endif %}
+                    </li>
+                    <li class="submenu-wrapper">
+
+                        {% if profile_user and profile_user.profile_picture %}
+                        <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" id="profile-photo"
+                            class="profile-photo">
+                        {% else %}
+                        <img src="{% static 'default.jpg' %}" alt="Default Picture" id="profile-photo"
+                            class="profile-photo">
+                        {% endif %}
+                        {% block submenu %}
+                        <ul class="submenu">
+                            <li><a href="{% url 'view_profile' %}" style="  text-decoration: none;"><i class="fa fa-user" style="margin-right: 3px;"></i> Profile</a></li>
+
+                            <li><a href="{% url 'logout' %}" style="  text-decoration: none;"><i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>Logout</a></li>
+                        </ul>
+
+            </div>
+            {% endblock %}
             </li>
-            <li class="submenu-wrapper">
-
-                {% if profile_user and profile_user.profile_picture %}
-                    <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" id="profile-photo" class="profile-photo">
-                {% else %}
-                    <img src="{% static 'default.jpg' %}" alt="Default Picture" id="profile-photo" class="profile-photo">
-                {% endif %}
-              {% block submenu %}
-                <ul class="submenu">
-                    <li><a href="{% url 'view_profile' %}">Profile</a></li>
-                    <!-- <li><a href="{% url 'borrow_history' %}">History</a></li>
-                    <li><a href="{% url 'returned_books' %}">Returned Book</a></li>
-                    <li><a href="{% url 'canceled_books' %}">Cancled Book</a></li>
-                    <li><a href="{% url 'renewal_books' %}">Renewal Book</a></li> -->
-                    <!-- <li><a href="#">Notifications</a></li> -->
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
-                </ul>
-               {% endblock %} 
-            </li>
-        </ul>
-        
-        
-    </nav>
-</header>
-    <!-- ======= HEADER END ======= -->
-
-    <!-- ======= PAGE CONTENT START ======= -->
-    <main>
-        <div class="sidebar">
-            <ul class="sidebar-menu">
-                <!-- <li><a href="{% url 'book' %}">Books</a></li>
-                <li><a href="{% url 'borrow_history' %}">History</a></li> -->
-                <li><a href="{% url 'home' %}"><i class="fa fa-tachometer"></i> Dashboard</a></li>
-                <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
-                <li><a href="{% url 'borrow_history' %}"><i class="fa fa-history"></i> History</a></li>
-                <li><a href="{% url 'about' %}"><i class="fas fa-info-circle" style=" margin-right: 10px;"></i>About Us</a></li>
-                <li><a href="{% url 'contactus' %}"><i class="fas fa-envelope" style=" margin-right: 10px;"></i>Contact Us</a></li>
-                <li><a href="{% url 'privacy' %}"><i class="fas fa-shield-alt" style=" margin-right: 10px;"></i>Privacy Policy</a></li>
-                <li><a href="{% url 'terms' %}"><i class="fas fa-file-alt" style=" margin-right: 10px;"></i>Terms of Service</a></li>
             </ul>
-        </div>
-        {% block content %}
-        <!-- Page-specific content will go here -->
-        {% endblock %}
-    </main>
-    <!-- ======= PAGE CONTENT END ======= -->
 
-    <!-- ======= FOOTER START ======= -->
-    <footer>
-        <div class="footer-container">
-            <p style="color: black;">&copy; 2025 Library Management System | version 1.0.0</p>
-            <!-- <div class="logo">
-                <img src="/static/logo.png" alt="logo">
-            </div> -->
-            <!-- <div class="quick-links">
-                <a href="#">Home</a>
-                <a href="#">Search</a>
-                <a href="#">My Profile</a>
-                <a href="#">Borrowing History</a>
-                <a href="#">Notifications</a>
-            </div> -->
-            <!-- <div class="other-links">
-                <a href="#">About Us</a>
-                <a href="#">Contact Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-            </div> -->
-        </div>
-        <!-- <p>&copy; 2024 Your Library Name. All Rights Reserved.</p> -->
-    </footer>
-    
-    
-</div>
-    <!-- ======= FOOTER END ======= -->
 
-    <!-- ======= SCRIPTS ======= -->
+        </nav>
+    
+    <!-- ======= HEADER END ======= -->
+    {% block extra_scripts %}
     <script>
-   
+
         const icon = document.querySelector('.icon');
         const menu = document.querySelector('.menu');
         const toggleBtn = document.querySelector('.toggle-btn');
@@ -149,29 +208,152 @@
         profilePhoto.addEventListener('click', function () {
             submenu.classList.toggle('active');
         });
-        
+
         const searchIcon = document.getElementById('search-icon');
         const searchInput = document.getElementById('search-input');
 
         searchIcon.addEventListener('click', () => {
-        searchInput.classList.toggle('expanded');
-        if (searchInput.classList.contains('expanded')) {
-            searchInput.focus();
-        }
+            searchInput.classList.toggle('expanded');
+            if (searchInput.classList.contains('expanded')) {
+                searchInput.focus();
+            }
         });
 
         // Optional: Collapse when clicking outside
         document.addEventListener('click', (e) => {
-        if (!e.target.closest('.search-container')) {
-            searchInput.classList.remove('expanded');
-        }
-});
+            if (!e.target.closest('.search-container')) {
+                searchInput.classList.remove('expanded');
+            }
+        });
 
 
     </script>
+    {% endblock %}
+    {% endblock %}
 
-    {% block extra_scripts %}
+
+    {% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #header {
+            display: block;
+            font-weight: bold;
+            font-size: large;
+        }
+
+        ul li {
+            list-style: none;
+        }
+        /* .sidebar{
+            flex-grow: 1;
+        } */
+
+        /* Sidebar styles */
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            position: absolute;
+        }
+
+        .sidebar-menu li {
+            padding: 10px 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .sidebar-menu a span {
+            flex-grow: 1;
+        }
+
+        .submenu {
+            display: none;
+            list-style: none;
+            padding-left: 20px;
+        }
+     
+        .sidebar-menu li:hover .submenu {
+            display: block;
+        }
+
+        .footer-container {
+            background: #417690;
+            color: white;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+     
+        /* .content{
+        margin: 0px 30px 30px 0;
+    } */
+
+    .sidebar {
+    display: flex;
+    flex-direction: column;
+  
+    
+    min-height: 100vh; /* Ensures the sidebar covers the full viewport height */
+    height: auto; /* Allows it to expand dynamically */
+    position: sticky; /* Keeps it visible while scrolling */
+    top: 0;
+}
+
+    </style>
+    <!-- ======= PAGE CONTENT START ======= -->
+
+    <div class="sidebar" style="display: flex; min-height: 100vh;">
+        <ul class="sidebar-menu" style="width: 220px; background-color: #f0f0f0; padding: 20px; min-height: 90%">
+
+            <li><a href="{% url 'home' %}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+            <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
+            <li><a href="{% url 'borrow_history' %}"><i class="fa fa-clock"></i> History</a></li>
+            <li><a href="{% url 'about' %}"><i class="fas fa-info-circle" style=" margin-right: 10px;"></i>About Us</a>
+            </li>
+            <li><a href="{% url 'contactus' %}"><i class="fas fa-envelope" style=" margin-right: 10px;"></i>Contact
+                    Us</a></li>
+            <li><a href="{% url 'privacy' %}"><i class="fas fa-shield-alt" style=" margin-right: 10px;"></i>Privacy
+                    Policy</a></li>
+            <li><a href="{% url 'terms' %}"><i class="fas fa-file-alt" style=" margin-right: 10px;"></i>Terms of
+                    Service</a></li>
+        </ul>
+
+        <div class="content" style="flex-grow: 1; padding: 20px; margin-left: 270px;">
+            {% block user_content %}{% endblock %}
+        </div>
+    </div>
+
+    {% endblock %}
+    <!-- ======= PAGE CONTENT END ======= -->
+
+    <!-- ======= FOOTER START ======= -->
+    {% block footer %}
+    <footer>
+        <div class="footer-container">
+            <p style="color: white;">&copy; 2025 Library Management System | version 1.0.0</p>
+
+        </div>
+    </footer>
+
+    {% endblock %}
+    <!-- ======= FOOTER END ======= -->
+
+    <!-- ======= SCRIPTS ======= -->
+
+    {% block scripts %}
     <!-- Additional scripts can be added from child templates -->
     {% endblock %}
-</body>
-</html>
+    </body>
+
+    </html>

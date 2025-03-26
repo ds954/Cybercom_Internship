@@ -2,13 +2,71 @@
 {% load static %}
 {% block title %} Home Page {% endblock %}
 
-{% block extra_head %}
-    <link rel="stylesheet" href="{% static 'home.css' %}"> 
-{% endblock %}
 
-{% block content %}
+{% block user_content %}
+<style>
+  
+  
+    h5{
+        font-size: large;
+    }
+    div.card-body{
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+    .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* margin-top: 5px; */
+  }
+  
+  /* Search Icon */
+  .search-icon {
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+    margin-right: 2px;
+    margin-top: 2px;
+  }
+  .bell{
+    margin-top: 2px;
+    margin-right: 10px;
+  }
+  
+  /* Search Input */
+  .search-input {
+    width: 0;
+    margin-top: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    opacity: 0;
+  }
+  
+  /* Expanded state */
+  .search-input.expanded {
+    width: 200px; /* You can adjust width */
+    opacity: 1;
+  }
+    
+.request-btn{
+    background:  #c0c4c6;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+.sidebar-menu{
+    height: 98% !important;
+}
+h2{
+    margin-top: 0;
+}
+</style>
     <div class="container mt-4">
-        <h2 class="text-center mb-4">Available Books</h2>
+        <h2 class="text-center mb-4" style="display: flex; align-items: center; justify-content: center; font-size: x-large; margin-bottom: 50px;">Available Books</h2>
         <div class="row">
             {% for book in books %}
             <div class="col-md-4">
@@ -31,7 +89,7 @@
 
                             <form method="post" action="{% url 'request_book' book.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="request-btn">Borrow Book</button>
+                                <button type="submit" class="request-btn" style="cursor: pointer;">Borrow Book</button>
                             </form>
                         {% else %}
                             <button class="request-btn disabled" disabled>Out of Stock</button>

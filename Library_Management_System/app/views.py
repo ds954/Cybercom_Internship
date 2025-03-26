@@ -48,6 +48,12 @@ from .models import BorrowRequest, UserInfo, Notification
 from django.utils.timezone import now
 from django.contrib.auth.models import User
 
+def admin_profile_view(request):
+    user = request.user  # Get the currently logged-in user
+    admin_profile = User.objects.get(username=user)  # Fetch admin's profile data
+
+    html_content=render_to_string('admin/admin_profile.html', {'admin_profile': admin_profile})
+    return HttpResponse(html_content)
 
 def borrowed_books_report(request):
     borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
@@ -317,6 +323,14 @@ def custom_admin_dashboard(request):
         filter_total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested', IssuedDate__range=(start_date, end_date)).count()
         filter_total_returned_books = BorrowRequest.objects.filter(status='book_returned', IssuedDate__range=(start_date, end_date)).count()
         filter_total_not_returned_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'], IssuedDate__range=(start_date, end_date)).count()
+    else:
+        # If no date range is selected, use total counts
+        filter_borrow_requests=borrow_requests
+        filter_total_issued_books = total_issued_books
+        filter_total_pending_borrow_requests = total_pending_borrow_requests
+        filter_total_pending_renewal_requests = total_pending_renewal_requests
+        filter_total_returned_books = total_returned_books
+        filter_total_not_returned_books = total_not_returned_books
 
     dashboard_html = render_to_string('admin/dashboard.html', {
         'users': users,

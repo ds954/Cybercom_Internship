@@ -2,56 +2,16 @@
 
 {% block title %}Terms of Service{% endblock %}
 
-{% block extra_head %}
-<style>
-    main {
-        padding-top: 100px;
-        padding-bottom: 200px;
-        padding-right: 150px;
-        padding-left: 150px;
-        display: block;
-        /* overflow-y: scroll; */
-    }
 
-    /* body {
-        
-    } */
-
-    footer {
-        position: fixed;
-    }
-
-    h1 {
-        text-align: center;
-        margin-bottom: 8px;
-    }
-
-    .main-container {
-        width: 100%;
-        margin: auto;
-        margin-top: 100px;
-    }
-
-    .container {
-        margin-bottom: 20px;
-    }
-
-    .container li {
-        /* margin-left: 50px; */
-        list-style: none;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
 {% block search-content %}
 {% endblock %}
-<div class="main-container">
+{% block user_content %}
+<div class="main-container" style="margin-left: 50px;">
     <div class="container">
-        <h1>Library Management System - Terms of Service</h1>
+        <h1 style="font-weight: 500; ">Library Management System - Terms of Service</h1>
     </div>
 
-    <div class="container">
+    <div class="container" >
         <h3>Acceptance of Terms</h3>
         <p>By accessing and using our Library Management System, you agree to comply with and be bound by these Terms of Service.</p>
     </div>
