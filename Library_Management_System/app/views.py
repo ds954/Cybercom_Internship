@@ -47,13 +47,38 @@ from reportlab.platypus import Table, TableStyle
 from .models import BorrowRequest, UserInfo, Notification
 from django.utils.timezone import now
 from django.contrib.auth.models import User
+from app.context_processors import user_context_processor
+from django.http import HttpResponseRedirect
+
 
 def admin_profile_view(request):
-    user = request.user  # Get the currently logged-in user
-    admin_profile = User.objects.get(username=user)  # Fetch admin's profile data
+    user = request.user  
+    admin_profile = User.objects.get(username=user)  
 
     html_content=render_to_string('admin/admin_profile.html', {'admin_profile': admin_profile})
     return HttpResponse(html_content)
+@csrf_exempt
+def admin_profile_edit(request):
+    user = request.user  # Get the logged-in admin user
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+
+        # Update user information
+        user.username = username
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('admin_profile')  # Redirect to profile view after update
+    html_content=render_to_string('admin/admin_profile_edit.html', {'admin_profile': user})
+    return HttpResponse(html_content)
+
 
 def borrowed_books_report(request):
     borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
@@ -297,6 +322,18 @@ def custom_admin_login(request):
       })
     return HttpResponse(login_page_html)
 
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def admin_logout(request):
+    request.session.flush()
+    response = redirect(reverse('login'))
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return response
+
+
 @csrf_exempt
 @login_required
 @user_passes_test(lambda u: u.is_staff)
@@ -309,7 +346,9 @@ def custom_admin_dashboard(request):
     total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending').count()
     total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested').count()
     total_returned_books = BorrowRequest.objects.filter(status='book_returned').count()
-    total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect']).count()
+    total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date()).count()
+    total_not_returned_bookss = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now())
+    print("non returned books",total_not_returned_bookss)
     start_date = request.POST.get('start_date')
     end_date = request.POST.get('end_date')
 
@@ -353,12 +392,16 @@ def custom_admin_dashboard(request):
     })
     return HttpResponse(dashboard_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def custom_books(request):
     books = Book.objects.all()
     books_html = render_to_string('admin/books.html', {'books': books})
     return HttpResponse(books_html)
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def custom_book_add(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -379,6 +422,8 @@ def custom_book_add(request):
     form_html = render_to_string('admin/book_add.html')
     return HttpResponse(form_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_borrow_request(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['pending'])
     borrow_request_html = render_to_string('admin/borrow_request.html', {
@@ -386,6 +431,8 @@ def admin_borrow_request(request):
     })
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_pending_renewal_request(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['renewal_requested'])
     borrow_request_html = render_to_string('admin/pending_renewal.html', {
@@ -393,6 +440,8 @@ def admin_pending_renewal_request(request):
     })
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_issued_book(request):
     borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
     borrow_request_html = render_to_string('admin/issued_book.html', {
@@ -400,6 +449,8 @@ def admin_issued_book(request):
     })
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_returned_book(request):
     borrow_requests=BorrowRequest.objects.filter(status='book_returned')
     borrow_request_html = render_to_string('admin/returned_book.html', {
@@ -407,6 +458,8 @@ def admin_returned_book(request):
     })
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_borrow_history(request):
     borrow_requests = BorrowRequest.objects.select_related('user').all()
     borrow_request_html = render_to_string('admin/borrow_history.html', {
@@ -414,6 +467,8 @@ def admin_borrow_history(request):
     })
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_not_returned_book(request):
     borrow_requests = BorrowRequest.objects.select_related('user').filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
     borrow_request_html = render_to_string('admin/non_returned_book.html', {
@@ -421,6 +476,8 @@ def admin_not_returned_book(request):
         })  
     return HttpResponse(borrow_request_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_user(request):
     users = UserInfo.objects.all()
     user_html = render_to_string('admin/user.html', {
@@ -429,12 +486,16 @@ def admin_user(request):
     return HttpResponse(user_html)
     
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def manage_members(request):
     users = UserInfo.objects.all()
     user_html = render_to_string('admin/manage_members.html', {'users': users})
     return HttpResponse(user_html)
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def add_member(request):
     if request.method == "POST":
         form = UserForm(request.POST)
@@ -448,6 +509,8 @@ def add_member(request):
     return HttpResponse(user_html)
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def edit_member(request, member_id):
     print(f"edit_member called with member_id: {member_id}")
     member = get_object_or_404(UserInfo, id=member_id)
@@ -462,12 +525,16 @@ def edit_member(request, member_id):
     user_html = render_to_string('admin/edit_member.html', {'form': form})
     return HttpResponse(user_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def delete_member(request, user_id):
     user = get_object_or_404(UserInfo, id=user_id)
     user.delete()
     return redirect('manage_members')
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def manage_books(request):
       print("manage books called")
       books = Book.objects.all()
@@ -475,6 +542,8 @@ def manage_books(request):
       return HttpResponse(book_html)
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def add_book(request):
     print('inside add_book')
     if request.method == "POST":
@@ -488,6 +557,8 @@ def add_book(request):
     return HttpResponse(book_html)
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def edit_book(request, book_id):
     print(f"edit_member called with member_id: {book_id}")
     book = get_object_or_404(Book, id=book_id)
@@ -502,6 +573,8 @@ def edit_book(request, book_id):
     book_html = render_to_string('admin/edit_book.html', {'form': form})
     return HttpResponse(book_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def delete_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
@@ -509,6 +582,8 @@ def delete_book(request, book_id):
     return redirect('manage_books')
 
 @csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def bulk_upload_books(request):
     if request.method == "POST":
         form = BookBulkUploadForm(request.POST, request.FILES)
@@ -524,6 +599,8 @@ def bulk_upload_books(request):
     book_html = render_to_string('admin/bulk_upload.html', {'form': form, 'messages': storage})
     return HttpResponse(book_html)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 def admin_notification(request):
     recent_notifications = Notification.objects.order_by('-timestamp')
     user_html = render_to_string('admin/notification.html', {
@@ -532,7 +609,8 @@ def admin_notification(request):
     })
     return HttpResponse(user_html)
 
-
+@login_required
+@user_passes_test(lambda u: u.is_staff)
 @csrf_exempt
 def update_borrow_request_status(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
@@ -577,6 +655,9 @@ def register_view(request):
 
         if UserInfo.objects.filter(email=email).exists():
              html_content = render_to_string( 'register.html', {'error': 'Email is already registered.'})  
+             return HttpResponse(html_content)
+        if User.objects.filter(username=username).exists():
+             html_content = render_to_string( 'register.html', {'error': 'Username is already registered.'})  
              return HttpResponse(html_content)
 
            
@@ -639,51 +720,117 @@ def verify_otp(request, user_id):
 
 #     return render(request, 'login.html')
 
+
 @csrf_exempt
 def login_view(request):
-    print("Inside login_view")
-    print(request.COOKIES)  
-    print(request.session.items()) 
-    print(f"Request Path: {request.path}")
-    if request.method == 'POST':
-        print("post request")
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+    
+        if request.method == 'POST':
+            identifier = request.POST.get('identifier')  # Accepts email or username
+            password = request.POST.get('password')
 
-        try:
-            user = UserInfo.objects.get(email=email)  
-            if check_password(password, user.password):  
+            # **Check if user is in Django's built-in User model (Admin Login)**
+            admin_user = authenticate(request, username=identifier, password=password)
+            if admin_user:
+                if admin_user.is_staff:  # Allow only staff/admin users
+                    login(request, admin_user)
+                    return redirect('custom_admin_dashboard')  # Redirect to Django Admin panel
+                else:
+                    html_content = render_to_string('login.html', {'error': 'Access denied for non-admin users.'})
+                    return HttpResponse(html_content)
+
+            # **Check if user is in UserInfo model**
+            try:
+                user_info = UserInfo.objects.get(email=identifier)  # Check if it's an email
+            except UserInfo.DoesNotExist:
+                try:
+                    user_info = UserInfo.objects.get(Username=identifier)  # Check if it's a username
+                except UserInfo.DoesNotExist:
+                    html_content = render_to_string('login.html', {'error': 'User does not exist'})
+                    return HttpResponse(html_content)
+
+            # **Verify password**
+            if check_password(password, user_info.password):
+                # **Generate JWT tokens**
                 access_token_payload = {
-                    'email': user.email,
-                    'exp': datetime.now() + settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'],
-                    'iat': int(time.time()),
+                    'email': user_info.email,
+                    'exp': datetime.utcnow() + timedelta(hours=1),
+                    'iat': datetime.utcnow(),
                 }
-                access_token = jwt.encode(access_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
+                access_token = jwt.encode(
+                    access_token_payload,
+                    settings.JWT_AUTH['JWT_SECRET_KEY'],
+                    algorithm=settings.JWT_AUTH['JWT_ALGORITHM']
+                )
 
                 refresh_token_payload = {
-                    'email': user.email,
-                    'exp': datetime.now() + settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'],
-                    'iat': int(time.time()),
+                    'email': user_info.email,
+                    'exp': datetime.utcnow() + timedelta(days=7),
+                    'iat': datetime.utcnow(),
                 }
-                refresh_token = jwt.encode(refresh_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
+                refresh_token = jwt.encode(
+                    refresh_token_payload,
+                    settings.JWT_AUTH['JWT_SECRET_KEY'],
+                    algorithm=settings.JWT_AUTH['JWT_ALGORITHM']
+                )
 
-                RefreshTokenStore.objects.filter(user=user).delete()
-                RefreshTokenStore.objects.create(user=user, token=refresh_token)
-
-                response = redirect('home')
-                response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'].total_seconds(),)
-                response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'].total_seconds())
+                response = redirect('home')  # Redirect UserInfo users to their dashboard
+                response.set_cookie('access_token', access_token, httponly=True)
+                response.set_cookie('refresh_token', refresh_token, httponly=True)
                 return response
-            else:
-                html_content = render_to_string('login.html', {'error': 'Invalid credentials'})  
-                return HttpResponse(html_content)
-                
-        except UserInfo.DoesNotExist:
-            html_content = render_to_string('login.html', {'error': 'User not found'})  
+
+            html_content = render_to_string('login.html', {'error': 'Invalid credentials'})
             return HttpResponse(html_content)
+
+        html_content = render_to_string('login.html')
+        return HttpResponse(html_content)
+# @csrf_exempt
+# def login_view(request):
+#     print("Inside login_view")
+#     print(request.COOKIES)  
+#     print(request.session.items()) 
+#     print(f"Request Path: {request.path}")
+#     if request.method == 'POST':
+#         print("post request")
         
-    html_content = render_to_string('login.html')  
-    return HttpResponse(html_content)
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+
+#         try:
+#             user = UserInfo.objects.get(email=email)  
+#             if check_password(password, user.password):  
+#                 access_token_payload = {
+#                     'email': user.email,
+#                     'exp': datetime.now() + settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'],
+#                     'iat': int(time.time()),
+#                 }
+#                 access_token = jwt.encode(access_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
+
+#                 refresh_token_payload = {
+#                     'email': user.email,
+#                     'exp': datetime.now() + settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'],
+#                     'iat': int(time.time()),
+#                 }
+#                 refresh_token = jwt.encode(refresh_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
+
+#                 RefreshTokenStore.objects.filter(user=user).delete()
+#                 RefreshTokenStore.objects.create(user=user, token=refresh_token)
+
+#                 response = redirect('home')
+#                 response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'].total_seconds(),)
+#                 response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'].total_seconds())
+#                 return response
+#             else:
+#                 html_content = render_to_string('login.html', {'error': 'Invalid credentials'})  
+#                 return HttpResponse(html_content)
+                
+#         except UserInfo.DoesNotExist:
+#             html_content = render_to_string('login.html', {'error': 'User not found'})  
+#             return HttpResponse(html_content)
+        
+#     html_content = render_to_string('login.html')  
+#     return HttpResponse(html_content)
+
+
 
 # def refresh_token_view(request):
 #     refresh_token = request.COOKIES.get('refresh_token')
@@ -871,8 +1018,8 @@ def view_profile(request):
     if not user_data:
         return redirect('login')
     user,_=user_data
-   
-    html_content = render_to_string('view_profile.html', { 'user': user})  
+    context = user_context_processor(request)
+    html_content = render_to_string('view_profile.html', { **context,'user': user})  
     return HttpResponse(html_content)
 
 
@@ -884,14 +1031,16 @@ def edit_profile(request):
     if not user_data:
         return redirect('login')
     user,_=user_data
-
+    print("User in edit_profile:", user.email)
+    context = user_context_processor(request)
     if request.method == 'POST':
         username = request.POST.get('username')
         firstname = request.POST.get('first_name')
         lastname = request.POST.get('last_name')
         phone = request.POST.get('phone_number')
-        remove_picture = request.POST.get('remove_picture')
-
+        print("POST data:", request.POST)
+        remove_picture = request.POST.get('remove_picture','true')
+        print("Remove Picture Value:", remove_picture) 
 
         # Update basic fields
         user.Username = username
@@ -904,6 +1053,7 @@ def edit_profile(request):
 
         # Remove photo if user clicked "Remove Photo"
         if remove_picture == 'true' :
+            print("Removing profile picture...")
             if user.profile_picture:
                 # Delete the file from storage
                 photo_path = os.path.join(settings.MEDIA_ROOT, str(user.profile_picture))
@@ -911,16 +1061,16 @@ def edit_profile(request):
                     os.remove(photo_path)
                 user.profile_picture.delete(save=False)
                 user.profile_picture = None
+            user.profile_picture = None
+            user.save()     
                 
         if 'profile_picture' in request.FILES:
             user.profile_picture = request.FILES['profile_picture']
 
         # Save user info and profile picture
         # user.save()
-        if form.is_valid():
-            form.save()
-        else:
-            user.save() 
+       
+        user.save() 
 
         if form.is_valid():
             form.save()
@@ -930,7 +1080,7 @@ def edit_profile(request):
     else:
         form = ProfileForm(instance=user)
         
-    html_content = render_to_string('Edit_Profile.html', {'form': form, 'user': user})  
+    html_content = render_to_string('Edit_Profile.html', {**context,'form': form, 'user': user})  
     return HttpResponse(html_content)
 
 
@@ -943,7 +1093,7 @@ def home(request):
         return redirect('/')
     user, _ = user_data
    
-
+    context = user_context_processor(request)
     borrowed_count = BorrowRequest.objects.filter(user=user, status__in=['accepted','renew_accpect']).count()
     overdue_count = BorrowRequest.objects.filter(user=user, Duedate__lt=timezone.now(), status='accepted').count()
     renewal_count = BorrowRequest.objects.filter(user=user, status='renewal_requested').count()
@@ -951,7 +1101,8 @@ def home(request):
     pending_count = BorrowRequest.objects.filter(user=user, status='pending').count()
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
 
-    html_content = render_to_string('home.html',{'user':user,'borrowed_count': borrowed_count,
+
+    html_content = render_to_string('home.html',{**context,'user':user,'borrowed_count': borrowed_count,
             'overdue_count': overdue_count,
             'renewal_count': renewal_count,
             'pending_count':pending_count,
@@ -965,24 +1116,36 @@ def book_list(request):
     print("data",user_data)
     if not user_data:
         return redirect('login')
+    user,_=user_data
     books = Book.objects.all()  # Fetch all books from the database
-    html_content = render_to_string('book.html', {'books': books})  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('book.html', {**context,'books': books})  
     return HttpResponse(html_content)
 
 # @session_login_required
 def book_detail(request, book_id):
     user_data = JWTAuthentication().authenticate(request)
+    user,_=user_data
     print("data",user_data)
     if not user_data:
         return redirect('login')
     book = get_object_or_404(Book, id=book_id)
-    html_content = render_to_string('book_detail.html', {'book': book})  
+    
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count}) 
+    html_content = render_to_string('book_detail.html', {**context,'book': book})  
     return HttpResponse(html_content)
 
 # @session_login_required
 def search_books(request):
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
+    user,_=user_data
     if not user_data:
         return redirect('login')
     query = request.GET.get('q', '').strip()  # get search query from URL params
@@ -999,8 +1162,12 @@ def search_books(request):
     profile_user = None
     if user_id:
         profile_user = UserInfo.objects.get(id=user_id)
-
-    html_content = render_to_string('search_results.html', {
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('search_results.html', {**context,
         'books': books,
         'query': query,
         'profile_user': profile_user})  
@@ -1014,11 +1181,15 @@ def borrow_history(request):
         return redirect('login')
     print(request.user)
     print(request.session.get('user_id'))
-
+    
     user,_=user_data
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+
+    borrow_requests = BorrowRequest.objects.filter(user=user).order_by('-id')
     # print(borrow_requests)
-    html_content = render_to_string( 'borrow_history.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    html_content = render_to_string( 'borrow_history.html', {**context,'borrow_requests': borrow_requests,'today': timezone.now().date()})  
     return HttpResponse(html_content)
 
 
@@ -1029,10 +1200,14 @@ def user_book(request):
     print("data",user_data)
     if not user:
         return redirect('login')
-   
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    context.update({'notification_count': notification_count})
    
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    html_content = render_to_string('user_book.html', {'borrow_requests': borrow_requests})  
+    html_content = render_to_string('user_book.html', {**context,'borrow_requests': borrow_requests})  
     return HttpResponse(html_content)
 
 
@@ -1045,7 +1220,11 @@ def user_duebook(request):
     user,_=user_data
     print(user)
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    html_content = render_to_string('user_duebook.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+
+    html_content = render_to_string('user_duebook.html', {**context,'borrow_requests': borrow_requests,'today': timezone.now().date()})  
     return HttpResponse(html_content)
 
 # @session_login_required
@@ -1056,7 +1235,11 @@ def pending_renewal(request):
         return redirect('login')
     user,_=user_data
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    html_content = render_to_string('pending_renewals.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+   
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('pending_renewals.html', {**context,'borrow_requests': borrow_requests,'today': timezone.now().date()})  
     return HttpResponse(html_content)
 
 def pending_request(request):
@@ -1066,7 +1249,10 @@ def pending_request(request):
         return redirect('login')
     user,_=user_data
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    html_content = render_to_string('pending_request.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('pending_request.html', {**context,'borrow_requests': borrow_requests,'today': timezone.now().date()})  
     return HttpResponse(html_content)
 
 
@@ -1079,10 +1265,12 @@ def returned_book(request):
     
     user,_ =user_data
     borrow_requests = BorrowRequest.objects.filter(user=user)
-    html_content = render_to_string('return_books.html', {'borrow_requests': borrow_requests,'today': timezone.now().date()})  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('return_books.html', {**context,'borrow_requests': borrow_requests,'today': timezone.now().date()})  
     return HttpResponse(html_content)
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+
 # @session_login_required
 @csrf_exempt
 def request_book(request, book_id):
@@ -1119,8 +1307,10 @@ def returned_books(request):
     user,_=user_data
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='book_returned')
-
-    html_content = render_to_string('returned_books.html', {
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('returned_books.html', {**context,
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()})
     return HttpResponse(html_content)
@@ -1136,8 +1326,10 @@ def canceled_books(request):
     user,_=user_data
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='Cancel_Request')
-
-    html_content = render_to_string('canceled_books.html', {
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('canceled_books.html', {**context,
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()
     })  
@@ -1151,10 +1343,12 @@ def renewal_books(request):
     if not user_data:
         return redirect('login')
     user,_=user_data
-
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
     borrow_requests = BorrowRequest.objects.filter(user=user, status='renew_accpect')
     print(borrow_requests)
-    html_content = render_to_string( 'renewal_books.html', {
+    html_content = render_to_string( 'renewal_books.html', {**context,
         'borrow_requests': borrow_requests,
         'today': timezone.now().date()
     })  
@@ -1273,8 +1467,8 @@ def notification(request):
     unread_notifications = user_notifications_queryset.filter(is_read=False)
     unread_notifications.update(is_read=True)
     user_notifications = user_notifications_queryset[:50]
-
-    html_content = render_to_string("notification.html", {"due_books": Duedate,'user_notifications': user_notifications,'messages': messages.get_messages(request)  })  
+    context = user_context_processor(request)
+    html_content = render_to_string("notification.html", {**context,"due_books": Duedate,'user_notifications': user_notifications,'messages': messages.get_messages(request)  })  
     return HttpResponse(html_content)
     # return render(request, "notification.html", {
     #     "due_books": Duedate,
@@ -1283,7 +1477,7 @@ def notification(request):
 
 
 def logout_view(request):
-    # request.session.flush()
+    request.session.flush()
     response = redirect(reverse('login'))
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
@@ -1291,34 +1485,50 @@ def logout_view(request):
 
 def about(request):
     user_data = JWTAuthentication().authenticate(request)
+    user,_=user_data
     print("data",user_data)
     if not user_data:
         return redirect('login')
-    html_content = render_to_string('about.html')  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('about.html',{**context})  
     return HttpResponse(html_content)
 
 def privacy(request):
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
+    user,_=user_data
     if not user_data:
         return redirect('login')
-    html_content = render_to_string('privacy.html')  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('privacy.html',{**context})  
     return HttpResponse(html_content)
 
 def terms(request):
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
+    user,_=user_data
     if not user_data:
         return redirect('login')
-    html_content = render_to_string('terms.html')  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('terms.html',{**context})  
     return HttpResponse(html_content)
 
 
 def contact(request):
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
+    user,_=user_data
     if not user_data:
         return redirect('login')
-    html_content = render_to_string('contactus.html')  
+    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+    context = user_context_processor(request) 
+    context.update({'notification_count': notification_count})
+    html_content = render_to_string('contactus.html',{**context})  
     return HttpResponse(html_content)
     

@@ -76,7 +76,7 @@ body {
 
 /* Register Button */
 .register-form button {
-    background: #9C6B4A;
+    background: #417690;
     color: white;
     padding: 12px;
     border: none;
@@ -87,7 +87,7 @@ body {
 }
 
 .register-form button:hover {
-    background: #875A3E;
+    background: #417690;
 }
 
 /* Login Link */

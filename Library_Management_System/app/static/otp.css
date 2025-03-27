@@ -60,7 +60,7 @@ body {
 
 /* Submit Button */
 .otp-form button {
-    background: #9C6B4A;
+    background: #417690;
     color: white;
     padding: 12px;
     border: none;
@@ -71,7 +71,7 @@ body {
 }
 
 .otp-form button:hover {
-    background: #875A3E;
+    background: #417690;
 }
 
 

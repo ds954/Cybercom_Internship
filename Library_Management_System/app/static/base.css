@@ -16,7 +16,7 @@ header {
     left: 0;
     width: 100%;
     height: 60px;  /* Adjust based on your header */
-    background: cyan;
+    background: #417690;
     z-index: 1000;  /* Keeps it above other elements */
 }
 body{
@@ -44,7 +44,7 @@ html, body {
     position:fixed;
     top:0;
     left:0;
-    background: #EAD7C5;
+    background: #417690;
     /* background: #DDD0C8; */
     /* background: #323232; */
     padding-right:2%;
@@ -58,7 +58,7 @@ header.navbar {
     left: 0;
     width: 100%;
     height: 60px;
-    background: cyan; /* Customize */
+    background: #417690; /* Customize */
     z-index: 1000;
     display: flex;
     align-items: center;

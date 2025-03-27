@@ -21,7 +21,7 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
@@ -54,11 +54,29 @@
     .actions a {
         margin-right: 8px;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
 </style>
 
-<h1>Books</h1>
 
-<table>
+<table class="borrow-history-table">
+    <h1>Books</h1>
+    <thead>
     <tr>
         <th>Title</th>
         <th>Author</th>
@@ -66,9 +84,10 @@
         <th>Description</th>
         <th>Quantity</th>
     </tr>
-
+</thead>
+<tbody>
     {% for book in books %}
-    <tr>
+    <tr class="borrow-row">
         <td>{{ book.title }}</td>
         <td>{{ book.author }}</td>
         <td>{{ book.category }}</td>
@@ -86,6 +105,68 @@
         <td colspan="5">No books found.</td>
     </tr>
     {% endfor %}
+</tbody>
 </table>
+{% if books|length > 5 %}
+<button id="showMoreBtn">Show More</button>
+<button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.querySelector('.borrow-history-table tbody');
+        const rows = tableBody.querySelectorAll('.borrow-row');
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const showLessBtn = document.getElementById('showLessBtn');
+        const initialRowsToShow = 10;
+        let visibleRowCount = initialRowsToShow;
+
+        // Initially hide rows beyond the initial limit
+        for (let i = initialRowsToShow; i < rows.length; i++) {
+            rows[i].classList.add('hidden-row');
+        }
+
+        if (rows.length <= initialRowsToShow) {
+            if (showMoreBtn) {
+                showMoreBtn.style.display = 'none';
+            }
+            if (showLessBtn) {
+                showLessBtn.style.display = 'none';
+            }
+        } else if (showMoreBtn) {
+            showMoreBtn.style.display = 'block';
+        }
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function() {
+                const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
+                const rowsToShow = 10;
+
+                for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                    hiddenRows[i].classList.remove('hidden-row');
+                }
+
+                visibleRowCount += rowsToShow;
+
+                if (visibleRowCount >= rows.length) {
+                    showMoreBtn.style.display = 'none';
+                    showLessBtn.style.display = 'inline-block'; // Show "Show Less"
+                }
+            });
+        }
+
+        if (showLessBtn) {
+            showLessBtn.addEventListener('click', function() {
+                const allRows = tableBody.querySelectorAll('.borrow-row');
+                for (let i = initialRowsToShow; i < allRows.length; i++) {
+                    allRows[i].classList.add('hidden-row');
+                }
+                visibleRowCount = initialRowsToShow;
+                showLessBtn.style.display = 'none';
+                showMoreBtn.style.display = 'inline-block';
+            });
+        }
+    });
+</script>
 
 {% endblock %}

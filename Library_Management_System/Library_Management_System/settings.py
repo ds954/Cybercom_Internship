@@ -85,7 +85,7 @@ STATICFILES_DIRS = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -93,8 +93,10 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'app.context_processors.user_context_processor',
                 'app.context_processors.notification_count',
-                'app.context_processors.user_profile',
+                # 'app.context_processors.user_profile',
+
             ],
         },
     },
@@ -116,6 +118,9 @@ CHANNEL_LAYERS = {
 #         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+LOGIN_URL = '/custom-admin/login/'
+
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',

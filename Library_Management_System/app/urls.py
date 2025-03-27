@@ -74,6 +74,8 @@ urlpatterns=[
     path('download-member-activities/', views.download_member_activities_report, name='download_member_activities_report'),
 
     path('custom-admin/profile/', views.admin_profile_view, name='admin_profile'),
+    path('custom-admin/admin-logout/',views.admin_logout,name="custom_admin_logout"),
+    path('custom-admin/profile/edit/', views.admin_profile_edit, name='admin_profile_edit'),
 
 ]
 

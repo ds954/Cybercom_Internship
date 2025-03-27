@@ -11,12 +11,17 @@
     <div class="container">
         <form class="login-form" method="post">
             {% csrf_token %}
-
+<!-- 
             <label for="email">Email:</label>
             <input type="email" name="email" placeholder="Enter your email" required>
 
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password" placeholder="Enter your password" required>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required> -->
+            <label for="identifier">Username or Email:</label>
+            <input type="text" name="identifier" placeholder="Enter Username or Email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required> 
             <label class="show-password">
                 <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()">
                 Show Password

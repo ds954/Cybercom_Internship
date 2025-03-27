@@ -84,7 +84,7 @@ html, body {
 
 /* Login Button */
 .login-form button {
-    background: #9C6B4A;
+    background: #417690;
     color: white;
     padding: 12px;
     border: none;
@@ -95,7 +95,7 @@ html, body {
 }
 
 .login-form button:hover {
-    background: #C9A38D;
+    background: #417690;
 }
 
 /* Forgot Password */

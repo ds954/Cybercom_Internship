@@ -14,12 +14,12 @@
 
 {% block nav-global %}
 <style>
-
     #header {
         padding: 2px 10px;
         font-weight: 100;
     }
-    nav.navbar{
+
+    nav.navbar {
         font-size: x-large;
     }
 
@@ -30,8 +30,6 @@
         color: black;
     }
 
-
-
     .profile-photo {
         width: 30px;
         height: 30px;
@@ -39,7 +37,6 @@
         cursor: pointer;
         border: 1px solid black;
         margin-top: 5px;
-        
     }
 
     img {
@@ -47,14 +44,11 @@
         height: 40px;
     }
 
-
     .sub-div {
         display: flex;
         align-items: center;
-        /* Align items vertically */
         justify-content: space-between;
         gap: 15px;
-        /* Add spacing between elements */
         margin-right: 10px;
     }
 
@@ -66,128 +60,135 @@
         display: flex;
         align-items: center;
         gap: 20px;
-        /* Adjust space between navbar items */
     }
-  
 
     .navbar a {
         text-decoration: none;
         color: black;
         vertical-align: middle;
     }
+
     .submenu {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 10px;
-    right: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    width: 20vh;
-    transition: all 0.3s ease-in-out;
-}
+        display: none;
+        position: absolute;
+        right: 5px;
+        background-color: white;
+        border: 1px solid #ccc;
+        min-width: 100px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        border-radius: 5px;
+    }
 
-.submenu a {
-    color: #417690 !important;
-    text-decoration: none;
-  
-}
+    .submenu a {
+        color: #417690 !important;
+        text-decoration: none;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+    }
 
-.submenu.active {
-    display: block;
-}
+    .submenu.active {
+        display: block;
+        pointer-events: auto;
+    }
 
-.fa-bell {
-  color: white;
-}
-.notification-count {
-    position: absolute;
-    top: 8px;
-    right: 62px;
-    /* left: 500px; */
-    background-color: aqua;
-    color: black;
-    /* font-size: 12px; */
-    font-weight: bold;
-    /* padding: 2px 6px; */
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-width: 18px;
-    height: 15px;
-    width: 10px;
-    /* height: 18px; */
-}
+    .fa-bell {
+        color: white;
+    }
 
+    .notification-count {
+        position: absolute;
+        top: 8px;
+        right: 62px;
+        background-color: #c2c4c6;
+        color: black;
+        font-weight: bold;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 18px;
+        height: 15px;
+        width: 10px;
+    }
 </style>
 
 <!-- ======= HEADER START ======= -->
 <div class="page-container">
-    
-        <nav class="navbar">
-            <div class="logo">
-                <img src="/static/logo.png" alt="Logo">
-            </div>
 
-            <div class="toggle-btn">
-                <div class="icon"></div>
-            </div>
+    <nav class="navbar">
 
-            <div class="sub-div">
-                <ul class="menu" style="margin-bottom: 4.8px;">
+        <div class="logo">
+            <img src="/static/logo.png" alt="Logo">
+        </div>
 
-                    {% block search-content %}
+        <div class="toggle-btn">
+            <div class="icon"></div>
+        </div>
+
+        <div class="sub-div">
+            <ul class="menu" style="margin-bottom: 4.8px;">
+
+                {% block search-content %}
                     <li class="search-container">
-                        <form action="{% url 'search_books' %}" method="get"
-                            style="display: flex; align-items: center;">
+                        <form action="{% url 'search_books' %}" method="get" style="display: flex;      align-items: center;">
                             <i class="fas fa-search search-icon" id="search-icon" style="color: white;"></i>
                             <input type="text" name="q" placeholder="Search..." class="search-input" id="search-input">
                             <button type="submit" style="border: none; background: none;">
-                                <!-- <i class="fas fa-arrow-right"></i> -->
                             </button>
                         </form>
                     </li>
+                {% endblock %}
+                <li>
+                    <a href="{% url 'home' %}"
+                        style="text-decoration: none; font-size: large; font-weight: 500;">Home</a>
+                </li>
+                <li>
+                    <a href="{% url 'book' %}"
+                        style="text-decoration: none; font-size: large;font-weight: 500;">Books</a>
+                </li>
+                <li>
+                    <a href="{% url 'borrow_history' %}"
+                        style="text-decoration: none;font-size: large;font-weight: 500;">History</a>
+                </li>
+                <li>
+                    <a href="{% url 'about' %}"
+                        style="text-decoration: none;font-size: large;font-weight: 500;">About</a>
+                </li>
 
-                    {% endblock %}
-                    <li><a href="{% url 'home' %}" style="text-decoration: none; font-size: large; font-weight: 500;">Home</a></li>
-                    <li><a href="{% url 'book' %}" style="text-decoration: none; font-size: large;font-weight: 500;">Books</a></li>
-                    <li><a href="{% url 'borrow_history' %}" style="text-decoration: none;font-size: large;font-weight: 500;">History</a></li>
-                    <li><a href="{% url 'about' %}" style="text-decoration: none;font-size: large;font-weight: 500;">About</a></li>
+                <li class="bell">
+                    <a href="{% url 'notification' %}" style="font-size: large;""><i class=" fa fa-bell"></i></a>
+                    {% if notification_count > 0 %}
+                        <span class="notification-count" >{{ notification_count }}</span>
+                    {% endif %}
+                </li>
+                <li class="submenu-wrapper">
 
-                    <li class="bell">
-                        <a href="{% url 'notification' %}" style="font-size: large;""><i class="fa fa-bell" ></i>
-                            
-                        </a>
-                        {% if notification_count > 0 %}
-                        <span class="notification-count" style="color: white;">{{ notification_count }}</span>
-                        {% endif %}
-                    </li>
-                    <li class="submenu-wrapper">
-
-                        {% if profile_user and profile_user.profile_picture %}
+                    {% if profile_user and profile_user.profile_picture %}
                         <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" id="profile-photo"
                             class="profile-photo">
-                        {% else %}
+                    {% else %}
                         <img src="{% static 'default.jpg' %}" alt="Default Picture" id="profile-photo"
                             class="profile-photo">
-                        {% endif %}
-                        {% block submenu %}
+                    {% endif %}
+                    {% block submenu %}
                         <ul class="submenu">
-                            <li><a href="{% url 'view_profile' %}" style="  text-decoration: none;"><i class="fa fa-user" style="margin-right: 3px;"></i> Profile</a></li>
+                            <li>
+                                <a href="{% url 'view_profile' %}" style="  text-decoration: none;"><i class="fa fa-user"style="margin-right: 5px;"></i> Profile</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'logout' %}" style="  text-decoration: none; cursor: pointer;"><i class="fas fa-sign-out-alt" style="margin-right: 5px; "></i>Logout</a>
+                            </li>
 
-                            <li><a href="{% url 'logout' %}" style="  text-decoration: none;"><i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i>Logout</a></li>
                         </ul>
+                    {% endblock %}    
+                </li>
+            </ul> 
 
-            </div>
-            {% endblock %}
-            </li>
-            </ul>
+        </div>
+    </nav>
 
-
-        </nav>
-    
     <!-- ======= HEADER END ======= -->
     {% block extra_scripts %}
     <script>
@@ -232,6 +233,7 @@
     {% endblock %}
 
 
+
     {% block content %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -244,9 +246,6 @@
         ul li {
             list-style: none;
         }
-        /* .sidebar{
-            flex-grow: 1;
-        } */
 
         /* Sidebar styles */
         .sidebar-menu {
@@ -281,7 +280,7 @@
             list-style: none;
             padding-left: 20px;
         }
-     
+
         .sidebar-menu li:hover .submenu {
             display: block;
         }
@@ -294,22 +293,15 @@
             align-items: center;
             justify-content: center;
         }
-     
-        /* .content{
-        margin: 0px 30px 30px 0;
-    } */
 
-    .sidebar {
-    display: flex;
-    flex-direction: column;
-  
-    
-    min-height: 100vh; /* Ensures the sidebar covers the full viewport height */
-    height: auto; /* Allows it to expand dynamically */
-    position: sticky; /* Keeps it visible while scrolling */
-    top: 0;
-}
-
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            height: auto;
+            position: sticky;
+            top: 0;
+        }
     </style>
     <!-- ======= PAGE CONTENT START ======= -->
 

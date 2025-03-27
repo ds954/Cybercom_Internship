@@ -92,9 +92,6 @@
         margin-top: 5px;
     }
     
-    #remove-photo-btn:hover {
-        background: #1a5bbf;
-    }
     
     /* Submit Button */
     .edit-profile-form button {
@@ -128,7 +125,7 @@
             <input type="file" id="profile-photo-upload" name="profile_picture" style="display: none;" accept="image/*">
 
             <!-- Remove Photo Button (show if profile picture exists) -->
-            <button type="button" id="remove-photo-btn" class="remove-photo-btn 
+            <button type="submit" id="remove-photo-btn" value="true" name="remove_picture" class="remove-photo-btn 
             {% if user.profile_picture %}
                 show-button
             {% else %}
@@ -139,7 +136,7 @@
 
 
             <!-- Hidden field to indicate photo removal -->
-            <input type="hidden" name="remove_picture" id="remove-picture" value="">
+            <input type="hidden" name="remove_picture" id="remove-picture" value="true">
         </div>
 
         <!-- Username -->
@@ -191,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.onload = () => {
                 profilePhoto.src = reader.result;
                 removeButton.style.display = 'block';
-                removePictureInput.value = '';
+                removePictureInput.value = 'false';
             };
             reader.readAsDataURL(file);
         }

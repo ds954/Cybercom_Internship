@@ -21,7 +21,7 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
@@ -69,13 +69,31 @@
         transition: background-color 0.3s ease;
         background-color: #e27474;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; /* Add some space between buttons if needed */
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <h1>Manage Books</h1>
 
 <a href="{% url 'bulk_upload_books' %}" class="btn">Import Books</a>
 <a href="{% url 'add_book' %}" class="btn">Add Book</a>
-<table>
+<table class="borrow-history-table">
+    <thead>
     <tr>
         <th>Title</th>
         <th>Author</th>
@@ -85,36 +103,100 @@
         <th>Quantity</th>
         <th>Actions</th>
     </tr>
+    </thead>
+    <tbody>
 
     {% for book in books %}
-    <tr>
-        <td>{{ book.title }}</td>
-        <td>{{ book.author }}</td>
-        <td>{{ book.category }}</td>
-        <td>
-            {% if book.description|length > 50 %}
-                {{ book.description|slice:":50" }}...
-            {% else %}
-                {{ book.description }}
-            {% endif %}
-        </td>
-        <td>{{ book.is_available }}</td>
-        <td>{{ book.quantity }}</td>
-        <td class="actions">
-            <a href="{% url 'edit_book' book.id %}" class="btn">
-                <i class="fas fa-edit"></i>
-            </a>
-            <a href="{% url 'delete_book' book.id %}" class="btn-del" onclick="return confirm('Are you sure you want to delete this book?');">
-                <i class="fas fa-trash-alt"></i>
-            </a>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="7" style="text-align: center;">No books found.</td>
-    </tr>
-    {% endfor %}
-</table>
+        <tr class="borrow-row">
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.category }}</td>
+            <td>
+                {% if book.description|length > 50 %}
+                    {{ book.description|slice:":50" }}...
+                {% else %}
+                    {{ book.description }}
+                {% endif %}
+            </td>
+            <td>{{ book.is_available }}</td>
+            <td>{{ book.quantity }}</td>
+            <td class="actions">
+                <a href="{% url 'edit_book' book.id %}" class="btn">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'delete_book' book.id %}" class="btn-del" onclick="return confirm('Are you sure you want to delete this book?');">
+                    <i class="fas fa-trash-alt"></i>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align: center;">No books found.</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if books|length > 5 %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+    {% endif %}
 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.querySelector('.borrow-history-table tbody');
+        const rows = tableBody.querySelectorAll('.borrow-row');
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const showLessBtn = document.getElementById('showLessBtn');
+        const initialRowsToShow = 5;
+        let visibleRowCount = initialRowsToShow;
+
+        // Initially hide rows beyond the initial limit
+        for (let i = initialRowsToShow; i < rows.length; i++) {
+            rows[i].classList.add('hidden-row');
+        }
+
+        if (rows.length <= initialRowsToShow) {
+            if (showMoreBtn) {
+                showMoreBtn.style.display = 'none';
+            }
+            if (showLessBtn) {
+                showLessBtn.style.display = 'none';
+            }
+        } else if (showMoreBtn) {
+            showMoreBtn.style.display = 'block';
+        }
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function() {
+                const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
+                const rowsToShow = 5;
+
+                for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                    hiddenRows[i].classList.remove('hidden-row');
+                }
+
+                visibleRowCount += rowsToShow;
+
+                if (visibleRowCount >= rows.length) {
+                    showMoreBtn.style.display = 'none';
+                    showLessBtn.style.display = 'inline-block'; // Show "Show Less"
+                }
+            });
+        }
+
+        if (showLessBtn) {
+            showLessBtn.addEventListener('click', function() {
+                const allRows = tableBody.querySelectorAll('.borrow-row');
+                for (let i = initialRowsToShow; i < allRows.length; i++) {
+                    allRows[i].classList.add('hidden-row');
+                }
+                visibleRowCount = initialRowsToShow;
+                showLessBtn.style.display = 'none';
+                showMoreBtn.style.display = 'inline-block';
+            });
+        }
+    });
+</script>
 
 {% endblock %}

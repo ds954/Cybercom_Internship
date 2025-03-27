@@ -1,10 +1,143 @@
 {% extends 'admin/admin_base.html' %}
+{% load static %}
+
+{% block title %}Admin Profile{% endblock %}
 
 {% block admin_content %}
-    <h2>Admin Profile</h2>
-    <p><strong>Username:</strong> {{ admin_profile.username }}</p>
-    <p><strong>Email:</strong> {{ admin_profile.email }}</p>
-    <p><strong>Full Name:</strong> {{ admin_profile.full_name }}</p>
-    <p><strong>Phone:</strong> {{ admin_profile.phone }}</p>
-    <p><strong>Joined On:</strong> {{ admin_profile.date_joined }}</p>
+
+<style>
+    /* Profile Container */
+    .profile-container {
+        display: flex;
+        flex-direction: row; /* Default to row for larger screens */
+        justify-content: center; /* Center horizontally */
+        align-items: flex-start; /* Align items to the top initially */
+        max-width: 800px; /* Adjust as needed */
+        margin: 20px auto; /* Add some margin for spacing */
+        padding: 20px;
+        background-color: #f8f8f8; /* Subtle background */
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    /* Right Section - Profile Photo */
+    .profile-photo-section {
+        text-align: center;
+        margin-right: 40px; /* Space between photo and details */
+        padding: 20px;
+    }
+
+    .profile-photo-container {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden; /* To ensure the image stays within the circle */
+        margin-bottom: 15px;
+        border: 4px solid #ddd; /* Subtle border around the photo */
+    }
+
+    .profile-photo-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Maintain aspect ratio and cover the container */
+    }
+
+    .edit-profile-link a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #c0c4c6; /* Example primary color */
+        color: black;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        font-size: 0.9em;
+    }
+
+    /* Left Section - User Details */
+    .user-details-section {
+        margin-top: 20px;
+        padding: 20px;
+        flex-grow: 1; /* Allow details section to take remaining space */
+    }
+
+    .user-details-section h2 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 1.5em;
+    }
+
+    .detail-item {
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .detail-item strong {
+        display: inline-block;
+        width: 100px; /* Adjust as needed for alignment */
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+        .profile-container {
+            flex-direction: column; /* Stack on smaller screens */
+            align-items: center;
+        }
+
+        .profile-photo-section {
+            margin-right: 0;
+            margin-bottom: 20px;
+        }
+
+        .user-details-section {
+            text-align: center; /* Center details on mobile */
+        }
+
+        .detail-item strong {
+            display: block; /* Make label full width on mobile */
+            width: auto;
+            margin-bottom: 5px;
+        }
+    }
+</style>
+<div class="profile-container">
+
+    <div class="profile-photo-section">
+        <div class="profile-photo-container">
+            <img
+                src="{% if admin_profile.profile_picture %}{{ admin_profile.profile_picture.url }}{% else %}{% static 'default.jpg' %}{% endif %}"
+                alt="Profile Photo"
+                id="profile-photo"
+            >
+        </div>
+     
+        <div class="edit-profile-link">
+           <a href="{% url 'admin_profile_edit' %}">Edit Profile</a>
+        </div>
+    </div>
+
+    <div class="user-details-section">
+        <h2>Admin Profile</h2>
+        <div class="detail-item">
+            <strong>Username:</strong> {{ admin_profile.username }}
+        </div>
+        <div class="detail-item">
+            <strong>Email:</strong> {{ admin_profile.email }}
+        </div>
+        <div class="detail-item">
+            <strong>Last Name:</strong> {{ admin_profile.first_name }}
+        </div>
+        <div class="detail-item">
+            <strong>Last Name:</strong> {{ admin_profile.last_name }}
+        </div>
+        <div class="detail-item">
+            <strong>Joined On:</strong> {{ admin_profile.date_joined|date:"F j, Y" }}
+        </div>
+        {# You can add more details here if needed #}
+    </div>
+
+</div>
+
 {% endblock %}

@@ -66,11 +66,28 @@
     .actions a {
         margin-right: 8px;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; /* Add some space between buttons if needed */
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
 </style>
     <div class="borrow-history-container">
         <h2>Returned Books</h2>
         <table class="borrow-history-table">
-            
+            <thead>
                 <tr>
                     <th>Book Title</th>
                     <th>Author</th>
@@ -78,11 +95,12 @@
                     <th>Due Date</th>
                     <th>Status</th>
                 </tr>
-
+            </thead>
+            <tbody>
             {% for request in borrow_requests %}
                 {% if request.status == 'book_returned' %}
                     {% if request.Duedate > today %}
-                    <tr id="request-{{ request.id }}">
+                    <tr id="request-{{ request.id }}" class="borrow-row">
                         <td>{{ request.book.title }}</td>
                         <td class="status">{{ request.book.author }}</td>
                         <td>{{ request.IssuedDate }}</td>
@@ -94,7 +112,70 @@
                     {% endif %}
                 {% endif %}
             {% endfor %}
+        </tbody>
         </table>
 
+        {% if borrow_requests|length > 2 %}
+        <button id="showMoreBtn">Show More</button>
+        <button id="showLessBtn" style="display: none;" >Show Less</button>
+        {% endif %}
     </div>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableBody = document.querySelector('.borrow-history-table tbody');
+            const rows = tableBody.querySelectorAll('.borrow-row');
+            const showMoreBtn = document.getElementById('showMoreBtn');
+            const showLessBtn = document.getElementById('showLessBtn');
+            const initialRowsToShow = 2;
+            let visibleRowCount = initialRowsToShow;
+    
+            // Initially hide rows beyond the initial limit
+            for (let i = initialRowsToShow; i < rows.length; i++) {
+                rows[i].classList.add('hidden-row');
+            }
+    
+            if (rows.length <= initialRowsToShow) {
+                if (showMoreBtn) {
+                    showMoreBtn.style.display = 'none';
+                }
+                if (showLessBtn) {
+                    showLessBtn.style.display = 'none';
+                }
+            } else if (showMoreBtn) {
+                showMoreBtn.style.display = 'block';
+            }
+    
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener('click', function() {
+                    const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
+                    const rowsToShow = 2;
+    
+                    for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                        hiddenRows[i].classList.remove('hidden-row');
+                    }
+    
+                    visibleRowCount += rowsToShow;
+    
+                    if (visibleRowCount >= rows.length) {
+                        showMoreBtn.style.display = 'none';
+                        showLessBtn.style.display = 'inline-block'; // Show "Show Less"
+                    }
+                });
+            }
+    
+            if (showLessBtn) {
+                showLessBtn.addEventListener('click', function() {
+                    const allRows = tableBody.querySelectorAll('.borrow-row');
+                    for (let i = initialRowsToShow; i < allRows.length; i++) {
+                        allRows[i].classList.add('hidden-row');
+                    }
+                    visibleRowCount = initialRowsToShow;
+                    showLessBtn.style.display = 'none';
+                    showMoreBtn.style.display = 'inline-block';
+                });
+            }
+        });
+    </script>
 {% endblock %}
