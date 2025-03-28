@@ -9,31 +9,82 @@
     }
       th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
+        /* padding: 8px; */
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
     table{
-        width: 100%;
+        width: 50%;
     }
 </style>
 <h1>Borrowed Books Report</h1>
 
-<table border="1" cellpadding="5" cellspacing="0">
+<h1>Total Number of Borrowed Books: {{borrowed_books|length}} </h1>
+<h1>Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h1>
+<h3>Borrowed Books</h3>
+<table style="margin-bottom: 50px;">
     
         <tr>
-            <th>User</th>
-            <th>Book Title</th>
+            <th>Member ID</th>
+            <th>Borrowed By</th>
+            <th>Email</th>
+            <th>Contact No</th>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
             <th>Issued Date</th>
             <th>Due Date</th>
+            <th>Status</th>
+            <th>Return Status</th>
+            <th>Renewal Requested</th>
+            <th>Renewal Requested Date</th>
+            <th>Renewal Requested Approve/Reject</th>
         </tr>
   
         {% for req in borrowed_books %}
         <tr>
+            <td>{{ req.user.id }}</td>
             <td>{{ req.user.Username }}</td>
+            <td>{{ req.user.phone }}</td>
+            <td>{{ req.user.email }}</td>
+            <td>{{ req.book.id }}</td>
             <td>{{ req.book.title }}</td>
+            <td>{{ req.book.author }}</td>
             <td>{{ req.IssuedDate }}</td>
             <td>{{ req.Duedate }}</td>
+
+            <td>{{ req.status }}</td>
+            {% if req.status in accepted_statuses and req.Duedate < today or req.status == 'book_returned' %}
+            <td>Yes</td>
+        {% else %}
+            <td>No</td>
+        {% endif %}   
+
+           
+
+        {% if req.status == 'renewal_requested' or req.status == 'renew_accpect' %}
+                <td>Yes</td>
+                {% if req.renewalrequests_set.first %}
+                    <td>{{ req.renewalrequests_set.first.request_date }}</td>
+                {% else %}
+                    <td>N/A</td>
+                {% endif %}
+        {% else %}
+            <td>No</td>
+            <td>N/A</td>
+        {% endif %}
+
+        {% if req.status == 'renew_accpect' %}
+            <td>Approved</td>
+           
+        {% elif req.status == 'renew_reject' %}
+            <td>Rejected</td>
+        {% elif req.status == 'renewal_requested' %}  
+            <td>Pending</td>
+        {% else %} 
+            <td>N/A</td>
+        {% endif %}    
+
         </tr>
         {% empty %}
         <tr>
@@ -42,7 +93,25 @@
         {% endfor %}
   
 </table>
-
+<h3>User Borrow Statistics</h3>
+<table >
+    <tr>
+        <th>User ID</th>
+        <th>Username</th>
+        <th>Books Borrowed</th>
+    </tr>
+    {% for user in user_borrow_stats %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.Username }}</td>
+        <td>{{ user.borrow_count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="3">No users found.</td>
+    </tr>
+    {% endfor %}
+</table>
 <!-- Download PDF Button -->
 <button style="margin-top: 50px;"><a href="{% url 'download_borrowed_books_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
 {% endblock %}

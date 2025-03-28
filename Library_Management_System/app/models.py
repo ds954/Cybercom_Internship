@@ -22,6 +22,7 @@ class UserInfo(models.Model):
 class RefreshTokenStore(models.Model):
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE, related_name="refresh_tokens")
     token = models.TextField(unique=True)
+    access_token = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -103,3 +104,34 @@ class AdminActions(models.Model):
 
     def __str__(self):
         return f"{self.admin_id} - {self.action_type}"
+    
+
+class MemberActivity(models.Model):
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True)
+    request_date = models.DateTimeField(null=True, blank=True) 
+    issued_date = models.DateTimeField(null=True, blank=True)  
+    due_date = models.DateTimeField(null=True, blank=True) 
+    accept_reject_date = models.DateTimeField(null=True, blank=True)  
+    renewal_request_date = models.DateTimeField(null=True, blank=True)  
+    renewal_accept_reject_date = models.DateTimeField(null=True, blank=True) 
+    return_date = models.DateTimeField(null=True, blank=True)  
+    cancel_date = models.DateTimeField(null=True, blank=True) 
+    login_time = models.DateTimeField(null=True, blank=True)  
+    logout_time = models.DateTimeField(null=True, blank=True) 
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('renewal_requested', 'Renewal Requested'),
+        ('renew_accpect','Renewal Request accepted'),
+        ('renew_reject','Renewal Request rejected'),
+        ('Cancel_Request',"Request Cancel"),
+        ('book_returned',"return"),
+    ]
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='requested')
+
+    def __str__(self):
+        return f"{self.user.Username} - {self.book.title if self.book else 'General Activity'} - {self.status}"    

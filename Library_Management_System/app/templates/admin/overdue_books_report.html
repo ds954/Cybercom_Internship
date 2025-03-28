@@ -23,21 +23,36 @@
 </style>
 <h1>Borrowed Books Report</h1>
 
-<table border="1" cellpadding="5" cellspacing="0">
+<h2>Total Overdue Books: {{ total_overdue_books }}</h2>
+<table >
     
         <tr>
-            <th>User</th>
-            <th>Book Title</th>
+            <th>Member ID</th>
+            <th>Borrowed By</th>
+            <th>Email</th>
+            <th>Contact No</th>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
             <th>Issued Date</th>
             <th>Due Date</th>
+            <th>Status</th>
+            <th>Overdue Days</th>
         </tr>
     
         {% for req in overdue_books %}
         <tr>
+            <td>{{ req.user.id }}</td>
             <td>{{ req.user.Username }}</td>
+            <td>{{ req.user.phone }}</td>
+            <td>{{ req.user.email }}</td>
+            <td>{{ req.book.id }}</td>
             <td>{{ req.book.title }}</td>
+            <td>{{ req.book.author }}</td>
             <td>{{ req.IssuedDate }}</td>
             <td>{{ req.Duedate }}</td>
+            <td>{{ req.status }}</td>
+            <td>{{ req.overdue_days }} days</td>
         </tr>
         {% empty %}
         <tr>

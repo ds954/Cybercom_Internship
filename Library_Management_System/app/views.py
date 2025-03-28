@@ -9,7 +9,7 @@ from .models import UserInfo
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import Book,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions
+from .models import Book,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions,MemberActivity
 from .admin import BorrowRequestAdmin
 from .forms import ProfileForm,UserForm,BookForm
 from channels.layers import get_channel_layer
@@ -78,13 +78,36 @@ def admin_profile_edit(request):
         return redirect('admin_profile')  # Redirect to profile view after update
     html_content=render_to_string('admin/admin_profile_edit.html', {'admin_profile': user})
     return HttpResponse(html_content)
-
+from django.db.models import Count
 
 def borrowed_books_report(request):
-    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
-    
+    today=datetime.now().date()
+    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect','renewal_requested'])
+    admin_data=AdminActions.objects.all()
+    for action in admin_data:
+        print(action.admin_id.id)
+    user_borrow_stats = (
+        UserInfo.objects.annotate(
+            borrow_count=Count('borrowrequest', filter=Q(borrowrequest__status__in=['accepted', 'renew_accpect']))
+        ).values('id', 'Username', 'borrow_count')
+    )
+    renewal_requests = {r.borrow_id_id: r.request_date for r in RenewalRequests.objects.all()}
+    most_borrowed = (
+        BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
+        .values('book__id', 'book__title', 'book__author')
+        .annotate(borrow_count=Count('id'))
+        .order_by('-borrow_count')
+        .first()
+    )
+  
     context = {
-        'borrowed_books': borrowed_books
+        'borrowed_books': borrowed_books,
+        'renewal_requests': renewal_requests,
+        'most_borrowed': most_borrowed,
+        'user_borrow_stats': user_borrow_stats, 
+        'today':today,
+        'accepted_statuses': ['accepted', 'renewal_accepted'],
+        'admin_date':admin_data
     }
     html_content=render_to_string('admin/borrowed_books_report.html', context)
     return HttpResponse(html_content)
@@ -106,7 +129,7 @@ def download_borrowed_books_report(request):
     # Fetch data
     borrowed_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect'])
 
-    data = [['User', 'Book Title', 'Issued Date', 'Due Date']]
+    data = [['Borrowed By', 'Title', 'Issued Date', 'Due Date']]
     for req in borrowed_books:
         data.append([req.user.Username, req.book.title, str(req.IssuedDate), str(req.Duedate)])
 
@@ -130,10 +153,14 @@ def download_borrowed_books_report(request):
 
 
 def overdue_books_report(request):
+    today = datetime.now().date()
     overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
-    
+    for book in overdue_books:
+        book.overdue_days = (today - book.Duedate).days
+    total_overdue_books = overdue_books.count()
     context = {
-        'overdue_books': overdue_books
+        'overdue_books': overdue_books,
+        'total_overdue_books': total_overdue_books
     }
     html_content=render_to_string('admin/overdue_books_report.html', context)
     return HttpResponse(html_content)
@@ -176,23 +203,64 @@ def download_overdue_books_report(request):
     p.save()
     return response
 
+
 def member_activities_report(request):
     users = UserInfo.objects.all()
 
     user_data = []
+    total_return_count = 0
+    total_cancel_count = 0
+    total_pending_count = 0
+    total_rejected_count = 0
+    total_accepted_count = 0
+    total_renewal_request_count = 0
+    total_renewal_rejected_count=0
+    total_renewal_accepted_count=0
+    
     for user in users:
         borrow_count = BorrowRequest.objects.filter(user=user).count()
+        return_count = BorrowRequest.objects.filter(user=user,status='book_returned').count()
+        cancel_count = BorrowRequest.objects.filter(user=user,status='Cancel_Request').count()
+        pending_count = BorrowRequest.objects.filter(user=user,status='pending').count()
+        rejected_count = BorrowRequest.objects.filter(user=user,status='rejected').count()
+        accepted_count = BorrowRequest.objects.filter(user=user,status='accepted').count()
+        renewal_request_count = BorrowRequest.objects.filter(user=user,status='renewal_requested').count()
+        renewal_rejected_count=BorrowRequest.objects.filter(user=user,status='renew_accpect').count()
+        renewal_accepted_count=BorrowRequest.objects.filter(user=user,status='renew_reject').count()
         notification_count = Notification.objects.filter(user=user).count()
+        last_activity = MemberActivity.objects.filter(user=user).order_by('-login_time').first()
+        print(last_activity)
         user_data.append({
             'user': user,
             'borrow_count': borrow_count,
-            'notification_count': notification_count
+            'notification_count': notification_count,
+            'last_login': last_activity.login_time if last_activity else None,
+            'last_logout': last_activity.logout_time if last_activity else None,
         })
+        member_activities = MemberActivity.objects.select_related('user', 'book').all()
+
+        total_return_count += return_count
+        total_cancel_count += cancel_count
+        total_pending_count += pending_count
+        total_rejected_count += rejected_count
+        total_accepted_count += accepted_count
+        total_renewal_request_count += renewal_request_count
+        total_renewal_rejected_count+= renewal_rejected_count
+        total_renewal_accepted_count+= renewal_accepted_count
 
     context = {
         'users': users,
         'user_data': user_data,
-        'borrow_requests': BorrowRequest.objects.all()
+        'borrow_requests': BorrowRequest.objects.all(),
+        'member_activities': member_activities,
+        'return_count': total_return_count,  
+        'cancel_count': total_cancel_count,
+        'pending_count': total_pending_count,
+        'rejected_count': total_rejected_count,
+        'accepted_count': total_accepted_count,
+        'renewal_request_count': total_renewal_request_count,
+        'renewal_rejected_count': total_renewal_rejected_count,
+        'renewal_accepted_count': total_renewal_accepted_count,
     }
     html_content=render_to_string('admin/member_activities_report.html', context)
     return HttpResponse(html_content)
@@ -750,36 +818,32 @@ def login_view(request):
 
             # **Verify password**
             if check_password(password, user_info.password):
-                # **Generate JWT tokens**
                 access_token_payload = {
                     'email': user_info.email,
-                    'exp': datetime.utcnow() + timedelta(hours=1),
-                    'iat': datetime.utcnow(),
+                    'exp': datetime.now() + settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'],
+                    'iat': int(time.time()),
                 }
-                access_token = jwt.encode(
-                    access_token_payload,
-                    settings.JWT_AUTH['JWT_SECRET_KEY'],
-                    algorithm=settings.JWT_AUTH['JWT_ALGORITHM']
-                )
+                access_token = jwt.encode(access_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
 
                 refresh_token_payload = {
                     'email': user_info.email,
-                    'exp': datetime.utcnow() + timedelta(days=7),
-                    'iat': datetime.utcnow(),
+                    'exp': datetime.now() + settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'],
+                    'iat': int(time.time()),
                 }
-                refresh_token = jwt.encode(
-                    refresh_token_payload,
-                    settings.JWT_AUTH['JWT_SECRET_KEY'],
-                    algorithm=settings.JWT_AUTH['JWT_ALGORITHM']
-                )
+                refresh_token = jwt.encode(refresh_token_payload, settings.JWT_AUTH['JWT_SECRET_KEY'], algorithm=settings.JWT_AUTH['JWT_ALGORITHM'])
 
-                response = redirect('home')  # Redirect UserInfo users to their dashboard
-                response.set_cookie('access_token', access_token, httponly=True)
-                response.set_cookie('refresh_token', refresh_token, httponly=True)
+                RefreshTokenStore.objects.filter(user=user_info).delete()
+                RefreshTokenStore.objects.create(user=user_info, token=refresh_token,access_token=access_token)
+                if user_info:
+                    MemberActivity.objects.create(user=user_info, login_time=now())
+                response = redirect('home')
+                response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'].total_seconds(),)
+                response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'].total_seconds())
                 return response
+            else:
 
-            html_content = render_to_string('login.html', {'error': 'Invalid credentials'})
-            return HttpResponse(html_content)
+                html_content = render_to_string('login.html', {'error': 'Invalid credentials'})
+                return HttpResponse(html_content)
 
         html_content = render_to_string('login.html')
         return HttpResponse(html_content)
@@ -1292,6 +1356,12 @@ def request_book(request, book_id):
                 IssuedDate=timezone.now(),
                 status="pending"
             )
+            MemberActivity.objects.create(
+            user=user,
+            book=book,
+            request_date=timezone.now(),
+            status="requested"
+            )
             messages.success(request, "Your request has been submitted.")
             for message in messages.get_messages(request):
                 print("Message:", message)
@@ -1326,6 +1396,7 @@ def canceled_books(request):
     user,_=user_data
 
     borrow_requests = BorrowRequest.objects.filter(user=user, status='Cancel_Request')
+
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
     context.update({'notification_count': notification_count})
@@ -1369,6 +1440,12 @@ def request_renewal(request,request_id):
         borrow_id=borrow_request,
         request_date=timezone.now()
     )
+    MemberActivity.objects.create(
+        user=borrow_request.user,
+        book=borrow_request.book,
+        renewal_request_date=timezone.now(),
+        status='renewal_requested'
+    )
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         f"user_{borrow_request.user.id}",
@@ -1387,7 +1464,12 @@ def cancel_book(request,request_id):
      cancel_request=BorrowRequest.objects.get(id=request_id)
      cancel_request.status='Cancel_Request'
      cancel_request.save()
-
+     MemberActivity.objects.create(
+        user=cancel_request.user,
+        book=cancel_request.book,
+        cancel_date=timezone.now(),
+        status='canceled'
+    )
      channel_layer=get_channel_layer()
      async_to_sync(channel_layer.group_send)(
           f"user_{cancel_request.user.id}",
@@ -1438,6 +1520,12 @@ def return_book(request,request_id):
         message=f"You have successfully returned '{borrow_request.book.title}' book.",
         is_read=False
      )
+    MemberActivity.objects.create(
+        user=user,
+        book=book,
+        return_date=timezone.now(),
+        status='book_returned'
+    )
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         f"user_{borrow_request.user.id}",
@@ -1477,6 +1565,10 @@ def notification(request):
 
 
 def logout_view(request):
+    if request.user.is_authenticated:
+        user_info = JWTAuthentication().authenticate(request)
+        if user_info:
+           MemberActivity.objects.filter(user=user_info).update(logout_time=now())
     request.session.flush()
     response = redirect(reverse('login'))
     response.delete_cookie('access_token')

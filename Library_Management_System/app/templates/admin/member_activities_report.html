@@ -51,6 +51,8 @@
         <th>Email</th>
         <th>Borrow Requests</th>
         <th>Notifications</th>
+        <th>Last Login</th>
+        <th>Last Logout</th>
     </tr>
     {% for user_data in user_data %}
     <tr>
@@ -58,12 +60,23 @@
         <td>{{ user_data.user.email }}</td>
         <td>{{ user_data.borrow_count }}</td>
         <td>{{ user_data.notification_count }}</td>
+        <td>{{ user_data.last_login|default:"N/A" }}</td>
+        <td>{{ user_data.last_logout|default:"N/A" }}</td>
     </tr>
     {% endfor %}
 </table>
 
 <!-- Borrow History Table -->
 <h1>Borrow History</h1>
+
+<h3>Total Returned Books: {{ return_count }}</h3>
+<h3>Total Canceled Books: {{ cancel_count }}</h3>
+<h3>Total Pending Requests: {{ pending_count }}</h3>
+<h3>Total Rejected Requests: {{ rejected_count }}</h3>
+<h3>Total Accepted Requests: {{ accepted_count }}</h3>
+<h3>Total Renewal Requests: {{ renewal_request_count }}</h3>
+<h3>Total Renewal Requests Rejected: {{ renewal_rejected_count }}</h3>
+<h3>Total Renewal Requests Accepted: {{ renewal_accepted_count }}</h3>
 <table border="1" >
     <tr>
         <th>Username</th>
@@ -83,7 +96,35 @@
     {% endfor %}
 </table>
 
-
+<table style="margin-top: 50px;">
+<tr>
+    <th>User</th>
+    <th>Title</th>
+    <th>Status</th>
+    <th>Book Request Date</th>
+    <th>Accept/Reject Date</th>
+    <th>Renewal Requested Accept/Reject Date</th>
+    <th>Return Date</th>
+    <th>Cancel Date</th>
+    <th>Issued Date</th>
+    <th>Due Date</th>
+</tr>
+{% for activity in member_activities %}
+<tr>
+    <td>{{ activity.user.Username }}</td>
+    <td>{{ activity.book.title }}</td>
+    <td>{{ activity.status }}</td>
+    <td>{{ activity.request_date|default:"N/A" }}</td>
+    <td>{{ activity.accept_reject_date|default:"N/A" }}</td>
+    <!-- <td>{{ activity.renewal_request_date|default:"N/A" }}</td> -->
+    <td>{{ activity.renewal_accept_reject_date|default:"N/A" }}</td>
+    <td>{{ activity.return_date|default:"N/A" }}</td>
+    <td>{{ activity.cancel_date|default:"N/A" }}</td>
+    <td>{{ activity.issued_date|default:"N/A" }}</td>
+    <td>{{ activity.due_date|default:"N/A" }}</td>
+</tr>
+{% endfor %}
+</table>
 <!-- Download PDF Button -->
 <button style="margin-top: 50px;"><a href="{% url 'download_member_activities_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
 {% endblock %}

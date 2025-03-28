@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserInfo, Book, BookCopy,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions
+from .models import UserInfo, Book, BookCopy,BorrowRequest,Notification,RefreshTokenStore,RenewalRequests,AdminActions,MemberActivity
 from import_export.admin import ImportExportModelAdmin
 from .resources import BookResource
 from django.contrib import messages
@@ -164,6 +164,14 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         if book.quantity == 0:
             book.is_available = False
         book.save()
+        MemberActivity.objects.create(
+            user=borrow_request.user,
+            book=borrow_request.book,
+            accept_reject_date=datetime.now().date(),
+            issued_date=borrow_request.IssuedDate,
+            due_date=borrow_request.Duedate,
+            status="accepted"
+        )
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Approve Borrow Request",
@@ -173,6 +181,12 @@ class BorrowRequestAdmin(admin.ModelAdmin):
 
     def reject_request(self, request, request_id):
         borrow_request = BorrowRequest.objects.get(id=request_id)
+        MemberActivity.objects.create(
+            user=borrow_request.user,
+            book=borrow_request.book,
+            accept_reject_date=datetime.now().date(),
+            status="rejected"
+        )
         AdminActions.objects.create(
             admin_id=request.user,
             action_type="Reject Borrow Request",
@@ -186,7 +200,15 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         borrow_request.status = 'renew_accpect'
         borrow_request.Duedate = datetime.now().date() + timedelta(days=60)
         borrow_request.save()
-        
+        MemberActivity.objects.create(
+            user=borrow_request.user,
+            book=borrow_request.book,
+            renewal_accept_reject_date=datetime.now(),
+            issued_date=borrow_request.IssuedDate,
+            due_date=borrow_request.Duedate,
+            status="renew_accpect"
+        )
+
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Approve Renewal Request",
@@ -203,6 +225,12 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         book.quantity += 1
         book.is_available = True 
         book.save()
+        MemberActivity.objects.create(
+            user=borrow_request.user,
+            book=borrow_request.book,
+            renewal_accept_reject_date=datetime.now(),
+            status="renew_reject"
+        )
         AdminActions.objects.create(
         admin_id=request.user,
         action_type="Reject Renewal Request",

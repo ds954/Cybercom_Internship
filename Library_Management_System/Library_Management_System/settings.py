@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'channels',
     'background_task',
     'import_export',
+    'login_history'
 ]
 CORS_ALLOW_HEADERS = [
     'authorization',
