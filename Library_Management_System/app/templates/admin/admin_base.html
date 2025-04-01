@@ -110,7 +110,9 @@
     display: block;
     font-weight: bold;
     font-size: large;
+    padding-right: 15px;
 }
+
 ul li {
     list-style: none;
 }
@@ -151,12 +153,75 @@ ul li {
 .sidebar-menu li:hover .submenu {
     display: block;
 }
+#content{
+    padding: 30px;
+}
 
 </style>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableBody = document.querySelector('.borrow-history-table tbody');
+        const rows = tableBody.querySelectorAll('.borrow-row');
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const showLessBtn = document.getElementById('showLessBtn');
+        const initialRowsToShow = 5;
+        let visibleRowCount = initialRowsToShow;
+
+        // Initially hide rows beyond the initial limit
+        for (let i = initialRowsToShow; i < rows.length; i++) {
+            rows[i].classList.add('hidden-row');
+        }
+
+        if (rows.length <= initialRowsToShow) {
+            if (showMoreBtn) {
+                showMoreBtn.style.display = 'none';
+            }
+            if (showLessBtn) {
+                showLessBtn.style.display = 'none';
+            }
+        } else if (showMoreBtn) {
+            showMoreBtn.style.display = 'block';
+        }
+
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function() {
+                const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
+                const rowsToShow = 5;
+
+                for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                    hiddenRows[i].classList.remove('hidden-row');
+                }
+
+                visibleRowCount += rowsToShow;
+
+                if (visibleRowCount >= rows.length) {
+                    showMoreBtn.style.display = 'none';
+                    showLessBtn.style.display = 'inline-block'; // Show "Show Less"
+                }
+            });
+        }
+
+        if (showLessBtn) {
+            showLessBtn.addEventListener('click', function() {
+                const allRows = tableBody.querySelectorAll('.borrow-row');
+                for (let i = initialRowsToShow; i < allRows.length; i++) {
+                    allRows[i].classList.add('hidden-row');
+                }
+                visibleRowCount = initialRowsToShow;
+                showLessBtn.style.display = 'none';
+                showMoreBtn.style.display = 'inline-block';
+            });
+        }
+    });
+</script>
+    
+
    
 <div class="container" style="display: flex; min-height: 100vh;;">
     <!-- Sidebar Menu -->
-    <div class="main-div" style="width: 250px; background-color: #f0f0f0; padding: 20px; min-height: 100%" >
+    <div class="main-div" style="width: 250px; background-color: #f0f0f0; padding: 20px; min-height: 100%; height: 80vh;" >
         <h2>Menu</h2>
         <ul class="sidebar-menu">
             <li><a href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-dashboard"></i><span>Dashboard</span></a></li>
@@ -169,6 +234,9 @@ ul li {
                     <li><a href="{% url 'admin_not_returned_book' %}"><i class="fas fa-exclamation-circle"></i> Not Returned</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="{% url 'admin_notification' %}"> <i class="fas fa-bell"></i><span>Notifications</span></a>
+            </li>
             <li><a href="{% url 'borrowed_books_report' %}"><i class="fas fa-file-alt"></i><span>Borrowed Books Report</span></a></li>
             <li><a href="{% url 'overdue_books_report' %}"><i class="fas fa-clock"></i><span>Overdue Books Report</span></a></li>
             <li><a href="{% url 'member_activities_report' %}"><i class="fas fa-user-clock"></i><span>Member Activities Report</span></a></li>
@@ -176,7 +244,7 @@ ul li {
     </div>
 
     <!-- Main Content -->
-    <div class="content" style="flex-grow: 1; padding: 20px;">
+    <div class="content" style="flex-grow: 1;  padding-left: 20px;">
         {% block admin_content %}{% endblock %}
     </div>
 </div>

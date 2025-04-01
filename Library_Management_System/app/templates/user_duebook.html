@@ -38,6 +38,7 @@
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -83,13 +84,14 @@
     #showLessBtn{
         background-color:#E27474;
     }
+
 </style>
-    <div class="borrow-history-container">
-        <h2>Overdue Book</h2>
+    <div class="borrow-history-container" style="padding-left: 20px;">
+        <h2 style="margin-top: 0;">Overdue Book</h2>
         <table class="borrow-history-table">
             <thead>
                 <tr>
-                    <th>Book Title</th>
+                    <th>Title</th>
                     <th>Author</th>
                     <th>Borrow Date</th>
                     <th>Due Date</th>
@@ -111,6 +113,10 @@
             </tr>
             {% endif %}
             {% endif %}
+            {% empty %}
+                <tr>
+                    <td >No overdue book found.</td>
+                </tr>
             {% endfor %}
         </tbody>
         </table>

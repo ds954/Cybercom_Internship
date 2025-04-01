@@ -32,6 +32,7 @@
         padding: 12px;
         border-bottom: 1px solid #ddd;
         text-align: left;
+       
     }
 
    thead th {
@@ -39,6 +40,7 @@
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -84,12 +86,12 @@
         background-color:#E27474;
     }
 </style>
-    <div class="borrow-history-container">
-        <h2>Pending Renewals</h2>
+    <div class="borrow-history-container" style="padding-left: 20px;">
+        <h2 style="margin-top: 0;">Pending Renewals</h2>
         <table class="borrow-history-table">
             <thead>
                 <tr>
-                    <th>Book Title</th>
+                    <th>Title</th>
                     <th>Author</th>
                     <th>Borrow Date</th>
                     <th>Due Date</th>
@@ -98,20 +100,24 @@
             </thead>
             <tbody>
             {% for request in borrow_requests %}
-            {% if request.status == 'renewal_requested' %}
-                {% if request.Duedate < today %}
-            <tbody> 
-            <tr id="request-{{ request.id }}" class="borrow-row">
-                <td>{{ request.book.title }}</td>
-                <td class="status">{{ request.book.author }}</td>
-                <td>{{ request.IssuedDate }}</td>
-                <td>{{ request.Duedate }}</td>
-                <td>
-                    {{ request.status }}
-                </td>
-            </tr>
-            {% endif %}
-            {% endif %}
+                {% if request.status == 'renewal_requested' %}
+                    {% if request.Duedate < today %}
+
+                        <tr id="request-{{ request.id }}" class="borrow-row">
+                            <td>{{ request.book.title }}</td>
+                            <td class="status">{{ request.book.author }}</td>
+                            <td>{{ request.IssuedDate }}</td>
+                            <td>{{ request.Duedate }}</td>
+                            <td>
+                                {{ request.status }}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
+                {% empty %}
+                <tr>
+                    <td>No renewal requests found.</td>
+                </tr>
             {% endfor %}
         </tbody>   
         </table>

@@ -33,11 +33,12 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -85,8 +86,8 @@
     }
 </style>
 
-    <div class="borrow-history-container">
-        <h2>Pending Request</h2>
+    <div class="borrow-history-container" style="padding-left: 20px;">
+        <h2 style="margin-top: 0;">Pending Request</h2>
         <table class="borrow-history-table">
             <thead>
                 <tr>

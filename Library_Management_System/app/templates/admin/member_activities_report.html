@@ -18,9 +18,18 @@
     table{
         width: 100%;
     }
+    .button{
+        display: inline-block;
+        padding: 8px 16px;
+        background-color:  #c0c4c6;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
 </style>
-
 <!-- User Details Table -->
+
 <h1>User Details</h1>
 <table border="1" class="table" style="margin-bottom: 50px;">
     <tr>
@@ -30,7 +39,10 @@
         <th>Lastname</th>
         <th>Phone</th>
         <th>Registration Date</th>
+        <!-- <th>Login Time</th>
+        <th>Logout Time</th> -->
     </tr>
+    
     {% for user in users %}
     <tr>
         <td>{{ user.Username }}</td>
@@ -39,9 +51,12 @@
         <td>{{ user.lastname }}</td>
         <td>{{ user.phone }}</td>
         <td>{{ user.created_at }}</td>
+        <!-- <td>{{ user.login_time }}</td>
+        <td>{{ user.logout_time }}</td> -->
     </tr>
     {% endfor %}
 </table>
+
 
 <!-- Borrow Requests & Notifications Table -->
 <h1>Borrow Requests & Notifications</h1>
@@ -51,8 +66,8 @@
         <th>Email</th>
         <th>Borrow Requests</th>
         <th>Notifications</th>
-        <th>Last Login</th>
-        <th>Last Logout</th>
+        <!-- <th>Last Login</th>
+        <th>Last Logout</th> -->
     </tr>
     {% for user_data in user_data %}
     <tr>
@@ -60,8 +75,8 @@
         <td>{{ user_data.user.email }}</td>
         <td>{{ user_data.borrow_count }}</td>
         <td>{{ user_data.notification_count }}</td>
-        <td>{{ user_data.last_login|default:"N/A" }}</td>
-        <td>{{ user_data.last_logout|default:"N/A" }}</td>
+        <!-- <td>{{ user_data.last_login|default:"N/A" }}</td>
+        <td>{{ user_data.last_logout|default:"N/A" }}</td> -->
     </tr>
     {% endfor %}
 </table>
@@ -79,24 +94,29 @@
 <h3>Total Renewal Requests Accepted: {{ renewal_accepted_count }}</h3>
 <table border="1" >
     <tr>
-        <th>Username</th>
-        <th>Book Title</th>
+        <th>Borrowed By</th>
+        <th>Title</th>
         <th>Status</th>
         <th>Issued Date</th>
         <th>Due Date</th>
+       
     </tr>
     {% for borrow in borrow_requests %}
     <tr>
         <td>{{ borrow.user.Username }}</td>
         <td>{{ borrow.book.title }}</td>
-        <td>{{ borrow.status }}</td>
+        <td>{{ borrow.get_status_display }}</td>
         <td>{{ borrow.IssuedDate }}</td>
         <td>{{ borrow.Duedate }}</td>
-    </tr>
+
     {% endfor %}
+         
+    
+</tr>
 </table>
 
-<table style="margin-top: 50px;">
+<h1 style="margin-top: 50px;">Member Activity</h1>
+<table>
 <tr>
     <th>User</th>
     <th>Title</th>
@@ -108,12 +128,14 @@
     <th>Cancel Date</th>
     <th>Issued Date</th>
     <th>Due Date</th>
+    <th>Last Login</th>
+    <th>Last Logout</th>
 </tr>
 {% for activity in member_activities %}
 <tr>
     <td>{{ activity.user.Username }}</td>
     <td>{{ activity.book.title }}</td>
-    <td>{{ activity.status }}</td>
+    <td>{{ activity.get_status_display }}</td>
     <td>{{ activity.request_date|default:"N/A" }}</td>
     <td>{{ activity.accept_reject_date|default:"N/A" }}</td>
     <!-- <td>{{ activity.renewal_request_date|default:"N/A" }}</td> -->
@@ -122,9 +144,12 @@
     <td>{{ activity.cancel_date|default:"N/A" }}</td>
     <td>{{ activity.issued_date|default:"N/A" }}</td>
     <td>{{ activity.due_date|default:"N/A" }}</td>
+    <td>{{ activity.login_time|default:"N/A" }}</td>
+    <td>{{ activity.logout_time|default:"N/A" }}</td>
+ 
 </tr>
 {% endfor %}
 </table>
 <!-- Download PDF Button -->
-<button style="margin-top: 50px;"><a href="{% url 'download_member_activities_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
+<button class="button"style="margin-top: 50px;"><a href="{% url 'download_member_activities_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
 {% endblock %}

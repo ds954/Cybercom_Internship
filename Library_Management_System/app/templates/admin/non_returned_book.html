@@ -9,9 +9,6 @@
         font-weight: 500;
     }
 
-    .borrow-history-container {
-        margin: 20px 0;
-    }
 
     .borrow-history-table {
         width: 100%;
@@ -50,13 +47,34 @@
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
+    html,body{
+        overflow-y: hidden;
+    }
+    
 </style>
 
 <div class="borrow-history-container">
     <h1>Non Returned Books</h1>
     
     <table class="borrow-history-table">
-        
+        <thead>
             <tr>
                 <th>User</th>
                 <th>Book Title</th>
@@ -65,7 +83,8 @@
                 <th>Due Date</th>
                 <th>Status</th>
             </tr>
-        
+        </thead>
+        <tbody>
             {% for request in borrow_requests %}
                 {% if request.status == 'accepted' or request.status == 'renew_accpect' or request.status == 'renewal_requested' %}
                     {% if request.Duedate < today %}
@@ -75,7 +94,7 @@
                             <td>{{ request.book.author }}</td>
                             <td>{{ request.IssuedDate }}</td>
                             <td class="status">{{ request.Duedate }}</td>
-                            <td>{{ request.status|title }}</td>
+                            <td>{{ request.get_status_display }}</td>
                         </tr>
                     {% endif %}
                 {% endif %}
@@ -84,9 +103,12 @@
                     <td colspan="5">No overdue books found.</td>
                 </tr>
             {% endfor %}
-       
+       </tbody>
     </table>
 
 </div>
-
+{% if borrow_requests|length > 5 %}
+<button id="showMoreBtn">Show More</button>
+<button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
 {% endblock %}

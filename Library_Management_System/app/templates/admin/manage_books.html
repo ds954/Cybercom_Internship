@@ -86,12 +86,31 @@
     #showLessBtn{
         background-color:#E27474;
     }
+    .scrollable-table-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    margin-bottom: 15px;
+    
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+body,html{
+    overflow-y: hidden;
+}
+
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <h1>Manage Books</h1>
 
 <a href="{% url 'bulk_upload_books' %}" class="btn">Import Books</a>
 <a href="{% url 'add_book' %}" class="btn">Add Book</a>
+<div class="scrollable-table-container">
 <table class="borrow-history-table">
     <thead>
     <tr>
@@ -136,6 +155,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
     {% if books|length > 5 %}
     <button id="showMoreBtn">Show More</button>
     <button id="showLessBtn" style="display: none;">Show Less</button>

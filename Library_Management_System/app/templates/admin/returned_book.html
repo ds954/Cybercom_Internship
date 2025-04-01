@@ -23,7 +23,7 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
@@ -56,30 +56,76 @@
     .actions a {
         margin-right: 8px;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
+    .scrollable-table-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    margin-bottom: 15px;
+    
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+body,html{
+    overflow-y: hidden;
+}
+    
 </style>
 
 <h1>Returned Books</h1>
 
-<table>
-   
+<div class="scrollable-table-container">
+<table class="borrow-history-table">
+    <thead>
         <tr>
             <th>User</th>
+            <th>Email</th>
+            <th>Contact No</th>
             <th>Book Name</th>
             <th>Status</th>
         </tr>
- 
+        <tbody>
         {% for request in borrow_requests %}
-        <tr>
+        <tr class="borrow-row">
             <td>{{ request.user.Username }}</td>
+            <td>{{ request.user.email}}</td>
+            <td>{{ request.user.phone}}</td>
             <td>{{ request.book }}</td>
-            <td>{{ request.status }}</td>
+            <td>{{ request.get_status_display }}</td>
         </tr>
         {% empty %}
         <tr>
             <td colspan="3">No returned books found.</td>
         </tr>
         {% endfor %}
-   
+   </tbody>
 </table>
+</div>
+{% if borrow_requests|length > 5 %}
+<button id="showMoreBtn">Show More</button>
+<button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
 
 {% endblock %}

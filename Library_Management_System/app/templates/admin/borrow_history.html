@@ -9,9 +9,7 @@
         font-weight: 500;
     }
    
-    .borrow-history-container {
-        margin: 20px 0;
-    }
+    
 
     .borrow-history-table {
         width: 100%;
@@ -49,13 +47,51 @@
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
+    .scrollable-table-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    margin-bottom: 15px;
+    
+}
+.main-div{
+    height: 80vh;
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+body,html{
+    overflow-y: hidden;
+}
 </style>
 
 <div class="borrow-history-container">
     <h1>Borrow Book History</h1>
     
-    <table class="borrow-history-table">
-        
+    <div class="scrollable-table-container">
+    <table class="borrow-history-table" >
+        <thead>
             <tr>
                 <th>User</th>
                 <th>Book Title</th>
@@ -64,10 +100,11 @@
                 <th>Due Date</th>
                 <th>Status</th>
             </tr>
-       
+        </thead>
+        <tbody>
            
             {% for request in borrow_requests %}
-            <tr id="request-{{ request.id }}">
+            <tr id="request-{{ request.id }}" class="borrow-row">
                 
                     <td>{{ request.user.Username }}</td>
                     
@@ -75,16 +112,19 @@
                 <td class="status">{{ request.book.author }}</td>
                 <td>{{ request.IssuedDate }}</td>
                 <td>{{ request.Duedate }}</td>
-                <td>{{ request.status|title }}</td>
+                <td>{{ request.get_status_display }}</td>
             </tr>
             {% empty %}
             <tr>
                 <td colspan="5">No borrow history available.</td>
             </tr>
             {% endfor %}
-        
+        </tbody>
     </table>
-
+    </div>
 </div>
-
+{% if borrow_requests|length > 5 %}
+<button id="showMoreBtn">Show More</button>
+<button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
 {% endblock %}

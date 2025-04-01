@@ -6,6 +6,12 @@
 {% block admin_content %}
 
 <style>
+    html,body{
+        overflow-y: hidden;
+    }
+    .main-div{
+        height: 80vh;
+    }
     table{
         width: 100%;
     }
@@ -18,13 +24,32 @@
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
+    .hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
+    }
+    
 
 </style>
 
 
-
+<div class="page-container" >
 <h1>Members</h1>
-<table>
+<table class="borrow-history-table" style="margin-bottom: 15px;">
+    <thead>
     <tr>
         <th>Username</th>
         <th>Email</th>
@@ -34,9 +59,11 @@
         <th>Registration Date</th>
       
     </tr>
+    </thead>
 
+    <tbody>
     {% for user in users %}
-    <tr>
+    <tr class="borrow-row">
         <td>{{ user.Username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.firstname }}</td>
@@ -50,7 +77,13 @@
         <td colspan="6">No users found.</td>
     </tr>
     {% endfor %}
+    </tbody>
 </table>
 
 </div>
+{% if users|length > 5 %}
+<button id="showMoreBtn">Show More</button>
+<button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
 {% endblock %}

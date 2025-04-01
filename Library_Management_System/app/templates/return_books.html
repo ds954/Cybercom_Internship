@@ -33,11 +33,12 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -83,8 +84,11 @@
     #showLessBtn{
         background-color:#E27474;
     }
+    h2{
+        margin-top: 0;
+    }
 </style>
-    <div class="borrow-history-container">
+    <div class="borrow-history-container" style="padding-left: 20px;">
         <h2>Returned Books</h2>
         <table class="borrow-history-table">
             <thead>

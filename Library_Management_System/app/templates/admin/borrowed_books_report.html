@@ -14,7 +14,58 @@
         border-bottom: 1px solid #ddd;
     }
     table{
-        width: 50%;
+        width: 100%;
+    }
+    a.btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color:  #c0c4c6;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+    .button{
+        display: inline-block;
+        padding: 8px 16px;
+        background-color:  #c0c4c6;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+
+    }
+    .scrollable-table-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    margin-bottom: 15px;
+    
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+
+.hidden-row {
+        display: none;
+    }
+    #showLessBtn,#showMoreBtn{
+        
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin: 0 5px; 
+    
+    }
+    #showLessBtn{
+        background-color:#E27474;
     }
 </style>
 <h1>Borrowed Books Report</h1>
@@ -22,14 +73,17 @@
 <h1>Total Number of Borrowed Books: {{borrowed_books|length}} </h1>
 <h1>Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h1>
 <h3>Borrowed Books</h3>
-<table style="margin-bottom: 50px;">
-    
+
+<div class="borrow-history-container">
+<div class="scrollable-table-container">
+<table style="margin-bottom: 50px;" class="borrow-history-table">
+    <thead>
         <tr>
             <th>Member ID</th>
             <th>Borrowed By</th>
             <th>Email</th>
             <th>Contact No</th>
-            <th>Book ID</th>
+            <!-- <th>Book ID</th> -->
             <th>Title</th>
             <th>Author</th>
             <th>Issued Date</th>
@@ -40,14 +94,15 @@
             <th>Renewal Requested Date</th>
             <th>Renewal Requested Approve/Reject</th>
         </tr>
-  
+    </thead>
+    <tbody>
         {% for req in borrowed_books %}
-        <tr>
-            <td>{{ req.user.id }}</td>
+        <tr class="borrow-row">
+            <td>{{ forloop.counter }}</td>
             <td>{{ req.user.Username }}</td>
-            <td>{{ req.user.phone }}</td>
             <td>{{ req.user.email }}</td>
-            <td>{{ req.book.id }}</td>
+            <td>{{ req.user.phone }}</td>
+            <!-- <td>{{ forloop.counter }}</td> -->
             <td>{{ req.book.title }}</td>
             <td>{{ req.book.author }}</td>
             <td>{{ req.IssuedDate }}</td>
@@ -91,18 +146,31 @@
             <td colspan="4">No borrowed books found.</td>
         </tr>
         {% endfor %}
-  
+  </tbody>
 </table>
+</div>
+</div>
+
+{% if borrowed_books|length > 3 %}
+<button class="showMoreBtn">Show More</button>
+<button class="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
+<div class="borrow-history-container">
 <h3>User Borrow Statistics</h3>
-<table >
+<div class="scrollable-table-container">
+<table class="borrow-history-table" >
+    <thead>
     <tr>
         <th>User ID</th>
         <th>Username</th>
-        <th>Books Borrowed</th>
+        <th>No of Books Borrowed</th>
     </tr>
+    </thead>
+    <tbody>
     {% for user in user_borrow_stats %}
-    <tr>
-        <td>{{ user.id }}</td>
+    <tr class="borrow-row">
+        <td>{{ forloop.counter }}</td>
         <td>{{ user.Username }}</td>
         <td>{{ user.borrow_count }}</td>
     </tr>
@@ -111,7 +179,17 @@
         <td colspan="3">No users found.</td>
     </tr>
     {% endfor %}
+    </tbody>
 </table>
+</div>
+</div>
+
+{% if user_borrow_stats|length > 5 %}
+<button class="showMoreBtn">Show More</button>
+<button class="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
 <!-- Download PDF Button -->
-<button style="margin-top: 50px;"><a href="{% url 'download_borrowed_books_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
+<button class= "button" style="margin-top: 50px; padding: 0;
+"><a href="{% url 'download_borrowed_books_report' %}" class="btn">Download PDF</a></button>
+
 {% endblock %}

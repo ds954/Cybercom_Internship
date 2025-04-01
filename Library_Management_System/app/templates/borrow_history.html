@@ -32,11 +32,12 @@
         text-align: left;
     }
 
-    th {
+    thead  th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -79,13 +80,16 @@
     #showLessBtn{
         background-color:#E27474;
     }
+    #content{
+            overflow-y:scroll;
+        }
 </style>
-    <div class="borrow-history-container">
-        <h1>Borrow History</h1>
+    <div class="borrow-history-container" style="padding-left: 20px;">
+        <h2 style="margin-top: 0;">Borrow History</h2>
         <table class="borrow-history-table">
             <thead>
                 <tr>
-                    <th>Book Title</th>
+                    <th>Title</th>
                     <th>Author</th>
                     <th>Borrow Date</th>
                     <th>Due Date</th>

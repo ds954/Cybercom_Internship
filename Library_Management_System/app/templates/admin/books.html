@@ -8,7 +8,7 @@
       h1{
         font-weight: 500;
     }
-
+   
     table {
         width: 100%;
         border-collapse: collapse;
@@ -26,6 +26,7 @@
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -71,11 +72,28 @@
     #showLessBtn{
         background-color:#E27474;
     }
+    .scrollable-table-container {
+    max-height: 400px; 
+    overflow-y: auto;
+    margin-bottom: 15px;
+    
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+body,html{
+    overflow-y: hidden;
+}
 </style>
 
-
+<h1>Books</h1>
+<div class="scrollable-table-container">
 <table class="borrow-history-table">
-    <h1>Books</h1>
     <thead>
     <tr>
         <th>Title</th>
@@ -107,6 +125,7 @@
     {% endfor %}
 </tbody>
 </table>
+</div>
 {% if books|length > 5 %}
 <button id="showMoreBtn">Show More</button>
 <button id="showLessBtn" style="display: none;">Show Less</button>
