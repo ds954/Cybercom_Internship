@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1> employee in IT department: </h1>
+    {% for employee in employee_data %}
+        <p> {{employee}}</p>
+    {% endfor %}      
+    <h1>Joined in Last 30 Days: </h1>
+    {% for emp in join_last_30 %}
+        <p>{{emp}}</p>
+    {% endfor %}
+    <h1>Total Employee:</h1>
+
+    {% for count in count_id %}
+    <p>Department: {{ count.department__department_name }} | Total Employees: {{ count.total }}</p>
+    {% endfor %}    
+</body>
+</html>
