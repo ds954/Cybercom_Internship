@@ -15,6 +15,8 @@ class UserInfo(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+    login_time = models.DateTimeField(null=True, blank=True)  
+    logout_time = models.DateTimeField(null=True, blank=True) 
 
     def __str__(self):
         return self.Username

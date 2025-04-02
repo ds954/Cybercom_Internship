@@ -86,46 +86,50 @@
     }
 
 </style>
-    <div class="borrow-history-container" style="padding-left: 20px;">
-        <h2 style="margin-top: 0;">Overdue Book</h2>
-        <table class="borrow-history-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Borrow Date</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for request in borrow_requests %}
-            {% if request.status == 'accepted' or request.status == 'renew_accpect' %}
-                {% if request.Duedate < today %}
-            <tr id="request-{{ request.id }}" class="borrow-row">
-                <td>{{ request.book.title }}</td>
-                <td class="status">{{ request.book.author }}</td>
-                <td>{{ request.IssuedDate }}</td>
-                <td>{{ request.Duedate }}</td>
-                <td>
-                    {{ request.status }}
-                </td>
+<div class="borrow-history-container" style="padding-left: 20px;">
+    <h1 style="margin-top: 0;">Overdue Book</h1>
+    <table class="borrow-history-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
             </tr>
-            {% endif %}
-            {% endif %}
-            {% empty %}
-                <tr>
-                    <td >No overdue book found.</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-        {% if borrow_requests|length > 1 %}
-        <button id="showMoreBtn">Show More</button>
-        <button id="showLessBtn" style="display: none;">Show Less</button>
-        {% endif %}
+        </thead>
+        <tbody>
+           
+                {% for request in borrow_requests %}
+                    
+                            
+                            <tr id="request-{{ request.id }}" class="borrow-row">
+                                <td>{{ request.book.title }}</td>
+                                <td class="status">{{ request.book.author }}</td>
+                                <td>{{ request.IssuedDate }}</td>
+                                <td>{{ request.Duedate }}</td>
+                                <td>{{ request.get_status_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; font-weight: bold; padding: 10px;">
+                                    No overdue books found.
+                                </td>
+                            </tr>
+                        
+                {% endfor %}
 
-    </div>
+                
+           
+        </tbody>
+    </table>
+
+</div>
+{% if borrow_requests|length > 1 and found %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {

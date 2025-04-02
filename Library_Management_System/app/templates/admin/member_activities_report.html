@@ -27,11 +27,108 @@
         border-radius: 4px;
         transition: background-color 0.3s ease;
     }
+    .hidden-row {
+    display: none;
+    }
+  /* Remove hover effect for Show More and Show Less buttons */
+#showMoreBtn1, #showLessBtn1, #showLessBtn3, #showLessBtn4,  
+#showMoreBtn2, #showLessBtn2,#showMoreBtn1,#showMoreBtn3,#showMoreBtn4 {
+    background-color: #c0c4c6; /* Default color */
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: none; /* Disable transition */
+}
+
+/* Show More buttons (Gray) */
+#showMoreBtn1, #showMoreBtn2, #showMoreBtn3, #showMoreBtn4 {
+    background-color: #c0c4c6; /* Gray */
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 50px;
+}
+
+/* Show Less buttons (Red) */
+#showLessBtn1, #showLessBtn2, #showLessBtn3, #showLessBtn4 {
+    background-color: #E27474; /* Red */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 50px;
+}
+
+/* Remove hover effects */
+#showMoreBtn1:hover, #showMoreBtn2:hover, #showMoreBtn3:hover, #showMoreBtn4:hover {
+    background-color: #c0c4c6; /* Keep same gray */
+}
+
+#showLessBtn1:hover, #showLessBtn2:hover, #showLessBtn3:hover, #showLessBtn4:hover {
+    background-color: #E27474; /* Keep same red */
+}
+
+h1{
+    margin-bottom: 15px;
+}
+.main-div {
+    min-height: 100vh; 
+    overflow: auto; 
+}
+.scrollable-table-container {
+    max-height: 400px; /* Adjust height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+    margin-bottom: 15px;
+    border: 1px solid #ddd; /* Optional border for clarity */
+}
+
+/* Ensure table headers remain fixed while scrolling */
+.scrollable-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.scrollable-table-container thead th {
+    position: sticky;
+    top: 0;
+    background-color: #89aec1; /* Keep the header visible */
+    z-index: 2;
+}
+
+.button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #c0c4c6;  /* Light grey */
+    color: black;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: none; /* Removes hover transition effect */
+}
+
+.button:hover {
+    background-color: #c0c4c6 !important; /* Keep the same color on hover */
+    color: black !important;
+    cursor: default; /* Prevent pointer cursor */
+}
+
+
+
 </style>
 <!-- User Details Table -->
+<!-- Download PDF Button -->
+<button class="button"style="margin-bottom: 20px; background-color: #c0c4c6 "><a href="{% url 'download_member_activities_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+
 
 <h1>User Details</h1>
-<table border="1" class="table" style="margin-bottom: 50px;">
+<table border="1" class="table" style="margin-bottom: 15px;">
     <tr>
         <th>Username</th>
         <th>Email</th>
@@ -39,28 +136,53 @@
         <th>Lastname</th>
         <th>Phone</th>
         <th>Registration Date</th>
-        <!-- <th>Login Time</th>
-        <th>Logout Time</th> -->
+        <th>Login Time</th>
+        <th>Logout Time</th>
     </tr>
     
-    {% for user in users %}
+    {% for user_data in user_data %}
     <tr>
-        <td>{{ user.Username }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.firstname }}</td>
-        <td>{{ user.lastname }}</td>
-        <td>{{ user.phone }}</td>
-        <td>{{ user.created_at }}</td>
-        <!-- <td>{{ user.login_time }}</td>
-        <td>{{ user.logout_time }}</td> -->
+        <td>{{ user_data.user.Username }}</td>
+        <td>{{ user_data.user.email }}</td>
+        <td>{{ user_data.user.firstname }}</td>
+        <td>{{ user_data.user.lastname }}</td>
+        <td>{{ user_data.user.phone }}</td>
+        <td>{{ user_data.user.created_at }}</td>
+        <td>{{ user_data.last_login|default:"N/A" }}</td>
+        {% if  user_data.last_logout == 'N/A' %}
+                {% if  user_data.last_login != 'N/A' %}
+                    <td>Logging in</td>
+                {% else %}
+                    <td>N/A</td>
+                {% endif %}
+        {% else %}
+            <td>{{ user_data.last_logout }}</td>
+        {% endif %}   
     </tr>
     {% endfor %}
 </table>
 
 
+<button id="showMoreBtn1" class="button" style="display: none;">Show More</button>
+<button id="showLessBtn1" class="button" style="display: none;">Show Less</button>
+<!-- <table>
+    <tr>
+        <th>Username</th>
+        <th>login</th>
+        <th>logout</th>
+    </tr>
+    {% for user_data in user_data %}
+    <tr>
+        <td>{{ user_data.user.Username }}</td>
+    <td>{{ user_data.last_login|default:"N/A" }}</td>
+    <td>{{ user_data.last_logout|default:"N/A" }}</td>
+    </tr>
+    {% endfor %}
+</table> -->
+
 <!-- Borrow Requests & Notifications Table -->
 <h1>Borrow Requests & Notifications</h1>
-<table border="1" style="margin-bottom: 50px;">
+<table border="1" style="margin-bottom: 15px;">
     <tr>
         <th>Username</th>
         <th>Email</th>
@@ -81,18 +203,21 @@
     {% endfor %}
 </table>
 
+<button id="showMoreBtn2" class="button" style="display: none;">Show More</button>
+<button id="showLessBtn2" class="button" style="display: none;">Show Less</button>
+
 <!-- Borrow History Table -->
 <h1>Borrow History</h1>
 
-<h3>Total Returned Books: {{ return_count }}</h3>
+<!-- <h3>Total Returned Books: {{ return_count }}</h3>
 <h3>Total Canceled Books: {{ cancel_count }}</h3>
 <h3>Total Pending Requests: {{ pending_count }}</h3>
 <h3>Total Rejected Requests: {{ rejected_count }}</h3>
 <h3>Total Accepted Requests: {{ accepted_count }}</h3>
 <h3>Total Renewal Requests: {{ renewal_request_count }}</h3>
 <h3>Total Renewal Requests Rejected: {{ renewal_rejected_count }}</h3>
-<h3>Total Renewal Requests Accepted: {{ renewal_accepted_count }}</h3>
-<table border="1" >
+<h3>Total Renewal Requests Accepted: {{ renewal_accepted_count }}</h3> -->
+<table border="1" style="margin-bottom: 15px;">
     <tr>
         <th>Borrowed By</th>
         <th>Title</th>
@@ -115,8 +240,11 @@
 </tr>
 </table>
 
-<h1 style="margin-top: 50px;">Member Activity</h1>
-<table>
+<button id="showMoreBtn3" class="button" style="display: none;">Show More</button>
+<button id="showLessBtn3" class="button" style="display: none;">Show Less</button>
+
+<h1 style="margin-top: 15px;">Member Activity</h1>
+<table style="margin-bottom: 15px;">
 <tr>
     <th>User</th>
     <th>Title</th>
@@ -128,8 +256,6 @@
     <th>Cancel Date</th>
     <th>Issued Date</th>
     <th>Due Date</th>
-    <th>Last Login</th>
-    <th>Last Logout</th>
 </tr>
 {% for activity in member_activities %}
 <tr>
@@ -144,12 +270,67 @@
     <td>{{ activity.cancel_date|default:"N/A" }}</td>
     <td>{{ activity.issued_date|default:"N/A" }}</td>
     <td>{{ activity.due_date|default:"N/A" }}</td>
-    <td>{{ activity.login_time|default:"N/A" }}</td>
-    <td>{{ activity.logout_time|default:"N/A" }}</td>
  
 </tr>
 {% endfor %}
 </table>
-<!-- Download PDF Button -->
-<button class="button"style="margin-top: 50px;"><a href="{% url 'download_member_activities_report' %}" class="btn btn-primary" style="text-decoration: none; color: black; ">Download PDF</a></button>
+
+<button id="showMoreBtn4" class="button" style="display: none;">Show More</button>
+<button id="showLessBtn4" class="button" style="display: none;">Show Less</button>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupShowMoreLess(tableSelector, showMoreBtnId, showLessBtnId, initialRowsToShow) {
+        const table = document.querySelector(tableSelector);
+        if (!table) return; // If table doesn't exist, exit function
+        
+        const tbody = table.querySelector('tbody');
+        const rows = tbody ? tbody.querySelectorAll('tr') : table.querySelectorAll('tr'); // Handle tables without <tbody>
+        const showMoreBtn = document.getElementById(showMoreBtnId);
+        const showLessBtn = document.getElementById(showLessBtnId);
+        let visibleRowCount = initialRowsToShow;
+
+        // Hide rows beyond the initial limit
+        for (let i = initialRowsToShow; i < rows.length; i++) {
+            rows[i].classList.add('hidden-row');
+        }
+
+        // Show "Show More" button only if extra rows exist
+        if (rows.length > initialRowsToShow) {
+            showMoreBtn.style.display = 'inline-block';
+        }
+
+        showMoreBtn.addEventListener('click', function() {
+            const hiddenRows = table.querySelectorAll('.hidden-row');
+            const rowsToShow = 5; // Show 5 more rows
+
+            for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                hiddenRows[i].classList.remove('hidden-row');
+            }
+
+            visibleRowCount += rowsToShow;
+
+            if (visibleRowCount >= rows.length) {
+                showMoreBtn.style.display = 'none';
+                showLessBtn.style.display = 'inline-block';
+            }
+        });
+
+        showLessBtn.addEventListener('click', function() {
+            for (let i = initialRowsToShow; i < rows.length; i++) {
+                rows[i].classList.add('hidden-row');
+            }
+
+            visibleRowCount = initialRowsToShow;
+            showLessBtn.style.display = 'none';
+            showMoreBtn.style.display = 'inline-block';
+        });
+    }
+
+    // Set initial rows to 5 instead of 3
+    setupShowMoreLess('.table', 'showMoreBtn1', 'showLessBtn1', 6);
+    setupShowMoreLess('table:nth-of-type(2)', 'showMoreBtn2', 'showLessBtn2', 6);
+    setupShowMoreLess('table:nth-of-type(3)', 'showMoreBtn3', 'showLessBtn3', 6);
+    setupShowMoreLess('table:nth-of-type(4)', 'showMoreBtn4', 'showLessBtn4', 6);
+});
+</script>
 {% endblock %}

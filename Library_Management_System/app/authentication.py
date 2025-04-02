@@ -113,7 +113,6 @@ class JWTAuthentication(BaseAuthentication):
         excluded_paths = [
             '/admin/',
             '/login/',
-            '/logout/',
             '/register/',
             '/reset_password/',
             '/otp/',

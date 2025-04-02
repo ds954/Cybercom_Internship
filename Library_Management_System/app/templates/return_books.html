@@ -78,7 +78,7 @@
         cursor: pointer;
         font-size: 1em;
         transition: background-color 0.3s ease;
-        margin: 0 5px; /* Add some space between buttons if needed */
+       
     
     }
     #showLessBtn{
@@ -89,11 +89,11 @@
     }
 </style>
     <div class="borrow-history-container" style="padding-left: 20px;">
-        <h2>Returned Books</h2>
+        <h1>Returned Books</h1>
         <table class="borrow-history-table">
             <thead>
                 <tr>
-                    <th>Book Title</th>
+                    <th>Title</th>
                     <th>Author</th>
                     <th>Borrow Date</th>
                     <th>Due Date</th>
@@ -102,19 +102,22 @@
             </thead>
             <tbody>
             {% for request in borrow_requests %}
-                {% if request.status == 'book_returned' %}
-                    {% if request.Duedate > today %}
+               
                     <tr id="request-{{ request.id }}" class="borrow-row">
                         <td>{{ request.book.title }}</td>
                         <td class="status">{{ request.book.author }}</td>
                         <td>{{ request.IssuedDate }}</td>
                         <td>{{ request.Duedate }}</td>
                         <td>
-                            {{ request.status }}
+                            {{ request.get_status_display }}
                         </td>
                     </tr>
-                    {% endif %}
-                {% endif %}
+                    {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; font-weight: bold; padding: 10px;">
+                        No return book found.
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
         </table>

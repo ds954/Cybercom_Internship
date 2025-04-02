@@ -32,11 +32,12 @@
         text-align: left;
     }
 
-    th {
+    thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
 
     tr:nth-child(even) {
@@ -76,7 +77,7 @@
         cursor: pointer;
         font-size: 1em;
         transition: background-color 0.3s ease;
-        margin: 0 5px; /* Add some space between buttons if needed */
+        
     
     }
     #showLessBtn{
@@ -85,13 +86,13 @@
 
 </style>
 <div class="borrow-history-container" style="padding-left: 20px;">
-<h2 style="margin-top: 0;">Your Books</h2>
+<h1 style="margin-top: 0;">Your Books</h1>
 
 
 <table class="borrow-history-table">
     <thead>
     <tr>
-        <th>Book Title</th>
+        <th>Title</th>
         <th>Author</th>
         <th>Borrow Date</th>
         <th>Due Date</th>
@@ -101,17 +102,23 @@
     <tbody>
     {% for request in borrow_requests %}
 
-                {% if request.status == 'accepted' or request.status == 'renew_accpect' %}
+               
             <tr id="request-{{ request.id }}" class="borrow-row">
                 <td>{{ request.book.title }}</td>
                 <td class="status">{{ request.book.author }}</td>
                 <td>{{ request.IssuedDate }}</td>
                 <td>{{ request.Duedate }}</td>
                 <td>
-                    {{ request.status }}
+                    {{ request.get_status_display }}
                 </td>
             </tr>
-            {% endif %}
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; font-weight: bold; padding: 10px;">
+                        You have not borrowed any books.
+                    </td>
+                </tr>
+            
             {% endfor %}
         </tbody>
         </table>

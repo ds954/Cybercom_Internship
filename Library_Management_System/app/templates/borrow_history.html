@@ -74,18 +74,25 @@
         cursor: pointer;
         font-size: 1em;
         transition: background-color 0.3s ease;
-        margin: 0 5px; /* Add some space between buttons if needed */
+        
     
     }
     #showLessBtn{
         background-color:#E27474;
     }
-    #content{
-            overflow-y:scroll;
-        }
+    .html,body{
+        overflow-y: hidden;
+    }
+    .sidebar .content {
+    max-height: 500px; /* Adjust the height as needed */
+    overflow-y: auto; /* Enables vertical scrolling */
+    padding-right: 10px; /* Prevents content from being cut off */
+}
+
+  
 </style>
     <div class="borrow-history-container" style="padding-left: 20px;">
-        <h2 style="margin-top: 0;">Borrow History</h2>
+        <h1 style="margin-top: 0;">Borrow History</h1>
         <table class="borrow-history-table">
             <thead>
                 <tr>
@@ -129,18 +136,18 @@
     
                 </td>
                 <td>
-                    {{ request.status }}
+                    {{ request.get_status_display }}
                 </td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
 
+        
         {% if borrow_requests|length > 2 %}
         <button id="showMoreBtn">Show More</button>
         <button id="showLessBtn" style="display: none;">Show Less</button>
         {% endif %}
-
     </div>
 
 

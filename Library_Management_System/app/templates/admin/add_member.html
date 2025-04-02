@@ -8,12 +8,7 @@
     body{
         overflow-y: hidden;
     }
-    h2 {
-        font-size: 24px;
-        color: #333;
-        text-align: center;
-        margin: 0;
-    }
+   
 
     .form-container {
         display: flex;
@@ -76,9 +71,9 @@
     }
 </style>
 
-<h2>Add Member</h2>
 
 <div class="form-container">
+    <h1 style="font-weight: 500;">Add Member</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}

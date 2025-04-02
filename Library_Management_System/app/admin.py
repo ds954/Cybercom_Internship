@@ -85,23 +85,24 @@ class BookAdmin(ImportExportModelAdmin):
     # In BookAdmin (admin.py)
 
 def save_model(self, request, obj, form, change):
-    super().save_model(request, obj, form, change)
-    if not change:
-        AdminActions.objects.create(
-            admin_id=request.user,
-            action_type="Add Book",
-            description=f"Added book: {obj.title}"
-        )
-        book_copies = [
-            BookCopy(book=obj, copy_number=i) for i in range(1, obj.quantity + 1)
-        ]
-        BookCopy.objects.bulk_create(book_copies)
-    else:
-        AdminActions.objects.create(
-            admin_id=request.user,
-            action_type="Edit Book",
-            description=f"Edited book: {obj.title}"
-        )
+        super().save_model(request, obj, form, change)
+        if not change:
+            AdminActions.objects.create(
+                admin_id=request.user,
+                action_type="Add Book",
+                description=f"Added book: {obj.title}"
+            )
+            book_copies = [
+                BookCopy(book=obj, copy_number=i) for i in range(1, obj.quantity + 1)
+            ]
+            print(f"Book copies to create: {book_copies}")
+            BookCopy.objects.bulk_create(book_copies)
+        else:
+            AdminActions.objects.create(
+                admin_id=request.user,
+                action_type="Edit Book",
+                description=f"Edited book: {obj.title}"
+            )
 
 @admin.register(BorrowRequest)
 class BorrowRequestAdmin(admin.ModelAdmin):

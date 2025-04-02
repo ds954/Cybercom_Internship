@@ -7,6 +7,15 @@
 {% block search-content %}
 {% endblock %}
 {% block user_content %}
+<style>
+    body{
+    overflow-y: hidden;
+}
+.content{
+            overflow-y:scroll;
+        }
+      
+</style>
 <div class="container">
     <h2>Search Results for "{{ query }}"</h2>
 

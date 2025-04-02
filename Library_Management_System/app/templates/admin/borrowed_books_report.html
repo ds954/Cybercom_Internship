@@ -7,11 +7,12 @@
       h1{
         font-weight: 500;
     }
-      th {
+    thead  th {
         background-color: #89aec1; /* Light Green for Members (first column) */
         /* padding: 8px; */
         text-align: left;
         border-bottom: 1px solid #ddd;
+        color: black;
     }
     table{
         width: 100%;
@@ -53,7 +54,7 @@
 .hidden-row {
         display: none;
     }
-    #showLessBtn,#showMoreBtn{
+    #showLessBtn1,#showMoreBtn1,#showMoreBtn2,#showLessBtn2{
         
         padding: 10px 20px;
         border: none;
@@ -61,22 +62,27 @@
         cursor: pointer;
         font-size: 1em;
         transition: background-color 0.3s ease;
-        margin: 0 5px; 
+        margin-bottom: 30px;
     
     }
-    #showLessBtn{
+    #showLessBtn1,#showLessBtn2{
         background-color:#E27474;
     }
 </style>
 <h1>Borrowed Books Report</h1>
 
-<h1>Total Number of Borrowed Books: {{borrowed_books|length}} </h1>
-<h1>Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h1>
-<h3>Borrowed Books</h3>
+<!-- Download PDF Button -->
+<button class= "button" style="margin-bottom: 5px; padding: 0;
+"><a href="{% url 'download_borrowed_books_report' %}" class="btn">Download PDF</a></button>
 
+<h3>Total Number of Borrowed Books: {{borrowed_books|length}} </h3>
+<h3 style="margin-bottom: 15px;">Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h3>
+
+
+<h3>Borrowed Books</h3>
 <div class="borrow-history-container">
 <div class="scrollable-table-container">
-<table style="margin-bottom: 50px;" class="borrow-history-table">
+<table class="borrow-history-table">
     <thead>
         <tr>
             <th>Member ID</th>
@@ -108,7 +114,7 @@
             <td>{{ req.IssuedDate }}</td>
             <td>{{ req.Duedate }}</td>
 
-            <td>{{ req.status }}</td>
+            <td>{{ req.get_status_display }}</td>
             {% if req.status in accepted_statuses and req.Duedate < today or req.status == 'book_returned' %}
             <td>Yes</td>
         {% else %}
@@ -152,9 +158,10 @@
 </div>
 
 {% if borrowed_books|length > 3 %}
-<button class="showMoreBtn">Show More</button>
-<button class="showLessBtn" style="display: none;">Show Less</button>
+<button id="showMoreBtn1">Show More</button>
+<button id="showLessBtn1" style="display: none;">Show Less</button>
 {% endif %}
+
 
 <div class="borrow-history-container">
 <h3>User Borrow Statistics</h3>
@@ -184,12 +191,63 @@
 </div>
 </div>
 
-{% if user_borrow_stats|length > 5 %}
-<button class="showMoreBtn">Show More</button>
-<button class="showLessBtn" style="display: none;">Show Less</button>
+{% if user_borrow_stats|length > 3 %}
+<button id="showMoreBtn2">Show More</button>
+<button id="showLessBtn2" style="display: none;">Show Less</button>
 {% endif %}
-<!-- Download PDF Button -->
-<button class= "button" style="margin-top: 50px; padding: 0;
-"><a href="{% url 'download_borrowed_books_report' %}" class="btn">Download PDF</a></button>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function setupShowMoreLess(tableSelector, showMoreBtnId, showLessBtnId, initialRowsToShow) {
+            const tableBody = document.querySelector(tableSelector).querySelector('tbody');
+            const rows = tableBody.querySelectorAll('.borrow-row');
+            const showMoreBtn = document.getElementById(showMoreBtnId);
+            const showLessBtn = document.getElementById(showLessBtnId);
+            let visibleRowCount = initialRowsToShow;
+
+            // Initially hide rows beyond the initial limit
+            for (let i = initialRowsToShow; i < rows.length; i++) {
+                rows[i].classList.add('hidden-row');
+            }
+
+            // Show "Show More" button only if more rows exist
+            if (rows.length > initialRowsToShow) {
+                showMoreBtn.style.display = 'inline-block';
+            }
+
+            showMoreBtn.addEventListener('click', function() {
+                const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
+                const rowsToShow = 5; // Show 5 rows at a time
+
+                for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
+                    hiddenRows[i].classList.remove('hidden-row');
+                }
+
+                visibleRowCount += rowsToShow;
+
+                if (visibleRowCount >= rows.length) {
+                    showMoreBtn.style.display = 'none';
+                    showLessBtn.style.display = 'inline-block';
+                }
+            });
+
+            showLessBtn.addEventListener('click', function() {
+                for (let i = initialRowsToShow; i < rows.length; i++) {
+                    rows[i].classList.add('hidden-row');
+                }
+
+                visibleRowCount = initialRowsToShow;
+                showLessBtn.style.display = 'none';
+                showMoreBtn.style.display = 'inline-block';
+            });
+        }
+
+        // Apply the function to both tables
+        setupShowMoreLess('.borrow-history-container:nth-of-type(1) .borrow-history-table', 'showMoreBtn1', 'showLessBtn1', 3);
+        setupShowMoreLess('.borrow-history-container:nth-of-type(2) .borrow-history-table', 'showMoreBtn2', 'showLessBtn2', 3);
+    });
+</script>
+
 
 {% endblock %}

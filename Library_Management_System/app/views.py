@@ -49,7 +49,10 @@ from django.utils.timezone import now
 from django.contrib.auth.models import User
 from app.context_processors import user_context_processor
 from django.http import HttpResponseRedirect
-
+from reportlab.lib.pagesizes import landscape, A3
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from .admin import BookAdmin
 
 def admin_profile_view(request):
     user = request.user  
@@ -114,22 +117,22 @@ def download_borrowed_books_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="borrowed_books_report.pdf"'
 
-    CUSTOM_HEIGHT=3300
-    CUSTOM_WIDTH=3000
-    CUSTOM_SIZE=(CUSTOM_HEIGHT,CUSTOM_WIDTH)
+    CUSTOM_HEIGHT = 1000
+    CUSTOM_WIDTH = 1200
+    CUSTOM_SIZE = (CUSTOM_WIDTH, CUSTOM_HEIGHT)
     p = canvas.Canvas(response, pagesize=CUSTOM_SIZE)
     width, height = CUSTOM_SIZE
 
-    p.setFont("Helvetica-Bold", 24)
-    p.drawString(1000, height - 50, "Borrowed Books Report")
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(400, height - 50, "Borrowed Books Report")
 
     generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-    p.setFont("Helvetica", 22)
-    p.drawString(1000, height - 70, f"Generated on: {generated_time}")
+    p.setFont("Helvetica", 14)
+    p.drawString(400, height - 70, f"Generated on: {generated_time}")
 
-    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect','renewal_requested'])
-    total_borrowed_books=borrowed_books.count()
-    print(total_borrowed_books)
+    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect', 'renewal_requested'])
+    total_borrowed_books = borrowed_books.count()
+
     most_borrowed = (
         BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'])
         .values('book__id', 'book__title', 'book__author')
@@ -138,107 +141,75 @@ def download_borrowed_books_report(request):
         .first()
     )
 
-    # Display most borrowed book details
     if most_borrowed:
-        p.setFont('Helvetica-Bold', 22)
-        p.drawString(90, height - 100, f"Total Number of Borrowed Books: {total_borrowed_books}")
-        p.setFont('Helvetica-Bold', 22)
-        p.drawString(90, height - 130, "Most Borrowed Book:")
-        p.setFont('Helvetica', 22)
-        p.drawString(90, height - 160, f"Title: {most_borrowed['book__title']}")
-        p.drawString(90, height - 190, f"Author: {most_borrowed['book__author']}")
-        p.drawString(90, height - 220, f"Times Borrowed: {most_borrowed['borrow_count']}")
+        p.setFont('Helvetica-Bold', 14)
+        p.drawString(50, height - 100, f"Total Borrowed Books: {total_borrowed_books}")
+        p.setFont('Helvetica-Bold', 14)
+        p.drawString(50, height - 130, "Most Borrowed Book:")
+        p.setFont('Helvetica', 14)
+        p.drawString(50, height - 160, f"Title: {most_borrowed['book__title']}")
+        p.drawString(50, height - 190, f"Author: {most_borrowed['book__author']}")
+        p.drawString(50, height - 220, f"Times Borrowed: {most_borrowed['borrow_count']}")
 
-    # Fetch data
-    borrowed_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect'])
+    data = [
+        ['ID', 'User', 'Email', 'Book', 'Issued Date', 'Due Date', 'Status', 'Renewal', 'Approval']
+    ]
 
-    data = [['Member ID','Borrowed By', 'Email','Contact No', 'Book ID', 'Title','Author', 'Issued Date', 'Due Date','Status','Return Status','Renewal Requested','Renewal Requested Date','Approve/Reject']]
-    for req in borrowed_books:
-        data.append([req.user.id,req.user.Username,req.user.email,req.user.phone,req.book.id,req.book.title, req.book.author,str(req.IssuedDate), str(req.Duedate),req.status,
-        
-         'Yes' if (req.status in ['accepted', 'renewal_accepted'] and req.Duedate < datetime.now().date()) or req.status == 'book_returned' else 'No',
-
+    for index,req in enumerate(borrowed_books):
+        data.append([
+            index + 1, req.user.Username, req.user.email, req.book.title,
+            req.IssuedDate.strftime('%Y-%m-%d') if req.IssuedDate else 'N/A',
+            req.Duedate.strftime('%Y-%m-%d') if req.Duedate else 'N/A',
+            req.status,
             'Yes' if req.status in ['renewal_requested', 'renew_accpect'] else 'No',
-
-            req.renewalrequests_set.first().request_date if req.status in ['renewal_requested', 'renew_accpect'] and req.renewalrequests_set.exists() else 'N/A',
-
             'Approved' if req.status == 'renew_accpect' else 'Rejected' if req.status == 'renew_reject' else 'Pending' if req.status == 'renewal_requested' else 'N/A'
         ])
-                     
-
-        # if req.status == 'accepted' or req.status == 'renewal_accepted' and req.Duedate < datetime.now().date() or req.status == 'book_returned':
-        #     data.append('Yes')
-        # else:
-        #     data.append('No')    
-
-        # if req.status == 'renewal_requested' or req.status == 'renew_accpect':
-        #     data.append('Yes')
-        #     # if req.renewalrequests_set.first:
-        #     #     data.append(req.renewalrequests_set.first.request_date)
-        #     # else:
-        #     #     data.append('N/A')
-        # else:
-        #     data.append('No')
-        #     data.append('N/A')
-
-        # if req.status == 'renew_accpect':
-        #     data.append('Approved')
-        # elif req.status == 'renew_reject':
-        #     data.append('Rejected') 
-        # elif req.status == 'renewal_requested':
-        #     data.append('Pending')    
-        # else:
-        #     data.append('N/A')            
-
-
-
-
-    # Create table
-    table = Table(data, colWidths=[100, 200, 300, 200, 100, 400, 300, 150, 150, 200, 200, 300, 300, 300], rowHeights=[50,50,50,50,50,50])
+    custom_table_color = colors.HexColor("#417690")
+    table = Table(data, colWidths=[50, 100, 150, 250, 100, 100, 100, 80, 80])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('BACKGROUND', (0, 0), (-1, 0), custom_table_color),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 22),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTSIZE', (0, 0), (-1, -1), 22),
     ]))
 
-    table.wrapOn(p, width, height)
-    table.drawOn(p, 90, height - 600)
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(50, height - 280, "Borrowed Books")
 
+    table.wrapOn(p, width - 100, height - 300)
+    table.drawOn(p, 50, height - 400)
 
     user_borrow_stats = (
         UserInfo.objects.annotate(
             borrow_count=Count('borrowrequest', filter=Q(borrowrequest__status__in=['accepted', 'renew_accpect']))
         ).values('id', 'Username', 'borrow_count')
     )
-    data1=[['User ID','Username','No of Books Borrowed']]
-    for user in user_borrow_stats:
-        data1.append([user['id'],user['Username'],user['borrow_count']])
 
-    table1=Table(data1,colWidths=[200,200,300],rowHeights=[50]*12)
+    data1 = [['User ID', 'Username', 'Books Borrowed']]
+    for user in user_borrow_stats:
+        data1.append([user['id'], user['Username'], user['borrow_count']])
+
+    table1 = Table(data1, colWidths=[100, 150, 150])
     table1.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('BACKGROUND', (0, 0), (-1, 0), custom_table_color),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTSIZE', (0, 0), (-1, -1), 22),
     ]))
 
-    p.showPage()
-    p.setFont("Helvetica-Bold", 24)
-    p.drawString(200,height-50,"User Borrow Statistics")
-    table1.wrapOn(p,CUSTOM_WIDTH,height-1000)
-    table1.drawOn(p, 50, height - 800)
+    
+    p.setFont("Helvetica-Bold", 18)
+    p.drawString(50, height - 470, "User Borrow Statistics")
+    table1.wrapOn(p, width - 50, height - 700)
+    table1.drawOn(p, 50, height - 700)
 
     p.save()
     return response
+
 
 
 def overdue_books_report(request):
@@ -265,45 +236,47 @@ def download_overdue_books_report(request):
     p = canvas.Canvas(response, pagesize=CUSTOM_SIZE)
     width, height = CUSTOM_SIZE
 
-    p.setFont("Helvetica-Bold", 24)
-    p.drawString(100, height - 50, "Overdue Books Report")
+    p.setFont("Helvetica-Bold", 50)
+    p.drawString(1000, height - 50, "Overdue Books Report")
 
     generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-    p.setFont("Helvetica", 20)
-    p.drawString(100, height - 80, f"Generated on: {generated_time}")
+    p.setFont("Helvetica", 36)
+    p.drawString(1000, height - 100, f"Generated on: {generated_time}")
 
     # Get overdue books (due date before today and not returned)
     overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
 
   
     total_overdue_books = overdue_books.count()
-    p.setFont("Helvetica",20)
-    p.drawString(100, height - 100, f"Total Overdue Books: {total_overdue_books}")
+    p.setFont("Helvetica",36)
+    p.drawString(80, height - 150, f"Total Overdue Books: {total_overdue_books}")
     print('total_overdue_books:',total_overdue_books)
 
     data = [['Member ID','Borrowed By','Email','Contact No','Book ID','Title','Author', 'Issued Date', 'Due Date','Status','Overdue Days']]
-    for req in overdue_books:
+    for index,req in enumerate(overdue_books):
         overdue_days=(datetime.now().date() - req.Duedate).days
-        data.append([req.user.id,req.user.Username,req.user.email,req.user.phone,req.book.id,req.book.title,req.book.author, str(req.IssuedDate), str(req.Duedate),req.status,overdue_days])
+        data.append([index+1,req.user.Username,req.user.email,req.user.phone,index+1,req.book.title,req.book.author, str(req.IssuedDate), str(req.Duedate),req.status,overdue_days])
         print(f"Overdue Days Calculation: {(datetime.now().date() - req.Duedate).days}")
     print("Table Data:")
     for row in data:
         print(row)    
-
-    table = Table(data, colWidths=[200,200, 300, 200, 200,200,200,200,200,200,200],rowHeights=[40]*2)
+   
+    custom_table_color = colors.HexColor("#417690")
+    table = Table(data, colWidths=[200,200, 350, 200, 200,250,200,200,200,200,200],rowHeights=[60]*2)
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.red),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('BACKGROUND', (0, 0), (-1, 0), custom_table_color),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('FONTSIZE',(0,0),(-1,-1),18)
+        ('FONTSIZE',(0,0),(-1,-1),24),
+        ('ROWSIZE',(0,0),(-1,-1),50)
     ]))
 
     table.wrapOn(p, width, height)
-    table.drawOn(p, 100, height - 200)
+    table.drawOn(p, 80, height - 400)
 
     p.showPage()
     p.save()
@@ -334,17 +307,17 @@ def member_activities_report(request):
         renewal_rejected_count=BorrowRequest.objects.filter(user=user,status='renew_accpect').count()
         renewal_accepted_count=BorrowRequest.objects.filter(user=user,status='renew_reject').count()
         notification_count = Notification.objects.filter(user=user).count()
-        last_activity = MemberActivity.objects.filter(user=user).order_by('-login_time').first()
+        last_login = user.login_time if user.login_time else "N/A"
+        last_logout = user.logout_time if user.logout_time else "N/A"
         
-        print(last_activity)
+       
         user_data.append({
             'user': user,
             'borrow_count': borrow_count,
             'notification_count': notification_count,
-            'last_login': last_activity.login_time if last_activity else None,
-            'last_logout': last_activity.logout_time if last_activity else None,
+            'last_login': last_login,
+            'last_logout': last_logout
         })
-        member_activities = MemberActivity.objects.select_related('user', 'book').all()
         
 
 
@@ -357,7 +330,9 @@ def member_activities_report(request):
         total_renewal_rejected_count+= renewal_rejected_count
         total_renewal_accepted_count+= renewal_accepted_count
 
-    
+    member_activities = MemberActivity.objects.select_related('user', 'book').all()
+    print("member_activity",member_activities)
+    # print("last activity: ",last_activity) 
     context = {
         'users': users,
         'user_data': user_data,
@@ -379,16 +354,20 @@ def download_member_activities_report(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="member_activities_report.pdf"'
 
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
+    # Set larger page size for better table fit
+    p = canvas.Canvas(response, pagesize=landscape(A3))
+    width, height = landscape(A3)
 
     # Title
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, height - 50, "Member Activities Report")
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(width / 2 - 100, height - 50, "Member Activities Report")
 
     generated_time = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-    p.setFont("Helvetica", 12)
-    p.drawString(200, height - 70, f"Generated on: {generated_time}")
+    p.setFont("Helvetica", 14)
+    p.drawString(width / 2 - 100, height - 80, f"Generated on: {generated_time}")
+
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(80, height - 120, "User Details")
 
     # First table: User basic details
     users = UserInfo.objects.all()
@@ -399,9 +378,9 @@ def download_member_activities_report(request):
             user.Username, user.email, user.firstname, user.lastname, user.phone, user.created_at.strftime('%Y-%m-%d')
         ])
 
-    table = Table(user_data, colWidths=[50, 150, 50, 50, 80, 100])
+    table = Table(user_data, colWidths=[100, 250, 100, 100, 150, 150])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#417690")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -409,20 +388,24 @@ def download_member_activities_report(request):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
     ]))
 
-    table.wrapOn(p, width - 100, height - 400)
-    table.drawOn(p, 50, height - 100 - 250)
+    table.wrapOn(p, width - 50, height - 400)
+    table.drawOn(p, 80, height - 150 - 250)
+
+    # Start a new page before the next table
+    p.showPage()
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(80, height - 50, "Borrow and Notification Summary")
 
     # Second table: Borrow Requests and Notifications
     data = [['Username', 'Email', 'Borrow Requests', 'Notifications']]
     for user in users:
         borrow_count = BorrowRequest.objects.filter(user=user).count()
         notification_count = Notification.objects.filter(user=user).count()
-
         data.append([user.Username, user.email, borrow_count, notification_count])
 
-    table1 = Table(data, colWidths=[100, 200, 100, 100])
+    table1 = Table(data, colWidths=[150, 300, 150, 150])
     table1.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#417690")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -430,15 +413,9 @@ def download_member_activities_report(request):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
     ]))
 
-    # Start a new page before drawing the second table
-    p.showPage()
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, height - 50, "Borrow and Notification Summary")
+    table1.wrapOn(p, width - 50, height - 400)
+    table1.drawOn(p, 80, height - 150 - 200)
 
-    table1.wrapOn(p, width - 100, height - 400)
-    table1.drawOn(p, 50, height - 100 - 200)
-
-    # Third table: Detailed user activities (borrow history)
     activity_data = [['Borrowed By', 'Title', 'Status', 'Issued Date', 'Due Date']]
     borrow_requests = BorrowRequest.objects.all()
 
@@ -451,9 +428,9 @@ def download_member_activities_report(request):
             request_obj.Duedate.strftime('%Y-%m-%d')
         ])
 
-    table2 = Table(activity_data, colWidths=[50, 200, 100, 90, 90])
+    table2 = Table(activity_data, colWidths=[100, 200, 100, 90, 90])
     table2.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.blue),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#417690")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -464,11 +441,62 @@ def download_member_activities_report(request):
     # Start another page before drawing the third table
     p.showPage()
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, height - 50, "Detailed Borrow Activity")
+    p.drawString(80, height - 50, "Detailed Borrow Activity")
     # p.drawString(f'Total Returned Books: {}')
 
-    table2.wrapOn(p, width - 100, height - 400)
-    table2.drawOn(p, 50, height - 100 - 400)
+ 
+    table2.wrapOn(p, width - 50, height - 400)
+    table2.drawOn(p, 80, height - 600)
+
+    p.showPage()
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(80, height - 50, "Member Activity")
+
+    # Define styles for better text wrapping
+    styles = getSampleStyleSheet()
+    styleN = styles["Normal"]
+
+    # Table 4: Member Activities
+    review_data = [['Username', 'Status', 'Book Request Date', 'Accept/Reject Date', 
+                    'Renewal Requested Accept/Reject Date', 'Return Date', 'Cancel Date', 
+                    'Issued Date', 'Last Login', 'Last Logout']]
+
+    activities = MemberActivity.objects.select_related('user', 'book').all()
+
+    for activity in activities:
+        review_data.append([
+            Paragraph(activity.user.Username, styleN),
+            Paragraph(activity.get_status_display(), styleN),
+            Paragraph(activity.request_date.strftime('%Y-%m-%d') if activity.request_date else 'N/A', styleN),
+            Paragraph(activity.accept_reject_date.strftime('%Y-%m-%d') if activity.accept_reject_date else 'N/A', styleN),
+            Paragraph(activity.renewal_accept_reject_date.strftime('%Y-%m-%d') if activity.renewal_accept_reject_date else 'N/A', styleN),
+            Paragraph(activity.return_date.strftime('%Y-%m-%d') if activity.return_date else 'N/A', styleN),
+            Paragraph(activity.cancel_date.strftime('%Y-%m-%d') if activity.cancel_date else 'N/A', styleN),
+            Paragraph(activity.issued_date.strftime('%Y-%m-%d') if activity.issued_date else 'N/A', styleN),
+            Paragraph(activity.login_time.strftime('%Y-%m-%d %H:%M') if activity.login_time else 'N/A', styleN),
+            Paragraph(activity.logout_time.strftime('%Y-%m-%d %H:%M') if activity.logout_time else 'N/A', styleN),
+        ])
+
+    # Dynamically calculate column widths to fit within the page
+    num_cols = len(review_data[0])
+    available_width = width - 100  # Leave margins on both sides
+    col_widths = [max(80, available_width / num_cols) for _ in range(num_cols)]
+
+    table3 = Table(review_data, colWidths=col_widths)
+
+    table3.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#417690")),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ]))
+
+    # Ensure the table fits on the page
+    table3.wrapOn(p, width - 50, height - 400)
+    table3.drawOn(p, 80, height - 600)
 
     p.save()
     return response
@@ -582,6 +610,7 @@ def custom_books(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_book_add(request):
+    print("Add Book Method Called")
     if request.method == 'POST':
         title = request.POST.get('title')
         author = request.POST.get('author')
@@ -596,6 +625,10 @@ def custom_book_add(request):
             description=description,
             quantity=quantity
         )
+        admin_instance = BookAdmin(Book, admin.site)  
+        print("callind admin instance for creating copy of book in copytable ")
+        admin_instance.save_model(request, Book, None, False)
+        print("redirecting to manage book")
         return redirect('custom_books')
 
     form_html = render_to_string('admin/book_add.html')
@@ -729,6 +762,10 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
+            admin_instance = BookAdmin(Book, admin.site) 
+            print("calling admin save model for creating bookcopy") 
+            admin_instance.save_model(request, Book, None, False)
+            print("redirecting to custom book")
             return redirect('manage_books')
     else:
         form = BookForm()
@@ -949,7 +986,12 @@ def login_view(request):
                 
                 # print("User",user_info)
                 # MemberActivity.objects.create(user=user_info, login_time=now())
+               
 
+                user_info.login_time = now()
+                user_info.save(update_fields=['login_time'])
+
+              
                 response = redirect('home')
                 response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_ACCESS_TOKEN_LIFETIME'].total_seconds(),)
                 response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='Lax',max_age=settings.JWT_AUTH['JWT_REFRESH_TOKEN_LIFETIME'].total_seconds())
@@ -1378,13 +1420,13 @@ def user_book(request):
     print("data",user_data)
     if not user:
         return redirect('login')
-    notification_count = Notification.objects.filter(user=user, is_read=False).count()
+   
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
-    context.update({'notification_count': notification_count})
+  
     context.update({'notification_count': notification_count})
    
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    borrow_requests = BorrowRequest.objects.filter(user=user,status__in=['accepted','renew_accpect'])
     html_content = render_to_string('user_book.html', {**context,'borrow_requests': borrow_requests})  
     return HttpResponse(html_content)
 
@@ -1397,7 +1439,8 @@ def user_duebook(request):
         return redirect('login')
     user,_=user_data
     print(user)
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    today= timezone.now().date()
+    borrow_requests = BorrowRequest.objects.filter(user=user,status__in=['accepted','renew_accpect'],Duedate__lt=today)
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
     context.update({'notification_count': notification_count})
@@ -1412,7 +1455,8 @@ def pending_renewal(request):
     if not user_data:
         return redirect('login')
     user,_=user_data
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    today = timezone.now().date()
+    borrow_requests = BorrowRequest.objects.filter(user=user,status='renewal_requested',Duedate__lt=today)
    
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
@@ -1426,7 +1470,7 @@ def pending_request(request):
     if not user_data:
         return redirect('login')
     user,_=user_data
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    borrow_requests = BorrowRequest.objects.filter(user=user,status='pending')
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
     context.update({'notification_count': notification_count})
@@ -1440,9 +1484,9 @@ def returned_book(request):
     print("data",user_data)
     if not user_data:
         return redirect('login')
-    
+    today= timezone.now().date()
     user,_ =user_data
-    borrow_requests = BorrowRequest.objects.filter(user=user)
+    borrow_requests = BorrowRequest.objects.filter(user=user,status='book_returned',Duedate__gt=today)
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
     context.update({'notification_count': notification_count})
@@ -1679,11 +1723,22 @@ def notification(request):
 
 
 def logout_view(request):
-    if request.user.is_authenticated:
-        user_info = JWTAuthentication().authenticate(request)
-        if user_info:
-           MemberActivity.objects.filter(user=user_info,logout_time__isnull=True).update(logout_time=now())
-        # logout(request)   
+    print('inside logout view')
+    user_data = JWTAuthentication().authenticate(request)
+    print(user_data)
+    if user_data:  # Ensure authentication was successful
+        user = user_data[0]  # Extract the User object
+        print('Currently logged in user:', user)
+
+        # **Update logout_time in UserInfo instead of creating new MemberActivity**
+        try:
+            user_info = UserInfo.objects.get(Username=user.Username)  # Ensure correct lookup
+            user_info.logout_time = now()  # Update the logout time
+            user_info.save(update_fields=['logout_time'])
+            print(f'Updated logout time for {user.Username}: {user_info.logout_time}')
+        except UserInfo.DoesNotExist:
+            print('UserInfo not found for:', user.Username)  # Debugging
+         
     request.session.flush()
     response = redirect(reverse('login'))
     response.delete_cookie('access_token')

@@ -78,7 +78,7 @@
         cursor: pointer;
         font-size: 1em;
         transition: background-color 0.3s ease;
-        margin: 0 5px; /* Add some space between buttons if needed */
+       
     
     }
     #showLessBtn{
@@ -86,41 +86,45 @@
     }
 </style>
 
-    <div class="borrow-history-container" style="padding-left: 20px;">
-        <h2 style="margin-top: 0;">Pending Request</h2>
-        <table class="borrow-history-table">
-            <thead>
-                <tr>
-                    <th>Book Title</th>
-                    <th>Author</th>
-                    <th>Request Date</th>
-                    <th>Due Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for request in borrow_requests %}
-            {% if request.status == 'pending' %}
-            <tr id="request-{{ request.id }}" class="borrow-row">
-                <td>{{ request.book.title }}</td>
-                <td class="status">{{ request.book.author }}</td>
-                <td>{{ request.IssuedDate }}</td>
-                <td>{{ request.Duedate }}</td>
-                <td>
-                    {{ request.status }}
-                </td>
+<div class="borrow-history-container" style="padding-left: 20px;">
+    <h1 style="margin-top: 0;">Pending Request</h1>
+    <table class="borrow-history-table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Author</th>
+                <th>Request Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
             </tr>
-            {% endif %}
-           
+        </thead>
+        <tbody>
+            {% for request in borrow_requests %}
+               
+                    <tr id="request-{{ request.id }}" class="borrow-row">
+                        <td>{{ request.book.title }}</td>
+                        <td class="status">{{ request.book.author }}</td>
+                        <td>{{ request.IssuedDate }}</td>
+                        <td>{{ request.Duedate }}</td>
+                        <td>{{ request.get_status_display }}</td>
+                    </tr>
+                
+            {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; font-weight: bold; padding: 10px;">
+                        No pending requests found.
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
-        </table>
-        {% if borrow_requests|length > 2 %}
-        <button id="showMoreBtn">Show More</button>
-        <button id="showLessBtn" style="display: none;">Show Less</button>
-        {% endif %}
+    </table>
 
-    </div>
+</div>
+{% if borrow_requests|length > 2 and found %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+{% endif %}
+
 
     
     <script>

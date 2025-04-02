@@ -11,9 +11,7 @@
 
 <!-- <link rel="stylesheet" href="{% static 'borrow_history.css' %}">  -->
     <style>
-        #content{
-            overflow-y: hidden;
-        }
+        
         
         main{
             align-items: start;
@@ -50,7 +48,7 @@
 
     </style>
 <div class="container">
-    <h2 style="margin-top: 0;">Notifications</h2>
+    <h1 style="margin-top: 0; font-weight: 500;">Notifications</h1>
     {% if messages %}
         {% for message in messages %}
             <p>{{message}}</p>
