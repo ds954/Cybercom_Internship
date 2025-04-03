@@ -295,5 +295,5 @@ class BorrowRequestAdmin(admin.ModelAdmin):
 
         
         # return redirect('user_notifications')
-        return redirect('/admin/app/borrowrequest/')
+        return redirect('/custom-admin/borrow')
     

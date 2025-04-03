@@ -164,20 +164,19 @@
                     <button type="submit" class="filter-btn">Filter</button>
                 </div>
             </form>
-            
             <style>
-            /* Centering and spacing */
-            .filter-container {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 15px;
-                align-items: center;
+                /* Centering and spacing */
+                .filter-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 15px;
+                    align-items: center;
                 
-                /* background: #ffffff; 
-                background: #f3dfdf; */
-                border-radius: 8px;
-            }
-            
+                    /* background: #ffffff; 
+                    background: #f3dfdf; */
+                    border-radius: 8px;
+                }
+                
             /* Labels */
             .filter-container label {
                 font-weight: 600;
@@ -219,6 +218,8 @@
             </style>
             
         </div>
+        <h1 style="font-weight: 500;">From {{ start_date|date:"d-m-Y" }} to {{ end_date|date:"d-m-Y" }}:</h1>
+
 
         <div style="display: flex; flex-wrap: wrap; gap: 20px;">
             <div style="width: 400px; height: 300px;">

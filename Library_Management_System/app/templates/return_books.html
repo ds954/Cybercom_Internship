@@ -122,7 +122,7 @@
         </tbody>
         </table>
 
-        {% if borrow_requests|length > 2 %}
+        {% if borrow_requests|length > 5 %}
         <button id="showMoreBtn">Show More</button>
         <button id="showLessBtn" style="display: none;" >Show Less</button>
         {% endif %}
@@ -135,7 +135,7 @@
             const rows = tableBody.querySelectorAll('.borrow-row');
             const showMoreBtn = document.getElementById('showMoreBtn');
             const showLessBtn = document.getElementById('showLessBtn');
-            const initialRowsToShow = 2;
+            const initialRowsToShow = 5;
             let visibleRowCount = initialRowsToShow;
     
             // Initially hide rows beyond the initial limit
@@ -157,7 +157,7 @@
             if (showMoreBtn) {
                 showMoreBtn.addEventListener('click', function() {
                     const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
-                    const rowsToShow = 2;
+                    const rowsToShow = 5;
     
                     for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
                         hiddenRows[i].classList.remove('hidden-row');

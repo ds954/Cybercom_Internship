@@ -10,10 +10,13 @@
 body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
 }
-
+main{
+    align-items: flex-start;
+    margin-top: 100px;
+}
 /* Container */
 .container {
     padding: 30px;

@@ -1,23 +1,52 @@
 {% extends "base_simple.html" %}
 {% load static %}
-{% block title %} Login Page {% endblock %}
+{% block title %} OTP Verification {% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'otp.css' %}"> 
+    <link rel="stylesheet" href="{% static 'otp.css' %}">
+    <script>
+        function startTimer(duration) {
+            var timer = duration, minutes, seconds;
+            var interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+                document.getElementById("timer").textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    document.getElementById("resend-btn").style.display = "block";
+                    document.getElementById("timer-text").style.display = "none";
+                }
+            }, 1000);
+        }
+
+        window.onload = function () {
+            '{% if resend %}'
+                document.getElementById("resend-btn").style.display = "block";
+                document.getElementById("timer-text").style.display = "none";
+            '{% else %}'
+                startTimer(60);  // 5 minutes
+            '{% endif %}'
+        };
+    </script>
 {% endblock %}
 
 {% block content %}
-
 <div class="container">
     <form class="otp-form" method="post">
         {% csrf_token %}
+        <h2>OTP Verification</h2>
+        <p>Please enter the OTP sent to your registered email.</p>
         <label for="otp">OTP:</label>
         <input type="text" name="email_otp" id="otp" placeholder="Enter your OTP" required>
         <button type="submit">Submit</button>
     </form>
+
     {% if error %}
     <p style="color: red;">{{ error }}</p>
-{% endif %}
-</div>
+    {% endif %}
 
+    <p id="timer-text">You can resend OTP in <span id="timer">1</span> minutes.</p>
+    <a id="resend-btn" href="{% url 'resend_otp' user_id=user_id %}" style="display: none;">Resend OTP</a>
+</div>
 {% endblock %}

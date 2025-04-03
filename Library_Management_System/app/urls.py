@@ -9,6 +9,7 @@ urlpatterns=[
     path('register/',views.register_view,name='register'),
     path('refresh-token/', views.refresh_token_view, name='refresh_token'),
     path('otp/<int:user_id>',views.verify_otp,name='verify-otp'),
+    path('resend-otp/<int:user_id>/', views.resend_otp, name='resend_otp'),
     path('book/', views.book_list, name='book'),
     path('email/',views.email,name='email'),
     path('otp/<int:user_id>/',views.otp_password,name='otp'),

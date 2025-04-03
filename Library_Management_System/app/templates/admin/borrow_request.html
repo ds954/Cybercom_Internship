@@ -17,28 +17,25 @@
         margin-bottom: 20px;
     }
 
-    th, td {
-        padding: 12px;
+    tbody tr, td {
+     
         border-bottom: 1px solid #ddd;
         text-align: left;
         color: #333;
+      
     }
+    
+
 
     thead th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
+        background-color: #89aec1; 
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
         color: black;
     }
 
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    tr:hover {
-        background-color: #f1f1f1;
-    }
+   
 
     .btn {
         display: inline-block;
@@ -85,13 +82,23 @@
     html,body{
         overflow-y: hidden;
     }
+    .borrow-history-table tbody tr td {
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+        color: #333;
+        padding: 6px 8px; 
+        font-size: 14px; 
+        line-height: 1.3; 
+        /* vertical-align: middle; */
+    }
+
 
 </style>
 
-<div class="container">
 <h1>Borrow Requests</h1>
+<div class="container">
 
-<table class="borrow-history-table">
+<table class="borrow-history-table" style="max-height: 70px;">
     <thead>
         <tr>
             <th>User</th>
