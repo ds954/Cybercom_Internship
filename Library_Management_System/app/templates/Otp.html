@@ -4,7 +4,7 @@
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'otp.css' %}">
-    <script>
+<!--    
         function startTimer(duration) {
             var timer = duration, minutes, seconds;
             var interval = setInterval(function () {
@@ -18,35 +18,38 @@
                     document.getElementById("timer-text").style.display = "none";
                 }
             }, 1000);
-        }
-
-        window.onload = function () {
-            '{% if resend %}'
-                document.getElementById("resend-btn").style.display = "block";
-                document.getElementById("timer-text").style.display = "none";
-            '{% else %}'
-                startTimer(60);  // 5 minutes
-            '{% endif %}'
-        };
-    </script>
+        } -->
+ 
 {% endblock %}
 
 {% block content %}
 <div class="container">
+   
+
     <form class="otp-form" method="post">
         {% csrf_token %}
         <h2>OTP Verification</h2>
         <p>Please enter the OTP sent to your registered email.</p>
+    
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        {% if message %}
+            <p style="color: green;">{{ message }}</p>
+        {% endif %}
+    
         <label for="otp">OTP:</label>
         <input type="text" name="email_otp" id="otp" placeholder="Enter your OTP" required>
-        <button type="submit">Submit</button>
+    
+        <button type="submit" name="verify" id="submit_btn">Submit</button>
+    
+        <p style="margin-top: 10px;">Didn't receive OTP?</p>
+        <button type="submit" class='resend-otp'name="resend" id="resend-otp" style="cursor: pointer;">Resend OTP</button>
     </form>
+    
 
-    {% if error %}
-    <p style="color: red;">{{ error }}</p>
-    {% endif %}
+   
 
-    <p id="timer-text">You can resend OTP in <span id="timer">1</span> minutes.</p>
-    <a id="resend-btn" href="{% url 'resend_otp' user_id=user_id %}" style="display: none;">Resend OTP</a>
 </div>
+   
 {% endblock %}

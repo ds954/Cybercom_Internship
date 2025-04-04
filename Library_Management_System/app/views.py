@@ -964,100 +964,92 @@ def register_view(request):
     html_content = render_to_string('register.html')  
     return HttpResponse(html_content)
 
-otp_store = {}
-def send_otp_mail(user):
-    """Generate and send OTP via email."""
-    print("calling send_otp_mail function")
-    otp = generate_otp()
-    current_time = datetime.now()
 
-    # Store OTP in memory with timestamp
-    otp_store[user.id] = {"otp": otp, "timestamp": current_time}
-    print("otp_store data: ",otp_store)
 
-    # Sending OTP via email
-    subject = "Your OTP Code"
-    message = f"Dear {user.Username},\n\nYour One-Time Password (OTP) for verification is: {otp}\n\nThis OTP is valid for 5 minutes.\n\nIf you did not request this, please ignore this email."
-    from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [user.email]
-
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+# @csrf_exempt
+# def verify_otp(request, user_id):
+#     user = JWTAuthentication().authenticate(request)
+#     user = UserInfo.objects.get(id=user_id)
+#     if request.method == 'POST':
+#         email_otp = request.POST.get('email_otp','').strip()  
+#         if verifyotp(email_otp, user.email_otp): 
+#             user.is_email_verified = True  
+#             user.save()
+#             return redirect('/')  
+#         else:
+#             html_content = render_to_string('Otp.html', {'error': 'Invalid OTP', 'user_id': user_id})  
+#             return HttpResponse(html_content)
+#     html_content = render_to_string('Otp.html', {'user_id': user_id})  
+#     return HttpResponse(html_content)
 
 @csrf_exempt
 def verify_otp(request, user_id):
-    print("calling verfy_otp method")
-    user = JWTAuthentication().authenticate(request)
-    user = UserInfo.objects.get(id=user_id)
+    try:
+        user = UserInfo.objects.get(id=user_id)
+    except UserInfo.DoesNotExist:
+        html_content = render_to_string('Otp.html', {
+            'error': 'User not found.',
+            'user_id': user_id
+        })
+        return HttpResponse(html_content)
+
     if request.method == 'POST':
-        email_otp = request.POST.get('email_otp','').strip()  
-        stored_data = otp_store.get(user.id)
-        print("stored_data in verify_otp ",stored_data)
-        if not stored_data:
-            return HttpResponse(render_to_string('Otp.html', {
-                'error': 'OTP expired or not requested. Please request a new one.',
-                'user_id': user_id,
-                'resend': True
-            }))
-        stored_otp = stored_data['otp']
-        print("fetch from stored_otp",stored_otp)
-        otp_generated_time = stored_data['timestamp']
-        print("genrated_otp",otp_generated_time)
-       
-        # if verifyotp(email_otp, user.email_otp): 
-        #     user.is_email_verified = True  
-        #     user.save()
-        #     return redirect('/')  
-        if email_otp == stored_otp:
+        print("resend otp")
+        print(request.POST)
+        if 'resend' in request.POST:
+            # If the resend OTP button was clicked
+            new_otp = generate_otp()
+            user.email_otp = new_otp
+            user.save()
+            print("sending mail")
+            send_mail(
+                'Resent OTP Code',
+                f'Your new OTP for registration is: {new_otp}',
+                settings.EMAIL_HOST_USER,
+                [user.email]
+            )
+
+            html_content = render_to_string('Otp.html', {
+                'message': 'A new OTP has been sent to your email.',
+                'user_id': user_id
+            })
+            return HttpResponse(html_content)
+
+        # Otherwise, handle OTP verification
+        email_otp = request.POST.get('email_otp', '').strip()
+
+        if verifyotp(email_otp, user.email_otp):
             user.is_email_verified = True
             user.save()
-            otp_store.pop(user.id, None)
-            return redirect('/')
-        
-        elif (datetime.now() - otp_generated_time).total_seconds() > 60:
-            return HttpResponse(render_to_string('Otp.html', {
-                'error': 'OTP has expired. Please request a new one.',
-                'user_id': user_id,
-                'resend': True
-            }))
-    
+            return redirect('/')  # Redirect to login page
         else:
-            html_content = render_to_string('Otp.html', {'error': 'Invalid OTP', 'user_id': user_id})  
+            html_content = render_to_string('Otp.html', {
+                'error': 'Invalid OTP',
+                'user_id': user_id
+            })
             return HttpResponse(html_content)
-        
-    html_content = render_to_string('Otp.html', {'user_id': user_id})  
+
+    html_content = render_to_string('Otp.html', {'user_id': user_id})
     return HttpResponse(html_content)
+
 
 @csrf_exempt
 def resend_otp(request, user_id):
-    """Resend OTP only if the previous OTP has expired or if user requests."""
-    print("Resend OTP function called...")
-
+    """Resend OTP if the user requests a new one."""
     user = UserInfo.objects.get(id=user_id)
-    stored_data = otp_store.get(user.id)
-    print("stored_data in resend_otp",stored_data)
-    # If OTP exists, check expiration time
-    if stored_data:
-        last_sent_time = stored_data.get("timestamp")
-        stored_otp = stored_data.get("otp")
+    new_otp = generate_otp() 
+    user.email_otp = new_otp  
+    user.save()
 
-        print("stored_otp im resend_otp",stored_otp)
-        # If OTP is still valid, ask user to use it instead of resending
-        if (datetime.now() - last_sent_time).total_seconds() < 60:
-            remaining_time = 60 - (datetime.now() - last_sent_time).total_seconds()
-            return HttpResponse(render_to_string('Otp.html', {
-                'error': f'Your OTP is still valid. Please wait {int(remaining_time)} seconds before requesting a new one.',
-                'user_id': user_id,
-                'resend': False
-            }))
+    send_mail(
+        'OTP Code - Resend',
+        f'Your new OTP is: {new_otp}',
+        settings.EMAIL_HOST_USER,
+        [user.email]
+    )
 
-    # ✅ Generate and send a new OTP
-    send_otp_mail(user)
-
-    return HttpResponse(render_to_string('Otp.html', {
-        'message': 'A new OTP has been sent to your email.',
-        'user_id': user_id,
-        'resend': False
-    }))
+    html_content = render_to_string('Otp.html', {'message': 'OTP resent successfully! Check your email.', 'user_id': user_id})  
+    return HttpResponse(html_content)
 # def login_view(request):
 #     if request.method == 'POST':
 #         email = request.POST.get('email')
@@ -1076,6 +1068,7 @@ def resend_otp(request, user_id):
 #     return render(request, 'login.html')
 
 
+
 @csrf_exempt
 def login_view(request):
     
@@ -1085,28 +1078,13 @@ def login_view(request):
 
             # **Check if user is in Django's built-in User model (Admin Login)**
             admin_user = authenticate(request, username=identifier, password=password)
-
-            # If username authentication fails, try logging in with email
-            if admin_user is None:
-                try:
-                    user = User.objects.get(email=identifier)  # Check if email exists
-                    admin_user = authenticate(request, username=user.username, password=password)  # Authenticate with username
-                except User.DoesNotExist:
-                    admin_user = None
-
             if admin_user:
-                print("Login successful:", admin_user)
                 if admin_user.is_staff:  # Allow only staff/admin users
                     login(request, admin_user)
-                    return redirect('custom_admin_dashboard')  # Redirect to custom admin panel
+                    return redirect('custom_admin_dashboard')  # Redirect to Django Admin panel
                 else:
                     html_content = render_to_string('login.html', {'error': 'Access denied for non-admin users.'})
                     return HttpResponse(html_content)
-            else:
-                html_content = render_to_string('login.html', {'error': 'Invalid credentials'})
-                return HttpResponse(html_content)
-           
-
 
             # **Check if user is in UserInfo model**
             try:
@@ -1157,7 +1135,6 @@ def login_view(request):
 
         html_content = render_to_string('login.html')
         return HttpResponse(html_content)
-# @csrf_exempt
 # def login_view(request):
 #     print("Inside login_view")
 #     print(request.COOKIES)  

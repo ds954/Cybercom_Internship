@@ -76,7 +76,12 @@ main{
 .otp-form button:hover {
     background: #417690;
 }
-
+.resend-otp{
+    background-color: #c0c4c6 !important;
+    width: 40% !important;
+    margin-left: 100px !important;
+    color: black !important;
+}
 
 /* Responsive Design */
 @media (max-width: 480px) {

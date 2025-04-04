@@ -8,6 +8,11 @@
 {% endblock %}
 
 {% block content %}
+<style>
+    html,body{
+        background-color: white;
+    }
+</style>
     <div class="container">
         <form class="login-form" method="post">
             {% csrf_token %}
