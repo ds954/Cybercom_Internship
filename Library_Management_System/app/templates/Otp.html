@@ -19,6 +19,38 @@
                 }
             }, 1000);
         } -->
+        <style>
+            #resend-otp {
+                display: none;
+            }
+            #timer-text {
+                font-weight: bold;
+                margin-top: 10px;
+                color: #333;
+            }
+        </style>
+        <script>
+            function startTimer(duration) {
+                var timer = duration, minutes, seconds;
+                var interval = setInterval(function () {
+                    minutes = parseInt(timer / 60, 10);
+                    seconds = parseInt(timer % 60, 10);
+    
+                    document.getElementById("timer").textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    
+                    if (--timer < 0) {
+                        clearInterval(interval);
+                        document.getElementById("resend-otp").style.display = "inline-block";
+                        document.getElementById("timer-text").style.display = "none";
+                    }
+                }, 1000);
+            }
+    
+            window.onload = function () {
+                var sixtySeconds = 300;
+                startTimer(sixtySeconds);
+            };
+        </script>
  
 {% endblock %}
 
@@ -39,12 +71,15 @@
         {% endif %}
     
         <label for="otp">OTP:</label>
-        <input type="text" name="email_otp" id="otp" placeholder="Enter your OTP" required>
+        <input type="text" name="email_otp" id="otp" placeholder="Enter your OTP">
     
         <button type="submit" name="verify" id="submit_btn">Submit</button>
     
         <p style="margin-top: 10px;">Didn't receive OTP?</p>
-        <button type="submit" class='resend-otp'name="resend" id="resend-otp" style="cursor: pointer;">Resend OTP</button>
+        <!-- <button type="submit" class='resend-otp'name="resend" id="resend-otp" style="cursor: pointer;">Resend OTP</button> -->
+        <p id="timer-text">Resend OTP in <span id="timer">1:00</span></p>
+
+        <button type="submit" class="resend-otp" name="resend" id="resend-otp" style="cursor: pointer;">Resend OTP</button>
     </form>
     
 

@@ -7,7 +7,7 @@ def generate_otp():
     """
     Generate a 6-digit OTP using time-based OTP (TOTP)
     """
-    totp = pyotp.TOTP(pyotp.random_base32(), interval=30)  # OTP valid for 5 minutes
+    totp = pyotp.TOTP(pyotp.random_base32(), interval=300)  # OTP valid for 5 minutes
     return totp.now()  # Return the generated OTP
 
 
