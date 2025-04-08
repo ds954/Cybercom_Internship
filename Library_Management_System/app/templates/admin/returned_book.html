@@ -14,21 +14,24 @@
     table {
         width: 100%;
         border-collapse: collapse;
+       
         margin-bottom: 20px;
     }
 
     th, td {
-        padding: 12px;
+        padding: 6px;
         border-bottom: 1px solid #ddd;
         text-align: left;
     }
 
     thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
+        /* padding: px; */
         text-align: left;
+        padding: 5px 6px;
         border-bottom: 1px solid #ddd;
         color: black;
+        border-bottom: none;
     }
 
     tr:nth-child(even) {
@@ -89,7 +92,7 @@
     z-index: 2;
 }
 body,html{
-    overflow-y: hidden;
+    overflow-y: hidden
 }
     
 </style>
@@ -101,16 +104,19 @@ body,html{
     <thead>
         <tr>
             <th>User</th>
-            <th>Email</th>
-            <th>Contact No</th>
-            <th>Title</th>
+            <th>Book</th>
+            <th>Author</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
             <th>Status</th>
             <!-- <th>Return Date</th> -->
         </tr>
+        
          <tbody>
         {% for request in borrow_requests %}
            
                 <tr id="request-{{ request.id }}" class="borrow-row">
+                    <td>{{ request.user.Username}}</td>
                     <td>{{ request.book.title }}</td>
                     <td class="status">{{ request.book.author }}</td>
                     <td>{{ request.IssuedDate }}</td>

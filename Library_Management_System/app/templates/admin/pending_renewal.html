@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Borrow Request{% endblock %}
+{% block title %}Renewal Request{% endblock %}
 
 
 {% block admin_content %}
@@ -17,7 +17,7 @@
     }
 
     th, td {
-        padding: 12px;
+        padding: 6px;
         border-bottom: 1px solid #ddd;
         text-align: left;
         color: #333;
@@ -25,7 +25,7 @@
 
     thead th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
+        padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
         color: black;
@@ -41,8 +41,7 @@
 
     .btn {
         display: inline-block;
-        padding: 8px 16px;
-        background-color: #c0c4c6; /* Green for accept */
+        margin-right: 5px;
         color: #fff;
         text-decoration: none;
         border-radius: 4px;
@@ -50,18 +49,12 @@
         margin-right: 8px;
     }
 
- 
-    .btn.reject {
-        background-color: #e27474; /* Red for reject */
-    }
-
-
     .actions {
         display: flex;
         flex-wrap: wrap;
     }
     a.btn{
-        color: black;
+        color: #6894ab;
     }
     .hidden-row {
         display: none;
@@ -82,6 +75,10 @@
     html,body{
         overflow-y: hidden;
     }
+    .fa-check:before, .fa-circle-xmark:before, .fa-times-circle:before, .fa-xmark-circle:before{
+        font-size: 15px;
+        margin-right: 8px;
+    }
 
 </style>
 
@@ -91,7 +88,7 @@
     <thead>
         <tr>
             <th>User</th>
-            <th>Book Name</th>
+            <th>Book </th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
@@ -105,8 +102,8 @@
             <td>
                 {% if request.status == "renewal_requested" %}
                 <div class="actions">
-                    <a href="{% url 'admin:accept_renewal' request.id %}" class="btn">Accept Renewal</a>
-                    <a href="{% url 'admin:reject_renewal' request.id %}" class="btn reject">Reject Renewal</a>
+                    <a href="{% url 'admin:accept_renewal' request.id %}" class="btn"><i class="fas fa-check"></i></a>
+                    <a href="{% url 'admin:reject_renewal' request.id %}" class="btn reject"><i class="fas fa-times-circle"></i></a>
                 </div>
                 {% else %}
                 <span style="color: #6c757d;">No Actions</span>

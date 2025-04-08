@@ -19,7 +19,7 @@
     }
     a.btn {
         display: inline-block;
-        padding: 8px 16px;
+        
         background-color:  #c0c4c6;
         color: black;
         text-decoration: none;
@@ -68,12 +68,19 @@
     #showLessBtn1,#showLessBtn2{
         background-color:#E27474;
     }
+    .heading{
+    display: flex;
+    gap:15px;
+    margin-bottom: 15px;
+}
 </style>
+<div class="heading">
 <h1>Borrowed Books Report</h1>
 
-<!-- Download PDF Button -->
-<button class= "button" style="margin-bottom: 5px; padding: 0;
-"><a href="{% url 'download_borrowed_books_report' %}" class="btn">Download PDF</a></button>
+
+<button class="button"style="margin-bottom: 15px; margine-right:25px; background-color: #c0c4c6 "><a href="{% url 'download_borrowed_books_report' %}"  class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+</div>
+
 
 <h3>Total Number of Borrowed Books: {{borrowed_books|length}} </h3>
 <h3 style="margin-bottom: 15px;">Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h3>

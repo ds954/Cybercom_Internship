@@ -6,50 +6,92 @@
 {% block admin_content %}
 
 <style>
-    html,body{
-        overflow-y: hidden;
-    }
-    .main-div{
-        height: 80vh;
-    }
-    table{
-        width: 100%;
-    }
     h1{
-        font-weight: 500;
-        
-    }
-    thead th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        color: black;
-    }
-    .hidden-row {
-        display: none;
-    }
-    #showLessBtn,#showMoreBtn{
-        
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
-        
-    
-    }
-    #showLessBtn{
-        background-color:#E27474;
-    }
-    
+      font-weight: 500;
+  }
+ 
+  
 
+  .borrow-history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+  }
+
+  .borrow-history-table th,
+  .borrow-history-table td {
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      color: #333;
+  }
+
+  .borrow-history-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+  }
+
+  .borrow-history-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+  }
+
+  .borrow-history-table tr:hover {
+      background-color: #f1f1f1;
+  }
+
+  .status {
+      color: #555;
+  }
+  .borrow-history-table th {
+      background-color: #89aec1; /* Light Green for Members (first column) */
+      padding: 5px 6px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+  }
+  .hidden-row {
+      display: none;
+  }
+  #showLessBtn,#showMoreBtn{
+      
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+      
+  }
+  #showLessBtn{
+      background-color:#E27474;
+  }
+  .scrollable-table-container {
+  max-height: 400px; 
+  overflow-y: auto;
+  margin-bottom: 15px;
+  
+}
+.main-div{
+  height: 100vh;
+}
+
+/* Optional: Ensure the table header stays fixed */
+.borrow-history-table thead th {
+  /* position: sticky; */
+  top: 0;
+  background-color: #89aec1; /* Keep the header visible */
+  /* padding: 10px 5px; */
+  z-index: 2;
+}
+body,html{
+  overflow-y: hidden;
+}
 </style>
 
 
+
 <div class="page-container" >
-<h1>Members</h1>
+<h1>Registered Members</h1>
+<div class="scrollable-table-container">
 <table class="borrow-history-table" style="margin-bottom: 15px;">
     <thead>
     <tr>
@@ -68,9 +110,9 @@
     <tr class="borrow-row">
         <td>{{ user.Username }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.firstname }}</td>
-        <td>{{ user.lastname }}</td>
-        <td>{{ user.phone }}</td>
+        <td>{{ user.firstname| default:'N/A'}}</td>
+        <td>{{ user.lastname| default:'N/A' }}</td>
+        <td>{{ user.phone| default:'N/A' }}</td>
         <td>{{ user.created_at}}</td>
        
     </tr>
@@ -82,6 +124,7 @@
     </tbody>
 </table>
 
+</div>
 </div>
 {% if users|length > 5 %}
 <button id="showMoreBtn">Show More</button>

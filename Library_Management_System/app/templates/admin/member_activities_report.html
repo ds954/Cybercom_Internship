@@ -4,9 +4,8 @@
 
 {% block admin_content %}
 
-<h1>Member Activities Report</h1>
 <style>
-      h1{
+    h1{
         font-weight: 500;
     }
       th {
@@ -28,37 +27,37 @@
         transition: background-color 0.3s ease;
     }
     .hidden-row {
-    display: none;
+        display: none;
     }
-  /* Remove hover effect for Show More and Show Less buttons */
-#showMoreBtn1, #showLessBtn1, #showLessBtn3, #showLessBtn4,  
-#showMoreBtn2, #showLessBtn2,#showMoreBtn1,#showMoreBtn3,#showMoreBtn4 {
-    background-color: #c0c4c6; /* Default color */
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: none; /* Disable transition */
-}
-
-/* Show More buttons (Gray) */
-#showMoreBtn1, #showMoreBtn2, #showMoreBtn3, #showMoreBtn4 {
-    background-color: #c0c4c6; /* Gray */
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
+    /* Remove hover effect for Show More and Show Less buttons */
+    #showMoreBtn1, #showLessBtn1, #showLessBtn3, #showLessBtn4,  
+    #showMoreBtn2, #showLessBtn2,#showMoreBtn1,#showMoreBtn3,#showMoreBtn4 {
+        background-color: #f0f0f0; /* Default color */
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: none; /* Disable transition */
+    }
+    
+    /* Show More buttons (Gray) */
+    #showMoreBtn1, #showMoreBtn2, #showMoreBtn3, #showMoreBtn4 {
+        background-color: #f0f0f0; /* Gray */
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
     margin-bottom: 50px;
 }
 
 /* Show Less buttons (Red) */
 #showLessBtn1, #showLessBtn2, #showLessBtn3, #showLessBtn4 {
     background-color: #E27474; /* Red */
-    color: white;
+    color: black;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -67,14 +66,9 @@
     margin-bottom: 50px;
 }
 
-/* Remove hover effects */
-#showMoreBtn1:hover, #showMoreBtn2:hover, #showMoreBtn3:hover, #showMoreBtn4:hover {
-    background-color: #c0c4c6; /* Keep same gray */
-}
 
-#showLessBtn1:hover, #showLessBtn2:hover, #showLessBtn3:hover, #showLessBtn4:hover {
-    background-color: #E27474; /* Keep same red */
-}
+
+
 
 h1{
     margin-bottom: 15px;
@@ -106,29 +100,35 @@ h1{
 .button {
     display: inline-block;
     padding: 8px 16px;
-    background-color: #c0c4c6;  /* Light grey */
+    background-color: #f0f0f0;  /* Light grey */
     color: black;
     text-decoration: none;
     border-radius: 4px;
     transition: none; /* Removes hover transition effect */
 }
 
-.button:hover {
-    background-color: #c0c4c6 !important; /* Keep the same color on hover */
-    color: black !important;
-    cursor: default; /* Prevent pointer cursor */
+
+.heading{
+    display: flex;
+    gap:15px;
+    margin-bottom: 15px;
 }
 
 
 
 </style>
-<!-- User Details Table -->
+<div class="heading">
+<h1>Member Activities Report  </h1>
 <!-- Download PDF Button -->
-<button class="button"style="margin-bottom: 20px; background-color: #c0c4c6 "><a href="{% url 'download_member_activities_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+<button class="button"style="margin-bottom: 15px; margine-right:25px; background-color: #c0c4c6 "><a href="{% url 'download_member_activities_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+</div>
+<!-- User Details Table -->
 
 
 <h1>User Details</h1>
-<table border="1" class="table" style="margin-bottom: 15px;">
+<!-- <div class="scrollable-table-container"> -->
+<table  class="table" style="margin-bottom: 15px;">
+    
     <tr>
         <th>Username</th>
         <th>Email</th>
@@ -139,6 +139,7 @@ h1{
         <th>Login Time</th>
         <th>Logout Time</th>
     </tr>
+  
     
     {% for user_data in user_data %}
     <tr>
@@ -220,7 +221,7 @@ h1{
 <table border="1" style="margin-bottom: 15px;">
     <tr>
         <th>Borrowed By</th>
-        <th>Title</th>
+        <th>Book</th>
         <th>Status</th>
         <th>Issued Date</th>
         <th>Due Date</th>

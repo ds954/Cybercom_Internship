@@ -926,7 +926,10 @@ def register_view(request):
     if request.method == 'POST':
         username=request.POST.get('username')
         email=request.POST.get('email')
+        firstname=request.POST.get('firstname')
+        lastname=request.POST.get('lastname')
         password=request.POST.get('password')
+        phone=request.POST.get('phone_number')
         confirm_password=request.POST.get('confirm-password')
 
         if UserInfo.objects.filter(email=email).exists():
@@ -935,19 +938,21 @@ def register_view(request):
         if User.objects.filter(username=username).exists():
              html_content = render_to_string( 'register.html', {'error': 'Username is already registered.'})  
              return HttpResponse(html_content)
-
-           
-        try:
-            validate_password(password,confirm_password)  
-        except ValidationError as e:
-             html_content = render_to_string('register.html', {'error': e.messages})  
+        if password != confirm_password:
+             html_content = render_to_string( 'register.html', {'error': 'Password do not match.'})  
              return HttpResponse(html_content)
+        if not phone.isdigit():    
+            html_content = render_to_string( 'register.html', {'error': 'Phone number must conatin only digit.'})  
+            return HttpResponse(html_content)
+
+
+        
            
         
         hashed_password=make_password(password)
         email_otp = generate_otp() 
         print(email_otp)
-        user=UserInfo.objects.create(Username=username,email=email,email_otp=email_otp,password=hashed_password)
+        user=UserInfo.objects.create(Username=username,email=email,firstname=firstname,lastname=lastname,phone=phone,email_otp=email_otp,password=hashed_password)
 
         send_mail(
             'OTP Code',

@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Non Returned Book{% endblock %}
+{% block title %}Not Returned Book{% endblock %}
 
 {% block admin_content %}
 
@@ -9,7 +9,7 @@
         font-weight: 500;
     }
 
-
+   
     .borrow-history-table {
         width: 100%;
         border-collapse: collapse;
@@ -18,11 +18,12 @@
 
     .borrow-history-table th,
     .borrow-history-table td {
-        padding: 12px;
+        padding: 6px;
         border-bottom: 1px solid #ddd;
         text-align: left;
         color: #333;
     }
+
 
     .borrow-history-table th {
         background-color: #f2f2f2;
@@ -43,7 +44,7 @@
     }
     .borrow-history-table th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
+        padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
@@ -71,13 +72,13 @@
 </style>
 
 <div class="borrow-history-container">
-    <h1>Non Returned Books</h1>
+    <h1>Not Returned Books</h1>
     
     <table class="borrow-history-table">
         <thead>
             <tr>
                 <th>User</th>
-                <th>Book Title</th>
+                <th>Book</th>
                 <th>Author</th>
                 <th>Borrow Date</th>
                 <th>Due Date</th>

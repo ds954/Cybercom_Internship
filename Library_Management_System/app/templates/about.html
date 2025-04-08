@@ -8,15 +8,22 @@
 {% endblock %}
 
 {% block user_content %}
+<style>
+    .features  ul li,
+    .getting-started ul li{
+        font-size: 16px;
+        list-style-type:circle;
+    }
+</style>
 <div class="container" style="padding-left: 20px;">
-    <h2 class="text-center" style="margin-top: 0;">Welcome to the Digital Library!</h2>
-    <p class="text">
+    <h2 class="text-center" style="margin-top: 0; font-size: 24px;">Welcome to the Digital Library!</h2>
+    <p class="text" style="font-size: 18px;">
         Welcome to the <strong>Library Management System</strong>, your one-stop destination for accessing a vast collection of books and resources. 
         Whether you’re a passionate reader, a student, or a researcher, our library is designed to make borrowing books easier and more efficient.
     </p>
 
     <div class="features">
-        <h4>What You Can Do:</h4>
+        <h2>What You Can Do:</h2>
         <ul>
             <li>Browse books by title, author, or category.</li>
             <li>Borrow books online and track your borrowing history.</li>
@@ -26,7 +33,7 @@
     </div>
 
     <div class="getting-started">
-        <h4>To access our library services, you’ll need:</h4>
+        <h2>To access our library services, you’ll need:</h2>
         <ul>
             <li>A registered <strong>Library Account</strong> with verified email.</li>
         </ul>
@@ -34,6 +41,6 @@
 
    
 
-    <h3 class="text-center"> Ready to dive into the world of knowledge? Start exploring today! </h3>
+    <h1 class="text-center" style="font-weight: 500;"> Ready to dive into the world of knowledge? Start exploring today! </h1>
 </div>
 {% endblock %}

@@ -13,13 +13,20 @@ body {
     align-items: center;
     height: 100vh;
 }
-
+.required {
+    color: red;
+}
+.error-message {
+    color: red;
+    font-size: 0.8em;
+    display: none;
+}
 
 /* Container */
 .container {
     width: 100%;
     max-width: 800px;
-    width: 300px;
+    width: 500px;
     text-align: center;
 }
 
@@ -30,22 +37,21 @@ body {
 }
 
 .register-form h2 {
-    margin-bottom: 15px;
+
     color: #333;
 }
 
 /* Input Fields */
 .register-form label {
     text-align: left;
-    font-weight: 500;
-    margin: 5px 0;
+    font-weight: 600;
     color: #444;
 }
 
 .register-form input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 7px;
+    margin-bottom: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;

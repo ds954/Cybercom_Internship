@@ -69,12 +69,19 @@
     color: black !important;
     cursor: default; /* Prevent pointer cursor */
 }
+.heading{
+    display: flex;
+    gap:15px;
+    margin-bottom: 15px;
+}
 
 </style>
+<div class="heading">
 <h1>Overdue Books Report</h1>
 
 <!-- Download PDF Button -->
-<button class="button" style="margin-bottom: 15px; margin-top: 15px;"><a href="{% url 'download_overdue_books_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+<button class="button" ><a href="{% url 'download_overdue_books_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+</div>
 
 <div class="scrollable-table-container">
 <h2>Total Overdue Books: {{ total_overdue_books }}</h2>

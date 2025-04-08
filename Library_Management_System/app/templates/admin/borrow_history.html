@@ -1,6 +1,6 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Issued Date{% endblock %}
+{% block title %}Borrow Book History{% endblock %}
 
 {% block admin_content %}
 
@@ -19,7 +19,7 @@
 
     .borrow-history-table th,
     .borrow-history-table td {
-        padding: 12px;
+        padding: 5px;
         border-bottom: 1px solid #ddd;
         text-align: left;
         color: #333;
@@ -43,7 +43,7 @@
     }
     .borrow-history-table th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        padding: 8px;
+        padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
@@ -75,7 +75,7 @@
 
 /* Optional: Ensure the table header stays fixed */
 .borrow-history-table thead th {
-    position: sticky;
+    /* position: sticky; */
     top: 0;
     background-color: #89aec1; /* Keep the header visible */
     z-index: 2;

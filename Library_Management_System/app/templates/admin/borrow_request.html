@@ -25,7 +25,11 @@
       
     }
     
-
+    th, td {
+        padding: 6px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
 
     thead th {
         background-color: #89aec1; 
@@ -34,7 +38,13 @@
         border-bottom: 1px solid #ddd;
         color: black;
     }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
 
+    tr:hover {
+        background-color: #f1f1f1;
+    }
    
 
     .btn {
@@ -102,7 +112,7 @@
     <thead>
         <tr>
             <th>User</th>
-            <th>Book Name</th>
+            <th>Book</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
