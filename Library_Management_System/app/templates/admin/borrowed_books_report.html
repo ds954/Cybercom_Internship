@@ -37,7 +37,7 @@
 
     }
     .scrollable-table-container {
-    max-height: 400px; 
+    max-height: 400px;
     overflow-y: auto;
     margin-bottom: 15px;
     
@@ -87,19 +87,19 @@
 
 
 <h3>Borrowed Books</h3>
-<div class="borrow-history-container">
+<div class="borrow-history-container" id="borrowedBooks">
 <div class="scrollable-table-container">
 <table class="borrow-history-table">
     <thead>
         <tr>
-            <th>Member ID</th>
+            <th>Member</th>
             <th>Borrowed By</th>
             <th>Email</th>
             <th>Contact No</th>
             <!-- <th>Book ID</th> -->
-            <th>Title</th>
+            <th>Book</th>
             <th>Author</th>
-            <th>Issued Date</th>
+            <th>Borrow Date</th>
             <th>Due Date</th>
             <th>Status</th>
             <th>Return Status</th>
@@ -164,19 +164,19 @@
 </div>
 </div>
 
-{% if borrowed_books|length > 3 %}
+{% if borrowed_books|length > 5 %}
 <button id="showMoreBtn1">Show More</button>
 <button id="showLessBtn1" style="display: none;">Show Less</button>
 {% endif %}
 
 
-<div class="borrow-history-container">
+<div class="borrow-history-container" id="userBorrowStats">
 <h3>User Borrow Statistics</h3>
 <div class="scrollable-table-container">
 <table class="borrow-history-table" >
     <thead>
     <tr>
-        <th>User ID</th>
+        <th>User</th>
         <th>Username</th>
         <th>No of Books Borrowed</th>
     </tr>
@@ -198,7 +198,7 @@
 </div>
 </div>
 
-{% if user_borrow_stats|length > 3 %}
+{% if user_borrow_stats|length > 5 %}
 <button id="showMoreBtn2">Show More</button>
 <button id="showLessBtn2" style="display: none;">Show Less</button>
 {% endif %}
@@ -225,7 +225,7 @@
 
             showMoreBtn.addEventListener('click', function() {
                 const hiddenRows = tableBody.querySelectorAll('.borrow-row.hidden-row');
-                const rowsToShow = 5; // Show 5 rows at a time
+                const rowsToShow = 2; // Show 5 rows at a time
 
                 for (let i = 0; i < rowsToShow && i < hiddenRows.length; i++) {
                     hiddenRows[i].classList.remove('hidden-row');
@@ -251,8 +251,11 @@
         }
 
         // Apply the function to both tables
-        setupShowMoreLess('.borrow-history-container:nth-of-type(1) .borrow-history-table', 'showMoreBtn1', 'showLessBtn1', 3);
-        setupShowMoreLess('.borrow-history-container:nth-of-type(2) .borrow-history-table', 'showMoreBtn2', 'showLessBtn2', 3);
+        // setupShowMoreLess('.borrow-history-container:nth-of-type(1) .borrow-history-table', 'showMoreBtn1', 'showLessBtn1', 3);
+        // setupShowMoreLess('.borrow-history-container:nth-of-type(2) .borrow-history-table', 'showMoreBtn2', 'showLessBtn2', 3);
+        setupShowMoreLess('#borrowedBooks .borrow-history-table', 'showMoreBtn1', 'showLessBtn1', 3);
+        setupShowMoreLess('#userBorrowStats .borrow-history-table', 'showMoreBtn2', 'showLessBtn2', 3);
+
     });
 </script>
 

@@ -165,6 +165,12 @@ class BorrowRequestAdmin(admin.ModelAdmin):
         if book.quantity == 0:
             book.is_available = False
         book.save()
+        borrow_requests = BorrowRequest.objects.create(
+                user=borrow_request.user,
+                book=book,
+                IssuedDate=datetime.now(),
+                status="accepted"
+        )
         MemberActivity.objects.create(
             user=borrow_request.user,
             book=borrow_request.book,

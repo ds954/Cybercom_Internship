@@ -5,12 +5,10 @@
 {% block admin_content %}
 
 <style>
-      h1{
+    h1{
         font-weight: 500;
     }
    
-    
-
     .borrow-history-table {
         width: 100%;
         border-collapse: collapse;
@@ -41,8 +39,9 @@
     .status {
         color: #555;
     }
+
     .borrow-history-table th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
+        background-color: #89aec1; 
         padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
@@ -50,6 +49,7 @@
     .hidden-row {
         display: none;
     }
+
     #showLessBtn,#showMoreBtn{
         
         padding: 10px 20px;
@@ -60,29 +60,30 @@
         transition: background-color 0.3s ease;
         
     }
+
     #showLessBtn{
         background-color:#E27474;
     }
-    .scrollable-table-container {
-    max-height: 400px; 
-    overflow-y: auto;
-    margin-bottom: 15px;
-    
-}
-.main-div{
-    height: 100vh;
-}
 
-/* Optional: Ensure the table header stays fixed */
-.borrow-history-table thead th {
-    /* position: sticky; */
-    top: 0;
-    background-color: #89aec1; /* Keep the header visible */
-    z-index: 2;
-}
-body,html{
-    overflow-y: hidden;
-}
+    .scrollable-table-container {
+        max-height: 400px; 
+        overflow-y: auto;
+        margin-bottom: 15px;
+        
+    }
+    .main-div{
+        height: 100vh;
+    }
+
+    .borrow-history-table thead th {
+        top: 0;
+        background-color: #89aec1; 
+        z-index: 2;
+    }
+
+    body,html{
+        overflow-y: hidden;
+    }
 </style>
 
 <div class="borrow-history-container">
@@ -105,8 +106,7 @@ body,html{
             {% for request in borrow_requests %}
             <tr id="request-{{ request.id }}" class="borrow-row">
                 
-                    <td>{{ request.user.Username }}</td>
-                    
+                <td>{{ request.user.Username }}</td>    
                 <td>{{ request.book.title }}</td>
                 <td class="status">{{ request.book.author }}</td>
                 <td>{{ request.IssuedDate }}</td>
@@ -122,8 +122,8 @@ body,html{
     </table>
     </div>
 </div>
-{% if borrow_requests|length > 5 %}
-<button id="showMoreBtn">Show More</button>
-<button id="showLessBtn" style="display: none;">Show Less</button>
-{% endif %}
+    {% if borrow_requests|length > 5 %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+    {% endif %}
 {% endblock %}

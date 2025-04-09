@@ -5,7 +5,7 @@
 {% block admin_content %}
 
 <style>
-      h1{
+    h1{
         font-weight: 500;
     }
    
@@ -22,7 +22,7 @@
     }
 
     thead th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
+        background-color: #89aec1; 
         padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
@@ -55,9 +55,11 @@
     .actions a {
         margin-right: 8px;
     }
+
     .hidden-row {
         display: none;
     }
+
     #showLessBtn,#showMoreBtn{
         
         padding: 10px 20px;
@@ -69,26 +71,26 @@
       
     
     }
+
     #showLessBtn{
         background-color:#E27474;
     }
-    .scrollable-table-container {
-    max-height: 400px; 
-    overflow-y: auto;
-    margin-bottom: 15px;
-    
-}
 
-/* Optional: Ensure the table header stays fixed */
-.borrow-history-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: #89aec1; /* Keep the header visible */
-    z-index: 2;
-}
-body,html{
-    overflow-y: hidden;
-}
+    .scrollable-table-container {
+        max-height: 400px; 
+        overflow-y: auto;
+        margin-bottom: 15px;    
+    }
+
+    .borrow-history-table thead th {
+        top: 0;
+        background-color: #89aec1; 
+        z-index: 2;
+    }
+
+    body,html{
+        overflow-y: hidden;
+    }
 </style>
 
 <h1>Books</h1>

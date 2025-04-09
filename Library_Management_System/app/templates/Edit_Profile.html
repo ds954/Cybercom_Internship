@@ -14,23 +14,21 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        /* margin-left: 400px; */
     }
+
     .form-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh; /* Full viewport height */
+        height: 100vh; 
     }
     
-    /* Form Styling */
     .edit-profile-form {
         display: flex;
         flex-direction: column;
-        width: 350px; /* Adjust width as needed */
+        width: 350px; 
     }
     
-    /* Align labels to the start (left) */
     .edit-profile-form label {
         text-align: left;
         font-weight: bold;
@@ -38,7 +36,6 @@
         color: #333;
     }
     
-    /* Ensure inputs take full width */
     .edit-profile-form input,
     .edit-profile-form textarea,
     .edit-profile-form button {
@@ -50,7 +47,6 @@
         font-size: 14px;
     }
     
-    /* Focus Effect */
     .edit-profile-form input:focus,
     .edit-profile-form textarea:focus {
         border-color: #2575fc;
@@ -58,7 +54,6 @@
         box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
     }
     
-    /* Center Profile Photo */
     .profile-photo-container {
         display: flex;
         flex-direction: column;
@@ -66,7 +61,6 @@
         margin-bottom: 15px;
     }
     
-    /* Profile Photo */
     .defaultImg {
         width: 100px;
         height: 100px;
@@ -74,7 +68,6 @@
         object-fit: cover;
     }
     
-    /* Upload & Remove Buttons */
     .upload-text {
         font-size: 12px;
         color: #2575fc;
@@ -92,8 +85,6 @@
         margin-top: 5px;
     }
     
-    
-    /* Submit Button */
     .edit-profile-form button {
         width: 105%;
         color: black;
@@ -101,8 +92,8 @@
         cursor: pointer;
     }
     
-    
-    </style>
+</style>
+
 <div class="container">
 
     <form method="post" class="edit-profile-form" enctype="multipart/form-data">
@@ -110,7 +101,6 @@
 
         <!-- Profile Photo Section -->
         <div class="profile-photo-container">
-            <!-- Dynamically display existing profile picture or default -->
             <img 
                 src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'default.jpg' %}{% endif %}" 
                 alt="Profile Photo" 

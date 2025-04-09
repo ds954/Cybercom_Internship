@@ -180,7 +180,7 @@ def download_borrowed_books_report(request):
     p.drawString(50, height - 280, "Borrowed Books")
 
     table.wrapOn(p, width - 100, height - 300)
-    table.drawOn(p, 50, height - 400)
+    table.drawOn(p, 50, height - 520)
 
     user_borrow_stats = (
         UserInfo.objects.annotate(
@@ -202,11 +202,11 @@ def download_borrowed_books_report(request):
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
     ]))
 
-    
+    p.showPage()    
     p.setFont("Helvetica-Bold", 18)
-    p.drawString(50, height - 470, "User Borrow Statistics")
+    p.drawString(50, height - 50, "User Borrow Statistics")
     table1.wrapOn(p, width - 50, height - 700)
-    table1.drawOn(p, 50, height - 700)
+    table1.drawOn(p, 50, height - 600)
 
     p.save()
     return response
@@ -332,7 +332,7 @@ def member_activities_report(request):
         total_renewal_accepted_count+= renewal_accepted_count
 
     member_activities = MemberActivity.objects.select_related('user', 'book').all()
-    print("member_activity",member_activities)
+ 
     # print("last activity: ",last_activity) 
     context = {
         'users': users,
@@ -390,7 +390,7 @@ def download_member_activities_report(request):
     ]))
 
     table.wrapOn(p, width - 50, height - 400)
-    table.drawOn(p, 80, height - 380)
+    table.drawOn(p, 80, height - 680)
 
     # Start a new page before the next table
     p.showPage()
@@ -415,7 +415,7 @@ def download_member_activities_report(request):
     ]))
 
     table1.wrapOn(p, width - 50, height - 400)
-    table1.drawOn(p, 80, height - 300)
+    table1.drawOn(p, 80, height - 600)
 
     activity_data = [['Borrowed By', 'Title', 'Status', 'Issued Date', 'Due Date']]
     borrow_requests = BorrowRequest.objects.all()
@@ -447,7 +447,7 @@ def download_member_activities_report(request):
 
  
     table2.wrapOn(p, width - 50, height - 400)
-    table2.drawOn(p, 80, height - 600)
+    table2.drawOn(p, 80, height - 780)
 
     p.showPage()
     p.setFont("Helvetica-Bold", 20)
@@ -497,7 +497,7 @@ def download_member_activities_report(request):
 
     # Ensure the table fits on the page
     table3.wrapOn(p, width - 50, height - 400)
-    table3.drawOn(p, 80, height - 1050)
+    table3.drawOn(p, 80, height - 1100)
     
     doc = SimpleDocTemplate(response, pagesize=landscape(A3))
     elements = []
@@ -555,6 +555,7 @@ def admin_logout(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_admin_dashboard(request):
+    print("admin dashboard method is called")
     users = UserInfo.objects.all()
     books = Book.objects.all()
     borrow_requests = BorrowRequest.objects.select_related('user', 'book').all()
@@ -566,14 +567,27 @@ def custom_admin_dashboard(request):
     total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date()).count()
     total_not_returned_bookss = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now())
     print("non returned books",total_not_returned_bookss)
-    start_date = request.POST.get('start_date')
-    end_date = request.POST.get('end_date')
+    # start_date = request.POST.get('start_date')
+    # end_date = request.POST.get('end_date')
+    date_range= request.POST.get('date_range')
+    print("this is the start and end date:",date_range)
+    start_date = None
+    end_date = None
+
+    
+    if date_range:
+        try:
+            start_str, end_str = date_range.split(" - ")
+            start_date = datetime.strptime(start_str.strip(), "%m/%d/%Y").date()
+            end_date = datetime.strptime(end_str.strip(), "%m/%d/%Y").date()
+        except ValueError:
+            print("Invalid date format received.")
 
     if start_date and end_date:
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
+        print("start_date",start_date)
+        print("end_date",end_date)
         filter_borrow_requests = borrow_requests.filter(IssuedDate__range=(start_date, end_date))
+        print("filter_borrowed request",filter_borrow_requests)
         filter_total_issued_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'], IssuedDate__range=(start_date, end_date)).count()
         filter_total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending', IssuedDate__range=(start_date, end_date)).count()
         filter_total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested', IssuedDate__range=(start_date, end_date)).count()
@@ -1423,8 +1437,6 @@ def edit_profile(request):
         if 'profile_picture' in request.FILES:
             user.profile_picture = request.FILES['profile_picture']
 
-        # Save user info and profile picture
-        # user.save()
        
         user.save() 
 
@@ -1645,8 +1657,7 @@ def request_book(request, book_id):
             borrow_request = BorrowRequest.objects.create(
                 user=user,
                 book=book,
-                IssuedDate=timezone.now(),
-                status="pending"
+                status=""
             )
             MemberActivity.objects.create(
             user=user,

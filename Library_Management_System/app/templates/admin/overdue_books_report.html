@@ -1,27 +1,30 @@
 {% extends 'admin/admin_base.html' %}
-{% block title %}Borrowed Books Report{% endblock %}
 
+{% block title %}Borrowed Books Report{% endblock %}
 
 {% block admin_content %}
 <style>
      #header{
         display: block;
     }
+
     table{
         width: 100%;
     }
 
     thead th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
+        background-color: #89aec1; 
         padding: 8px;
         text-align: left;
         border-bottom: 1px solid #ddd;
         color: black;
     }
+
     h1{
         font-weight: 500;
         margin-bottom: 0;
     }
+
     .button{
         display: inline-block;
         padding: 8px 16px;
@@ -31,11 +34,12 @@
         border-radius: 4px;
         transition: background-color 0.3s ease;
     }
+
     .hidden-row {
         display: none;
     }
-    #showLessBtn,#showMoreBtn{
-        
+
+    #showLessBtn,#showMoreBtn{ 
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
@@ -43,88 +47,88 @@
         font-size: 1em;
         transition: background-color 0.3s ease;
         margin: 0 5px; 
-    
     }
+
     #showLessBtn{
         background-color:#E27474;
     }
-    .scrollable-table-container {
-    max-height: 400px; 
-    overflow-y: auto;
-    margin-bottom: 15px;
-    
-}
-.button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #c0c4c6;  /* Light grey */
-    color: black;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: none; /* Removes hover transition effect */
-}
 
-.button:hover {
-    background-color: #c0c4c6 !important; /* Keep the same color on hover */
-    color: black !important;
-    cursor: default; /* Prevent pointer cursor */
-}
-.heading{
-    display: flex;
-    gap:15px;
-    margin-bottom: 15px;
-}
+    .scrollable-table-container {
+        max-height: 400px; 
+        overflow-y: auto;
+        margin-bottom: 15px;   
+    }
+    .button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #c0c4c6;  
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: none; 
+    }
+
+    .button:hover {
+        background-color: #c0c4c6 !important; 
+        color: black !important;
+        cursor: default; 
+    }
+    .heading{
+        display: flex;
+        gap:15px;
+        margin-bottom: 15px;
+    }
 
 </style>
 <div class="heading">
-<h1>Overdue Books Report</h1>
+    <h1>Overdue Books Report</h1>
 
-<!-- Download PDF Button -->
-<button class="button" ><a href="{% url 'download_overdue_books_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+    <!-- Download PDF Button -->
+    <button class="button" ><a href="{% url 'download_overdue_books_report' %}" class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+    </div>
+
+    <div class="scrollable-table-container">
+    <h2>Total Overdue Books: {{ total_overdue_books }}</h2>
+    <table class="borrow-history-table">
+        <thead>
+            <tr>
+                <th>Member</th>
+                <th>Borrowed By</th>
+                <th>Email</th>
+                <th>Contact No</th>
+                <!-- <th>Book ID</th> -->
+                <th>Book</th>
+                <th>Author</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Overdue Days</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in overdue_books %}
+            <tr class="borrow-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ req.user.Username }}</td>
+                <td>{{ req.user.phone }}</td>
+                <td>{{ req.user.email }}</td>
+                <!-- <td>{{ forloop.counter }}</td> -->
+                <td>{{ req.book.title }}</td>
+                <td>{{ req.book.author }}</td>
+                <td>{{ req.IssuedDate }}</td>
+                <td>{{ req.Duedate }}</td>
+                <td>{{ req.get_status_display }}</td>
+                <td>{{ req.overdue_days }} days</td>
+            </tr>
+            {% endfor %}
+        
+    </tbody>
+    </table>
 </div>
 
-<div class="scrollable-table-container">
-<h2>Total Overdue Books: {{ total_overdue_books }}</h2>
-<table class="borrow-history-table">
-    <thead>
-        <tr>
-            <th>Member ID</th>
-            <th>Borrowed By</th>
-            <th>Email</th>
-            <th>Contact No</th>
-            <th>Book ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Issued Date</th>
-            <th>Due Date</th>
-            <th>Status</th>
-            <th>Overdue Days</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for req in overdue_books %}
-        <tr class="borrow-row">
-            <td>{{ forloop.counter }}</td>
-            <td>{{ req.user.Username }}</td>
-            <td>{{ req.user.phone }}</td>
-            <td>{{ req.user.email }}</td>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ req.book.title }}</td>
-            <td>{{ req.book.author }}</td>
-            <td>{{ req.IssuedDate }}</td>
-            <td>{{ req.Duedate }}</td>
-            <td>{{ req.get_status_display }}</td>
-            <td>{{ req.overdue_days }} days</td>
-        </tr>
-        {% endfor %}
-       
-   </tbody>
-</table>
-</div>
-
-{% if overdue_books|length > 5 %}
-<button id="showMoreBtn">Show More</button>
-<button id="showLessBtn" style="display: none;">Show Less</button>
-{% endif %}
+    {% if overdue_books|length > 5 %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+    {% endif %}
 
 {% endblock %}

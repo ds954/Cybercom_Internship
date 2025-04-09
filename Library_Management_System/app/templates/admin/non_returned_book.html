@@ -5,11 +5,10 @@
 {% block admin_content %}
 
 <style>
-      h1{
+    h1{
         font-weight: 500;
     }
 
-   
     .borrow-history-table {
         width: 100%;
         border-collapse: collapse;
@@ -39,20 +38,22 @@
     }
 
     .status {
-        color: #d9534f; /* Red text for overdue */
+        color: #d9534f; 
         font-weight: bold;
     }
+
     .borrow-history-table th {
-        background-color: #89aec1; /* Light Green for Members (first column) */
+        background-color: #89aec1; 
         padding: 5px 6px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
+
     .hidden-row {
         display: none;
     }
-    #showLessBtn,#showMoreBtn{
-        
+
+    #showLessBtn,#showMoreBtn{  
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
@@ -60,11 +61,12 @@
         font-size: 1em;
         transition: background-color 0.3s ease;
         margin: 0 5px; 
-    
     }
+
     #showLessBtn{
         background-color:#E27474;
     }
+
     html,body{
         overflow-y: hidden;
     }
@@ -108,8 +110,8 @@
     </table>
 
 </div>
-{% if borrow_requests|length > 5 %}
-<button id="showMoreBtn">Show More</button>
-<button id="showLessBtn" style="display: none;">Show Less</button>
-{% endif %}
+    {% if borrow_requests|length > 5 %}
+    <button id="showMoreBtn">Show More</button>
+    <button id="showLessBtn" style="display: none;">Show Less</button>
+    {% endif %}
 {% endblock %}

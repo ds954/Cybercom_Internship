@@ -177,7 +177,7 @@ ul li {
 .scrollable-content {
     max-height: calc(100vh - 80px); /* Adjust based on your header/footer height */
     overflow-y: auto;
-    padding-right: 10px; /* To avoid hidden scrollbar behind content */
+    padding-right: 20px; /* To avoid hidden scrollbar behind content */
 }
 html,body{
     overflow-y: hidden;
@@ -257,7 +257,6 @@ html,body{
 <div class="container" style="display: flex; min-height: 100vh;;">
     <!-- Sidebar Menu -->
     <div class="main-div" style="width: 250px; background-color: #f0f0f0; padding: 20px; min-height: 100%; height: 78vh;" >
-        <h2>Menu</h2>
         <ul class="sidebar-menu">
             <li><a href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-dashboard"></i><span>Dashboard</span></a></li>
             <li><a href="{% url 'manage_members' %}"><i class="fas fa-users"></i><span>Manage Members</span></a></li>

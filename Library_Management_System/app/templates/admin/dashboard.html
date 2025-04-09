@@ -1,266 +1,472 @@
 {% extends 'admin/admin_base.html' %}
 
-{% block title %}Admin Dashboard{% endblock %}
-
-
-
-
-
-
+{% block title %}Dashboard{% endblock %}
 
 {% block admin_content %}
-<style>
+{% load static %}
 
-.main-div {
-        width: 500px !important; /* Override width */
-    }    
-/* Card Styles */
-.card {
-    height: 90px;
-    padding: 20px;
+<!-- Mobiscroll JS and CSS Includes -->
+<link rel="stylesheet" href="{% static 'css/mobiscroll.javascript.min.css' %}">
+<script src="{% static 'js/mobiscroll.javascript.min.js' %}"></script>
 
-    border-radius: 8px;
-    width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    
-}
+<style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+    }
 
-.card p{
-    border-radius: 50%; 
-    width: 30px;
-    height: 30px;
-     display: flex; 
-     align-items: center; 
-     justify-content: center; 
-     color: black;
-     margin: 0;
-     margin-top: 5px;
-}
+    body,html {
+        height: 100%;
+    }
 
-.card:hover{
-    transform: scale(1.1);
-}
-/* Different Colors for Each Card */
-.members-card { background-color:  #e8f5e9;  border: 1px solid #86da97 ;} /* Light Green */
-.books-card { background-color: #e0f7fa; border: 1px solid #81d4fa } /* Light Blue */
-.issued-books-card { background-color: #e0f7fa; border: 1px solid #81d4fa } /* Purple */
-.returned-books-card { background-color:  #c8e6c9; border: 1px solid #78c18a } /* Green */
-.borrow-history-card { background-color: #fff3e0; border: 1px solid #eed3a9 } /* Light Orange */
-.pending-requests-card { background-color:  #fff3e0; border: 1px solid #eed3a9} /* Yellow */
-.pending-renewals-card { background-color: #fff3e0; border: 1px solid #eed3a9 } /* Peach */
-.not-returned-books-card { background-color: #ffcdd2;border: 1px solid #ef9a9a } /* Light Red */
-.notifications-card { background-color: #fce4ec; border: 1px solid #f48fb1} /* Pink */
+    .md-mobile-picker-header {
+        font-size: 14px;
+    }
 
-.members-card p{ background-color:   #86da97; } /* Light Green */
-.books-card p{ background-color: #81d4fa; } /* Light Blue */
-.issued-books-card p{ background-color: #81d4fa; } /* Purple */
-.returned-books-card p{ background-color:  #78c18a; } /* Green */
-.borrow-history-card p{ background-color: #eed3a9;  } /* Light Orange */
-.pending-requests-card p{ background-color:  #eed3a9; } /* Yellow */
-.pending-renewals-card p{ background-color: #eed3a9; } /* Peach */
-.not-returned-books-card p{ background-color: #ef9a9a; } /* Light Red */
-.notifications-card p{ background-color: #f48fb1; } /* Pink */
+    input.md-mobile-picker-input {
+        color: initial;
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 12px 0;
+        border: 1px solid #ccc;
+        border-radius: 0;
+        font-family: arial, verdana, sans-serif;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
 
+    .md-mobile-picker-button.mbsc-button {
+        font-size: 13px;
+        padding: 0 15px;
+        line-height: 36px;
+        float: right;
+        margin: 6px 0;
+        width: 100%;
+    }
 
-.card h1{
-    font-size: 16.5px;
-    font-weight:600;
-    color: black;
-    margin: 0;
-}
-.div-card a{
-    text-decoration: none;
-}
-.div-card{
-    margin-bottom: 70px;
-}
-.card p{
-    font-weight: 600;
-}
+    .mbsc-col-no-padding {
+        padding-left: 0;
+    }
 
-
-
+    .md-mobile-picker-box-label.mbsc-textfield-wrapper-box,
+    .md-mobile-picker-box-label .mbsc-textfield-wrapper-box,
+    .md-mobile-picker-inline {
+        margin: 6px 0 12px 0;
+    }
 </style>
 
-    
 
-    <div style=" padding: 20px; padding-top: 0;">
-        <!-- <h1>Welcome to Admin Dashboard</h1> -->
-        <h1 style="font-weight: bolder;">Welcome {{ admin_user.username }}</h1>
+<style>
+    .main-div {
+        width: 500px !important;
+    }
+
+    .card {
+        height: 90px;
+        padding: 20px;
+        border-radius: 8px;
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .card p {
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: black;
+        margin: 0;
+        margin-top: 5px;
+    }
+
+    .card:hover {
+        transform: scale(1.1);
+    }
+
+    .members-card {
+        background-color: #e8f5e9;
+        border: 1px solid #86da97;
+    }
+
+    .books-card {
+        background-color: #e0f7fa;
+        border: 1px solid #81d4fa
+    }
+
+    .issued-books-card {
+        background-color: #e0f7fa;
+        border: 1px solid #81d4fa
+    }
+
+    .returned-books-card {
+        background-color: #c8e6c9;
+        border: 1px solid #78c18a
+    }
+
+    .borrow-history-card {
+        background-color: #fff3e0;
+        border: 1px solid #eed3a9
+    }
+
+    .pending-requests-card {
+        background-color: #fff3e0;
+        border: 1px solid #eed3a9
+    }
+
+    .pending-renewals-card {
+        background-color: #fff3e0;
+        border: 1px solid #eed3a9
+    }
+
+    .not-returned-books-card {
+        background-color: #ffcdd2;
+        border: 1px solid #ef9a9a
+    }
+
+    .notifications-card {
+        background-color: #fce4ec;
+        border: 1px solid #f48fb1
+    }
+
+    .members-card p {
+        background-color: #86da97;
+    }
+
+    .books-card p {
+        background-color: #81d4fa;
+    }
+
+    .issued-books-card p {
+        background-color: #81d4fa;
+    }
+
+    .returned-books-card p {
+        background-color: #78c18a;
+    }
+
+    .borrow-history-card p {
+        background-color: #eed3a9;
+    }
+
+    .pending-requests-card p {
+        background-color: #eed3a9;
+    }
+
+    .pending-renewals-card p {
+        background-color: #eed3a9;
+    }
+
+    .not-returned-books-card p {
+        background-color: #ef9a9a;
+    }
+
+    .notifications-card p {
+        background-color: #f48fb1;
+    }
+
+    .card h1 {
+        font-size: 16.5px;
+        font-weight: 600;
+        color: black;
+        margin: 0;
+    }
+
+    .div-card a {
+        text-decoration: none;
+    }
+
+    .div-card {
+        margin-bottom: 70px;
+    }
+
+    .card p {
+        font-weight: 600;
+    }
+
+    .filter-contentt {
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+
+    .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .filter-container label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .date-input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        outline: none;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .date-input:hover,
+    .date-input:focus {
+        border-color: #007bff;
+        box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.3);
+    }
+
+    .filter-btn {
+        height: 42.400px;
+        padding: 10px 20px;
+        cursor: pointer;
+        display: inline-block;
+        color: black;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        border: none;
+        background-color: rgba(75, 192, 192, 0.2);
+        border: 1px solid rgba(75, 192, 192, 1);
+    }
+
+    .fromto h1 {
+        margin: 0;
+    }
+
+    .mbsc-ios.mbsc-page {
+        display: none;
+    }
+
+    .mbsc-ios.mbsc-form-control-wrapper.mbsc-ltr:after,
+    .mbsc-ios.mbsc-form-control-wrapper.mbsc-ltr:before {
+        display: none;
+
+    }
+
+    /* input[type=text],
+    textarea,
+    select,
+    .vTextField {
+        border: 1px solid rgba(75, 192, 192, 1);
+    } */
+</style>
 
 
-        <div style="display: flex; flex-wrap: wrap; gap: 40px;" class="div-card">
-            <a href="{% url 'admin_user' %}" >
-                <div class="card members-card">
-                    <h1 >Members</h1>
-                    <div style="margin-bottom: 0px;">
+
+<div style=" padding: 20px; padding-top: 0;">
+    <h1 style="font-weight: bolder;">Welcome {{ admin_user.username }}</h1>
+
+
+    <div style="display: flex; flex-wrap: wrap; gap: 40px;" class="div-card">
+        <a href="{% url 'admin_user' %}">
+            <div class="card members-card">
+                <h1>Members</h1>
+                <div style="margin-bottom: 0px;">
                     <p>{{ users|length }}</p>
-                    </div>
                 </div>
-            </a>
-            
-            <a href="{% url 'custom_books' %}">
-                <div class="card books-card">
-                    <h1>Books</h1>
-                    <p>{{ books|length }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_issued_book' %}">
-                <div class="card issued-books-card">
-                    <h1>Issued Books</h1>
-                    <p>{{ total_issued_books }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_returned_book' %}">
-                <div class="card returned-books-card">
-                    <h1>Returned Books</h1>
-                    <p>{{ total_returned_books }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_borrow_history' %}">
-                <div class="card borrow-history-card">
-                    <h1>Borrow Book History</h1>
-                    <p>{{ borrow_requests|length }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_borrow_request' %}">
-                <div class="card pending-requests-card">
-                    <h1>Pending Borrow Requests</h1>
-                    <p>{{ total_pending_borrow_requests }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_pending_renewal_request' %}">
-                <div class="card pending-renewals-card">
-                    <h1>Pending Renewal Requests</h1>
-                    <p>{{ total_pending_renewal_requests }}</p>
-                </div>
-            </a>
-            
-            <a href="{% url 'admin_not_returned_book' %}">
-                <div class="card not-returned-books-card">
-                    <h1>Not Returned Books</h1>
-                    <p>{{ total_not_returned_books }}</p>
-                </div>
-            </a>
-            
-            
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 20px; "class="filter-contentt">
+            </div>
+        </a>
+
+        <a href="{% url 'custom_books' %}">
+            <div class="card books-card">
+                <h1>Books</h1>
+                <p>{{ books|length }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_issued_book' %}">
+            <div class="card issued-books-card">
+                <h1>Issued Books</h1>
+                <p>{{ total_issued_books }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_returned_book' %}">
+            <div class="card returned-books-card">
+                <h1>Returned Books</h1>
+                <p>{{ total_returned_books }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_borrow_history' %}">
+            <div class="card borrow-history-card">
+                <h1>Borrow Book History</h1>
+                <p>{{ borrow_requests|length }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_borrow_request' %}">
+            <div class="card pending-requests-card">
+                <h1>Pending Borrow Requests</h1>
+                <p>{{ total_pending_borrow_requests }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_pending_renewal_request' %}">
+            <div class="card pending-renewals-card">
+                <h1>Pending Renewal Requests</h1>
+                <p>{{ total_pending_renewal_requests }}</p>
+            </div>
+        </a>
+
+        <a href="{% url 'admin_not_returned_book' %}">
+            <div class="card not-returned-books-card">
+                <h1>Not Returned Books</h1>
+                <p>{{ total_not_returned_books }}</p>
+            </div>
+        </a>
+
+
+     </div>
+        <div style="display: flex; flex-direction: column; gap: 50px; "class="filter-contentt">
             <div class="filter-container">
                 <form method="POST" class="filter-form">
                     {% csrf_token %}
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date" name="start_date" value="{{ start_date }}" class="date-input">
-        
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date" name="end_date" value="{{ end_date }}" class="date-input">
-        
+                    <label for="range">
+                    <input type="text" id="range" name="date_range" mbsc-input placeholder="Please select date range...">
+                    </label>
                     <button type="submit" class="filter-btn">Filter</button>
                 </form>
             </div>
-        
-            <div class="fromto">
-                <h1 style="font-weight: 500; margin-top: 10px;">From {{ start_date|date:"d-m-Y" }} to {{ end_date|date:"d-m-Y" }}:</h1>
-            </div>
-        
-        <style>
-            .filter-contentt {
-                border: 1px solid black;
-                padding: 4%;
-                border-radius: 7px;
-            }
-            .filter-contentt {
-                background-color: #fff; /* White background for content blocks */
-                border: 1px solid #e0e0e0; /* Light grey border */
-                padding: 4%;
-                border-radius: 8px;
-                margin-bottom: 15px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            }
-                
-            .filter-form {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 15px;
-                align-items: center;
-            }
-        
-            .filter-container label {
-                font-weight: 600;
-                color: #333;
-            }
-        
-            .date-input {
-                padding: 8px 12px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                font-size: 14px;
-                outline: none;
-                transition: all 0.3s ease-in-out;
-            }
-        
-            .date-input:hover,
-            .date-input:focus {
-                border-color: #007bff;
-                box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.3);
-            }
-        
-            .filter-btn {
-                padding: 8px 16px;
-                cursor: pointer;
-                display: inline-block;
-                color: black;
-                text-decoration: none;
-                border-radius: 4px;
-                transition: background-color 0.3s ease;
-                border: none;
-            }
-        
-            .filter-btn:hover {
-                background-color: #417690;
-                color: white;
-            }
-        
-            .fromto h1 {
-                margin: 0;
-            }
-        </style>
-        
-        
-            
-            
+
+
             <div style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <div style="width: 400px; height: 300px;">
-                <h3>Book Status</h3>
-                
-                
-                <canvas id="bookStatusChart"></canvas> 
-            </div>
-            <div style="width: 400px; height: 300px;">
-                <h3>Borrow Requests</h3>
-               
-                <canvas id="borrowRequestChart"></canvas> 
+                    <h3>Book Status</h3>
+                    <canvas id="bookStatusChart"></canvas>
+                </div>
+                <div style="width: 400px; height: 300px;">
+                    <h3>Borrow Requests</h3>
+                    <canvas id="borrowRequestChart"></canvas>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div mbsc-page class="demo-mobile-desktop-usage">
+    <div style="height:100%">
+        <div class="mbsc-grid">
+            <div class="mbsc-form-group">
+                <div class="mbsc-row">
+                    <div class="mbsc-col-12">
+                        <div class="mbsc-txt-muted md-mobile-picker-header">Use the picker with any inputs & show on
+                            focus/click</div>
+                        <input id="demo-mobile-picker-input" class="md-mobile-picker-input"
+                            placeholder="Please Select..." />
+                    </div>
+                </div>
+            </div>
+            <div class="mbsc-form-group">
+                <div class="mbsc-row">
+                    <div class="mbsc-col-12 mbsc-txt-muted md-mobile-picker-header">Disable <code>onClick/onFocus</code>
+                        and only show on button</div>
+                    <div class="mbsc-col-8">
+                        <input id="demo-mobile-picker-button" class="md-mobile-picker-input" />
+                    </div>
+                    <div class="mbsc-col-4">
+                        <button mbsc-button data-variant="outline" data-color="primary" id="show-mobile-date-picker"
+                            class="md-mobile-picker-button">Show picker</button>
+                    </div>
+                </div>
+            </div>
+            <div class=" mbsc-form-group">
+                <div class="mbsc-row">
+                    <div class="mbsc-col-12">
+                        <div class="mbsc-txt-muted md-mobile-picker-header">Use the picker with a Mobiscroll input</div>
+                        <label class="md-mobile-picker-box-label">
+                            <input id="demo-mobile-picker-mobiscroll" mbsc-input data-label-style="stacked"
+                                data-input-style="box" placeholder="Please Select..." />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mbsc-txt-muted md-mobile-picker-header">Use the picker inline in any page</div>
         </div>
+        <div class="md-mobile-picker-inline">
+            <div id="demo-mobile-picker-inline"></div>
+        </div>
+
     </div>
 </div>
 <!-- This line includes the Chart.js library from a CDN (Content Delivery Network). Chart.js is a powerful JavaScript library for creating various types of charts. -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script>
+
+    mobiscroll.setOptions({
+        locale: mobiscroll.localeEn,  // Specify language like: locale: mobiscroll.localePl or omit setting to use default
+        theme: 'ios',                 // Specify theme like: theme: 'ios' or omit setting to use default
+        themeVariant: 'light'       // More info about themeVariant: https://mobiscroll.com/docs/javascript/datepicker/api#opt-themeVariant
+    });
+
+    var now = new Date();
+    var week = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 6);
+
+    mobiscroll.datepicker('#demo-mobile-picker-input', {
+        controls: ['calendar'],       // More info about controls: https://mobiscroll.com/docs/javascript/datepicker/api#opt-controls
+        select: 'range',              // More info about select: https://mobiscroll.com/docs/javascript/datepicker/api#methods-select
+        showRangeLabels: true,
+        dateFormat: 'yyyy-mm-dd',
+        onSet: function (event, inst) {
+            if (event.valueText) {
+                console.log("Selected range:", event.valueText);
+                const dates = event.value;
+                if (Array.isArray(dates) && dates.length === 2) {
+                    const [start, end] = dates;
+                    console.log("IssuedDate Start:", start, "Type:", typeof start);
+                    console.log("IssuedDate End:", end, "Type:", typeof end);
+                }
+            }
+        }
+
+
+    });
+
+    var instance = mobiscroll.datepicker('#demo-mobile-picker-button', {
+        controls: ['calendar'],       // More info about controls: https://mobiscroll.com/docs/javascript/datepicker/api#opt-controls
+        select: 'range',              // More info about select: https://mobiscroll.com/docs/javascript/datepicker/api#methods-select
+        showRangeLabels: true,
+        showOnClick: false,           // More info about showOnClick: https://mobiscroll.com/docs/javascript/datepicker/api#opt-showOnClick
+        showOnFocus: false,           // More info about showOnFocus: https://mobiscroll.com/docs/javascript/datepicker/api#opt-showOnFocus
+        dateFormat: 'YYYY-MM-DD'
+    });
+
+    instance.setVal([now, week]);
+
+    mobiscroll.datepicker('#demo-mobile-picker-mobiscroll', {
+        controls: ['calendar'],       // More info about controls: https://mobiscroll.com/docs/javascript/datepicker/api#opt-controls
+        select: 'range',              // More info about select: https://mobiscroll.com/docs/javascript/datepicker/api#methods-select
+        showRangeLabels: true,
+        dateFormat: 'YYYY-MM-DD'
+    });
+
+    var inlineInst = mobiscroll.datepicker('#demo-mobile-picker-inline', {
+        controls: ['calendar'],       // More info about controls: https://mobiscroll.com/docs/javascript/datepicker/api#opt-controls
+        select: 'range',              // More info about select: https://mobiscroll.com/docs/javascript/datepicker/api#methods-select
+        showRangeLabels: true,
+        display: 'inline',            // Specify display mode like: display: 'bottom' or omit setting to use default
+        dateFormat: 'YYYY-MM-DD'
+    });
+
+    inlineInst.setVal([now, week]);
+
+    document.getElementById('show-mobile-date-picker').addEventListener('click', function () {
+        instance.open();
+        return false;
+    });
+
+</script>
 
 <script>
     // JavaScript code runs after the HTML document is fully loaded.
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // Book Status Chart
         // This gets the 2D drawing context of the canvas, allowing Chart.js to draw on it.
         const bookStatusCtx = document.getElementById('bookStatusChart').getContext('2d');
@@ -270,8 +476,8 @@
                 labels: ['Returned', 'Not Returned'],
                 datasets: [{
                     label: 'Book Status',
-                   
-                    data: [ '{{filter_total_returned_books}}', '{{filter_total_not_returned_books}}'],
+
+                    data: ['{{filter_total_returned_books}}', '{{filter_total_not_returned_books}}'],
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(255, 99, 132, 0.2)'
@@ -285,7 +491,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,     
+                maintainAspectRatio: false,
             }
         });
 
@@ -311,8 +517,8 @@
                     borderWidth: 1
                 }]
             },
-                options: {
-                    scales: {
+            options: {
+                scales: {
                     x: {
                         grid: {
                             display: false // Removes grid lines from X-axis
@@ -324,10 +530,10 @@
                         }
                     }
                 },
-            
+
                 responsive: true,
                 maintainAspectRatio: false,
-            
+
             }
         });
     });
@@ -335,12 +541,12 @@
 </script>
 <script>
     mobiscroll.datepicker('#range', {
-    controls: ['calendar'],
-    select: 'range',
-    calendarType: 'month',
-    pages: 2,
-    touchUi: true
-});
+        controls: ['calendar'],
+        select: 'range',
+        calendarType: 'month',
+        pages: 2,
+        touchUi: true
+    });
 
 </script>
-{% endblock %} 
+{% endblock %}
