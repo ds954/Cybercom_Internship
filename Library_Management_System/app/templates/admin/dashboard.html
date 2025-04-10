@@ -249,12 +249,7 @@
 
     }
 
-    /* input[type=text],
-    textarea,
-    select,
-    .vTextField {
-        border: 1px solid rgba(75, 192, 192, 1);
-    } */
+ 
 </style>
 
 
@@ -324,7 +319,7 @@
 
 
      </div>
-        <div style="display: flex; flex-direction: column; gap: 50px; "class="filter-contentt">
+        <div style="display: flex; flex-direction: column; gap: 40px; "class="filter-contentt">
             <div class="filter-container">
                 <form method="POST" class="filter-form">
                     {% csrf_token %}
@@ -333,6 +328,7 @@
                     </label>
                     <button type="submit" class="filter-btn">Filter</button>
                 </form>
+                <p id="live-selected-range" style="font-weight: bold; margin-top: 10px; color: green;"></p>
             </div>
 
 
@@ -417,6 +413,7 @@
         onSet: function (event, inst) {
             if (event.valueText) {
                 console.log("Selected range:", event.valueText);
+                document.getElementById("live-selected-range").textContent = "Selected Range: " + event.valueText;
                 const dates = event.value;
                 if (Array.isArray(dates) && dates.length === 2) {
                     const [start, end] = dates;
@@ -425,6 +422,7 @@
                 }
             }
         }
+        
 
 
     });

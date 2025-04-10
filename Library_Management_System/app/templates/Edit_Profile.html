@@ -115,18 +115,18 @@
             <input type="file" id="profile-photo-upload" name="profile_picture" style="display: none;" accept="image/*">
 
             <!-- Remove Photo Button (show if profile picture exists) -->
-            <button type="submit" id="remove-photo-btn" value="true" name="remove_picture" class="remove-photo-btn 
-            {% if user.profile_picture %}
-                show-button
-            {% else %}
-                hide-button
-            {% endif %}">
-            Remove Photo
-        </button>
+            <button type="submit" id="remove-photo-btn"  name="remove_picture" value="true"  class="remove-photo-btn 
+                    {% if user.profile_picture %}
+                        show-button
+                    {% else %}
+                        hide-button
+                    {% endif %}">
+                    Remove Photo
+            </button>
 
 
             <!-- Hidden field to indicate photo removal -->
-            <input type="hidden" name="remove_picture" id="remove-picture" value="true">
+            <input type="hidden" name="remove_picture1" id="remove-picture" value="false">
         </div>
 
         <!-- Username -->
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('profile-photo-upload');
     const removeButton = document.getElementById('remove-photo-btn');
     const profilePhoto = document.getElementById('profile-photo');
-    const removePictureInput = document.getElementById('remove-picture');
+    const removePictureInput = document.getElementById('remove-picture1');
 
     if (!uploadText || !fileInput || !removeButton || !profilePhoto || !removePictureInput) {
         console.error('One or more elements not found.');
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     removeButton.addEventListener('click', () => {
-        profilePhoto.src = "{% static 'default.jpg' %}"; // use your path here
+        profilePhoto.src = "{% static 'default.jpg' %}"; 
         removeButton.style.display = 'none';
         fileInput.value = '';
         removePictureInput.value = 'true';

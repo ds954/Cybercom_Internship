@@ -9,7 +9,8 @@
     }
     thead  th {
         background-color: #89aec1; /* Light Green for Members (first column) */
-        /* padding: 8px; */
+        padding: 8px !important;
+        font-size: 12px !important;
         text-align: left;
         border-bottom: 1px solid #ddd;
         color: black;
@@ -86,13 +87,13 @@
 <h3 style="margin-bottom: 15px;">Most Borrowed Book : {{ most_borrowed.book__title }} by {{ most_borrowed.book__author }} (Borrowed {{ most_borrowed.borrow_count }} times)</h3>
 
 
-<h3>Borrowed Books</h3>
+<h3 style="font-size: 1.2rem;">Borrowed Books</h3>
 <div class="borrow-history-container" id="borrowedBooks">
 <div class="scrollable-table-container">
 <table class="borrow-history-table">
     <thead>
         <tr>
-            <th>Member</th>
+            <th>User</th>
             <th>Borrowed By</th>
             <th>Email</th>
             <th>Contact No</th>
@@ -171,7 +172,7 @@
 
 
 <div class="borrow-history-container" id="userBorrowStats">
-<h3>User Borrow Statistics</h3>
+<h3 style="font-size: 1.2rem;">User Borrow Statistics</h3>
 <div class="scrollable-table-container">
 <table class="borrow-history-table" >
     <thead>

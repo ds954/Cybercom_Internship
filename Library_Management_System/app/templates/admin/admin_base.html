@@ -69,7 +69,7 @@
     </style>
 
     <div class="navbar">
-        <a href="{% url 'custom_admin_dashboard' %}">Dashboard</a>
+        <a href="{% url 'custom_admin_dashboard' %}" style="text-decoration: none;">Dashboard</a>
 
         <div class="profile-menu">
             <img src="{% static 'default.jpg' %}" class="profile-icon">
@@ -191,7 +191,23 @@ html,body{
     border-radius: 3px;
 }
 
+thead th{
+    font-size: 14px;
+    padding: 10px 6px;
+}
 
+td,th{
+    font-size: 14px;
+    padding: 15px 6px;
+}
+.borrow-history-table thead th{
+    font-size: 14px;
+    padding: 10px 6px;
+}
+.borrow-history-table td,th{
+    font-size: 14px;
+    padding: 15px 6px;
+}
 </style>
 
 

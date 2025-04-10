@@ -229,7 +229,9 @@
     {% block content %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        
+        h1{
+            font-size: 1.6rem;
+        }
         #header {
             display: block;
             font-weight: bold;
@@ -295,13 +297,29 @@
             position: sticky;
             top: 0;
         }
-       
-        
+        thead th{
+        font-size: 14px;
+        padding: 10px 6px;
+        }
+
+        td,th{
+            font-size: 14px;
+            padding: 15px 6px;
+        }
+        .borrow-history-table thead th{
+            font-size: 14px;
+            padding: 10px 6px;
+        }
+        .borrow-history-table td,th{
+            font-size: 14px;
+            padding: 15px 6px;
+        }
+            
     </style>
     <!-- ======= PAGE CONTENT START ======= -->
 
     <div class="sidebar" style="display: flex; min-height: 100vh;">
-        <ul class="sidebar-menu" style="width: 220px; background-color: #f0f0f0; padding: 20px; min-height: 72%">
+        <ul class="sidebar-menu" style="width: 220px; background-color: #f0f0f0; padding: 20px; min-height: 73%">
 
             <li><a href="{% url 'home' %}"><i class="fa fa-dashboard"></i> Dashboard</a></li>
             <li><a href="{% url 'book' %}"><i class="fa fa-book"></i> Books</a></li>
