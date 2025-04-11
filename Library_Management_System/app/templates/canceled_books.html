@@ -12,9 +12,9 @@
     <ul>
     {% for request in borrow_requests %}
         <li style="list-style: none; margin-bottom: 10px;">
-            <strong>Book:</strong> {{ request.book.title }}<br>
-            <strong>Cancel Date:</strong> {{ request.cancel_date|default:"N/A" }}<br>
-            <strong>Status:</strong> {{ request.status }}
+            <p style="font-size: 14px;"><strong style="font-size: 14px;">Book:</strong> {{ request.book.title }}</p>
+            <p style="font-size: 14px;"><strong style="font-size: 14px;">Cancel Date:</strong>{{ request.cancel_date|default:"N/A" }}</p> 
+            <p style="font-size: 14px;"><strong style="font-size: 14px;">Status:</strong>{{ request.status }}</p>
         </li>
     {% endfor %}
     </ul>

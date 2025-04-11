@@ -5,71 +5,73 @@
 
 {% block user_content %}
 <style>
-  
-  
     h5{
         font-size: large;
     }
+
     div.card-body{
         margin-bottom: 15px;
         font-size: 16px;
     }
+
     .search-container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    /* margin-top: 5px; */
-  }
-  
-  /* Search Icon */
-  .search-icon {
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
-    margin-right: 2px;
-    margin-top: 2px;
-  }
-  .bell{
-    margin-top: 2px;
-    margin-right: 10px;
-  }
-  
-  /* Search Input */
-  .search-input {
-    width: 0;
-    margin-top: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    outline: none;
-    transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out;
-    opacity: 0;
-  }
-  
-  /* Expanded state */
-  .search-input.expanded {
-    width: 200px; /* You can adjust width */
-    opacity: 1;
-  }
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
     
-.request-btn{
-    background:  #c0c4c6;
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 4px;
-}
-.sidebar-menu{
-    height: 98% !important;
-}
-h2{
-    margin-top: 0;
-}
-body{
-    overflow-y: hidden;
-}
- .content{
-    overflow-y: scroll;
-}
+    .search-icon {
+        cursor: pointer;
+        font-size: 18px;
+        color: #333;
+        margin-right: 2px;
+        margin-top: 2px;
+    }
+
+    .bell{
+        margin-top: 2px;
+        margin-right: 10px;
+    }
+    
+    .search-input {
+        width: 0;
+        margin-top: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        outline: none;
+        transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        opacity: 0;
+    }
+    
+    .search-input.expanded {
+        width: 200px; 
+        opacity: 1;
+    }
+        
+    .request-btn,.request-btn1{
+        cursor: pointer;
+        background:  #c0c4c6;
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+    }
+
+    h2{
+        margin-top: 0;
+    }
+
+    body{
+        overflow-y: hidden;
+    }
+
+    .content{
+        overflow-y: scroll;
+    }
+
+    .request-btn1{
+        cursor:not-allowed;
+    }
 </style>
     <div class="container mt-4" style="padding-left: 20px;">
         <h2 class="text-center mb-4" style="display: flex; align-items: center; justify-content: center; font-size: x-large; margin-bottom: 50px;">Available Books</h2>
@@ -92,15 +94,16 @@ body{
                         </p>
                         <p class="book-quantity"><strong>Quantity:</strong> {{ book.quantity }}</p>
                         {% if book.is_available  %}
-
+                       
                             <form method="post" action="{% url 'request_book' book.id %}">
                                 {% csrf_token %}
                                 <button type="submit" class="request-btn" style="cursor: pointer;">Borrow Book</button>
+                                <a href="{% url 'book_detail' book.id %}" class="view-details" style="margin-left: 5px;">View Details</a>
                             </form>
                         {% else %}
-                            <button class="request-btn disabled" disabled>Out of Stock</button>
+                            <button class="request-btn1 disabled" disabled>Out of Stock</button>
+                            <a href="{% url 'book_detail' book.id %}" class="view-details" style="margin-left: 5px;">View Details</a>
                         {% endif %}
-                        <a href="{% url 'book_detail' book.id %}" class="view-details">View Details</a>
                     </div>
                 </div>
             </div>

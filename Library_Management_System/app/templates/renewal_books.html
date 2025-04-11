@@ -7,19 +7,19 @@
 {% endblock %}
 
 {% block user_content %}
-
+<div >
 {% if borrow_requests %}
     <ul>
     {% for request in borrow_requests %}
-        <li style="list-style: none; margin-bottom: 10px;">
-            <strong>Book:</strong> {{ request.book.title }}<br>
-            <strong>Renewal Date:</strong> {{ request.renewal_date|default:"N/A" }}<br>
-            <strong>Status:</strong> {{ request.status }}
+        <li style="list-style: none; margin-bottom: 20px;">
+            <p style="font-size: 16px;"><strong style="font-size: 16px;">Book:</strong> {{ request.book.title }}</p>
+            <p style="font-size: 16px;"><strong style="font-size: 16px;">Renewal Date:</strong>{{ request.renewal_date|default:"N/A" }}</p> 
+            <p style="font-size: 16px;"><strong style="font-size: 16px;">Status:</strong>{{ request.status }}</p>
         </li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No renewal books yet.</p>
 {% endif %}
-
+</div>
 {% endblock %}

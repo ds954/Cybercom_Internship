@@ -2,6 +2,7 @@ from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
 from django.shortcuts import redirect
+from django.urls import resolve
 
 class RefreshTokenMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
@@ -37,7 +38,6 @@ class AuthenticationRedirectMiddleware(MiddlewareMixin):
     def process_exception(self, request, exception):
         print(f"Request path: {request.path}")
         print(f"Exception: {exception}")
-        from django.urls import resolve
         try:
             resolved_path = resolve(request.path)
             if resolved_path.app_name == 'admin':

@@ -7,9 +7,21 @@
 {% block search-content %}
 {% endblock %}
 {% block user_content %}
+<style>
+.book-detail-card{
+    font-size: larger;
+    margin-left: 30px;
+}    
+.request-btn{
+    background:  #c0c4c6;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+</style>
     <div class="container">
         <div class="book-detail-card">
-            <h2>{{ book.title }}</h2>
+            <h2 style="font-size: 1.3rem;">{{ book.title }}</h2>
             <p><strong>Author:</strong> {{ book.author }}</p>
             <p><strong>Category:</strong> {{ book.category }}</p>
             <p><strong>Description:</strong> {{ book.description }}</p>

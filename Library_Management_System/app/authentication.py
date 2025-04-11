@@ -102,7 +102,7 @@ class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
         print(f"\nAuthenticating {request.path}...")
         try:
-            resolved_path = resolve(request.path)
+            resolved_path = resolve(request.path) # Resolve the current request URL path to the corresponding view function and route details
             print("resolve_path:",resolved_path)
             if resolved_path.app_name == 'admin':
                 print("Skipping authentication for Django Admin.")
@@ -126,22 +126,25 @@ class JWTAuthentication(BaseAuthentication):
             return None
 
         print("Path not excluded. Proceeding with JWT auth.")
-        access_token = request.COOKIES.get('access_token')
-        refresh_token = request.COOKIES.get('refresh_token')
+        access_token = request.COOKIES.get('access_token') #tries to get access_token from the cookies
+        refresh_token = request.COOKIES.get('refresh_token')#tries to get refresh_token from the cookies
 
         print(f"Access Token: {access_token}")
         print(f"Refresh Token: {refresh_token}")
 
         if access_token:
+            """
+            this try except block attempt to decode and validate the access token.
+            """
             try:
                 payload = jwt.decode(
                     access_token,
-                    settings.JWT_AUTH['JWT_SECRET_KEY'],
-                    algorithms=[settings.JWT_AUTH['JWT_ALGORITHM']]
+                    settings.JWT_AUTH['JWT_SECRET_KEY'],#secret key of algo
+                    algorithms=[settings.JWT_AUTH['JWT_ALGORITHM']] #HS256 used for siging
                 )
                 print("Access token valid.")
                 try:
-                    user = UserInfo.objects.get(email=payload['email'])
+                    user = UserInfo.objects.get(email=payload['email']) #email address from access_token
                     return (user, None)
                 except UserInfo.DoesNotExist:
                     print("User not found in UserInfo model.")

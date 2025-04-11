@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from decouple import config 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-di4ql#xnnfobaqegiv41&b1846-rh6hd_ai*-&vw(o%p(33p9j"
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -125,11 +126,11 @@ LOGIN_URL = '/custom-admin/login/'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'Library_Management_System ',
-       'USER': 'postgres',
-       'PASSWORD': 'Dhara@95',
-       'HOST': 'localhost',
-       'PORT': 5432,
+       'NAME': config('NAME'),
+       'USER': config('USER'),
+       'PASSWORD': config('PASSWORD'),
+       'HOST': config('HOST'),
+       'PORT': config('PORT'),
    }
 }
 
@@ -216,6 +217,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'dsm952004@gmail.com'
-EMAIL_HOST_PASSWORD ='srjb yaqo odma ydrd'
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')

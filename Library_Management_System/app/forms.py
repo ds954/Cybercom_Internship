@@ -41,6 +41,7 @@ class BookBulkUploadForm(forms.Form):
             book, created = Book.objects.get_or_create(
                 title=row['title'],
                 author=row['author'],
+                category=row['category'],
                 defaults={
                     'description': row.get('description', ''),
                     'is_available': row.get('is_available', True),

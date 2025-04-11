@@ -57,6 +57,15 @@ from reportlab.platypus import SimpleDocTemplate
 from django.db.models import Count
 
 def admin_profile_view(request):
+    """
+    Display the admin profile page.
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: Rendered admin profile HTML page.
+    """
     user = request.user  
     admin_profile = User.objects.get(username=user)  
 
@@ -65,6 +74,18 @@ def admin_profile_view(request):
 
 @csrf_exempt
 def admin_profile_edit(request):
+    """
+    Handle admin profile editing.
+
+    On POST request, updates the admin's profile details.
+    On GET request, renders the profile edit form.
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: Redirects after update or renders edit form.
+    """
     user = request.user  # Get the logged-in admin user
 
     if request.method == 'POST':
@@ -86,6 +107,16 @@ def admin_profile_edit(request):
     return HttpResponse(html_content)
 
 def borrowed_books_report(request):
+    """
+    Generate a report of all currently borrowed books, most borrowed book,
+    and user borrowing statistics.
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: Rendered HTML page for borrowed books report.
+    """
     today=datetime.now().date()
     borrowed_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect','renewal_requested'])
     admin_data=AdminActions.objects.all()
@@ -116,6 +147,15 @@ def borrowed_books_report(request):
     return HttpResponse(html_content)
 
 def download_borrowed_books_report(request):
+    """
+    Download the borrowed books report in PDF format.
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: PDF file of the borrowed books report.
+    """
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="borrowed_books_report.pdf"'
 
@@ -214,6 +254,15 @@ def download_borrowed_books_report(request):
 
 
 def overdue_books_report(request):
+    """
+    Generate a report of overdue books (due date past current date).
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: Rendered HTML page for overdue books.
+    """
     today = datetime.now().date()
     overdue_books = BorrowRequest.objects.filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
     for book in overdue_books:
@@ -228,6 +277,15 @@ def overdue_books_report(request):
 
 
 def download_overdue_books_report(request):
+    """
+    Download the overdue books report in PDF format.
+
+    Args:
+        request (HttpRequest): The incoming request from the client.
+
+    Returns:
+        HttpResponse: PDF file of the overdue books report.
+    """
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="overdue_books_report.pdf"'
 
@@ -285,6 +343,16 @@ def download_overdue_books_report(request):
 
 
 def member_activities_report(request):
+    """
+    View to generate the member activities summary for the admin panel.
+
+    This function collects and aggregates data related to borrow requests, notifications,
+    login/logout times, and renewal statuses for each user. It prepares context data for
+    rendering the member activity HTML report.
+
+    Returns:
+        HttpResponse: Rendered HTML content of the member activities report.
+    """
     users = UserInfo.objects.all()
 
     user_data = []
@@ -352,6 +420,19 @@ def member_activities_report(request):
     return HttpResponse(html_content)
 
 def download_member_activities_report(request):
+    """
+    View to generate and download a detailed member activities report as a PDF.
+
+    This function creates a landscape A3-sized PDF that includes:
+    - Basic user information
+    - Borrow request and notification summary
+    - Detailed borrow activity records
+    - Member activity logs including request, return, renewal, login/logout dates
+
+    Returns:
+        HttpResponse: PDF file response containing the member activities report.
+    """
+    ...
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="member_activities_report.pdf"'
 
@@ -543,6 +624,19 @@ def custom_admin_login(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_logout(request):
+    """
+    Logs out an authenticated admin (staff) user by clearing the session 
+    and deleting authentication-related cookies.
+
+    This view is restricted to users who are both logged in and marked as staff.
+    After logout, the user is redirected to the login page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponseRedirect: A response redirecting the user to the login page.
+    """
     request.session.flush()
     response = redirect(reverse('login'))
     response.delete_cookie('access_token')
@@ -554,6 +648,22 @@ def admin_logout(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_admin_dashboard(request):
+    """
+    Displays the admin dashboard with statistics and records related to users, books, 
+    and borrow requests. Supports optional filtering by date range for issued books 
+    and borrow statuses.
+
+    Authenticates the staff user, fetches all users, books, and borrow request data, 
+    calculates various statistics including total issued, pending, returned, and 
+    overdue books. If a date range is provided in the POST request, the statistics 
+    are filtered accordingly.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of the admin dashboard with statistical context.
+    """
     print("admin dashboard method is called")
     users = UserInfo.objects.all()
     books = Book.objects.all()
@@ -564,6 +674,7 @@ def custom_admin_dashboard(request):
     total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested').count()
     total_returned_books = BorrowRequest.objects.filter(status='book_returned').count()
     total_not_returned_books = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date()).count()
+    print("not",total_not_returned_books)
     total_not_returned_bookss = BorrowRequest.objects.filter(status__in =['accepted','renew_accpect','renewal_requested'],Duedate__lt=now())
     print("non returned books",total_not_returned_bookss)
     date_range= request.POST.get('date_range')
@@ -586,7 +697,9 @@ def custom_admin_dashboard(request):
         filter_total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending', IssuedDate__range=(start_date, end_date)).count()
         filter_total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested', IssuedDate__range=(start_date, end_date)).count()
         filter_total_returned_books = BorrowRequest.objects.filter(status='book_returned', IssuedDate__range=(start_date, end_date)).count()
-        filter_total_not_returned_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect'], IssuedDate__range=(start_date, end_date)).count()
+        filter_total_not_returned_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect','renewal_requested'], 
+        IssuedDate__range=(start_date, end_date),Duedate__lt=now().date()).count()
+        
     else:
         # If no date range is selected, use total counts
         filter_borrow_requests=borrow_requests
@@ -622,6 +735,18 @@ def custom_admin_dashboard(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_books(request):
+    """
+    Displays the list of all books for the admin user.
+
+    Authenticates the staff user, retrieves all book records from the database, 
+    and renders the 'books.html' template with the list of books.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of the books page with all book records.
+    """
     books = Book.objects.all()
     books_html = render_to_string('admin/books.html', {'books': books})
     return HttpResponse(books_html)
@@ -630,6 +755,17 @@ def custom_books(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_book_add(request):
+    """
+    Handles the addition of a new book by the admin.
+
+    Authenticates the staff user, processes POST request to create a new book, triggers the BookAdmin model logic to create copies, and redirects to the book list.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Redirects to the book list on successful POST, else renders the book add form.
+    """
     print("Add Book Method Called")
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -657,6 +793,17 @@ def custom_book_add(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_borrow_request(request):
+    """
+    Displays all pending borrow requests for the admin.
+
+    Fetches borrow requests with 'pending' status and renders them to the template.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML showing pending borrow requests.
+    """
     borrow_requests=BorrowRequest.objects.filter(status__in =['pending'])
     borrow_request_html = render_to_string('admin/borrow_request.html', {
         'borrow_requests': borrow_requests,
@@ -666,6 +813,17 @@ def admin_borrow_request(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_pending_renewal_request(request):
+    """
+    Displays pending renewal requests for the admin.
+
+    Fetches borrow requests with 'renewal_requested' status and renders them.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of pending renewal requests.
+    """
     borrow_requests=BorrowRequest.objects.filter(status__in =['renewal_requested'])
     borrow_request_html = render_to_string('admin/pending_renewal.html', {
         'borrow_requests': borrow_requests,   
@@ -675,6 +833,17 @@ def admin_pending_renewal_request(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_issued_book(request):
+    """
+    Displays currently issued books for the admin.
+
+    Fetches borrow requests with 'accepted' or 'renew_accpect' status and renders them.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of issued books.
+    """
     borrow_requests=BorrowRequest.objects.filter(status__in =['accepted','renew_accpect'])
     borrow_request_html = render_to_string('admin/issued_book.html', {
         'borrow_requests': borrow_requests, 
@@ -684,6 +853,17 @@ def admin_issued_book(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_returned_book(request):
+    """
+    Displays books that have been returned by users.
+
+    Fetches borrow requests with 'book_returned' status and renders them.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of returned books.
+    """
     borrow_requests=BorrowRequest.objects.filter(status='book_returned')
     borrow_request_html = render_to_string('admin/returned_book.html', {
         'borrow_requests': borrow_requests,  
@@ -693,6 +873,17 @@ def admin_returned_book(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_borrow_history(request):
+    """
+    Displays complete borrow history for all users.
+
+    Retrieves all borrow requests and renders them for the admin to review.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of full borrow history.
+    """
     borrow_requests = BorrowRequest.objects.select_related('user').all()
     borrow_request_html = render_to_string('admin/borrow_history.html', {
         'borrow_requests': borrow_requests,  
@@ -702,6 +893,18 @@ def admin_borrow_history(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_not_returned_book(request):
+    """
+    Displays the list of books not returned after the due date.
+
+    Fetches borrow requests with due dates earlier than today and status 
+    indicating the book is still with the user. Renders the overdue list.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of overdue books.
+    """
     borrow_requests = BorrowRequest.objects.select_related('user').filter(status__in=['accepted','renew_accpect','renewal_requested'],Duedate__lt=now().date())
     borrow_request_html = render_to_string('admin/non_returned_book.html', {
         'borrow_requests': borrow_requests,'today': timezone.now().date()
@@ -711,6 +914,17 @@ def admin_not_returned_book(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_user(request):
+    """
+    Displays the list of all users for the admin.
+
+    Fetches all user records and renders them in the admin interface.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML of user list.
+    """
     users = UserInfo.objects.all()
     user_html = render_to_string('admin/user.html', {
         'users': users,
@@ -721,6 +935,18 @@ def admin_user(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def manage_members(request):
+    """
+    Displays a list of all library members for administrative management.
+
+    Authenticates admin user, retrieves all user records from the database,
+    and renders the 'manage_members.html' template.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML displaying all members.
+    """
     users = UserInfo.objects.all()
     user_html = render_to_string('admin/manage_members.html', {'users': users})
     return HttpResponse(user_html)
@@ -729,6 +955,18 @@ def manage_members(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def add_member(request):
+    """
+    Handles adding a new member to the system by the admin.
+
+    Displays a form to add a member. On POST, saves user details,
+    logs the action, and redirects to member list.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders form or redirects on success.
+    """
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
@@ -749,6 +987,19 @@ def add_member(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def edit_member(request, member_id):
+    """
+    Allows the admin to update details of an existing member.
+
+    Loads the member by ID, displays pre-filled form, updates on valid POST,
+    logs the admin action, and redirects to members list.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        member_id (int): ID of the member to edit.
+
+    Returns:
+        HttpResponse: Rendered form or redirection to members list.
+    """
     print(f"edit_member called with member_id: {member_id}")
     member = get_object_or_404(UserInfo, id=member_id)
 
@@ -771,6 +1022,20 @@ def edit_member(request, member_id):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def delete_member(request, user_id):
+    """
+    Allows admin to delete a member from the system.
+
+    Authenticates admin, deletes the user by ID, logs the action,
+    and redirects to member list.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        user_id (int): ID of the user to be deleted.
+
+    Returns:
+        HttpResponseRedirect: Redirects to manage_members view.
+    """
+
     user = get_object_or_404(UserInfo, id=user_id)
     user.delete()
     AdminActions.objects.create(
@@ -784,6 +1049,18 @@ def delete_member(request, user_id):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def manage_books(request):
+      """
+    Displays the list of all books for admin to manage.
+
+    Authenticates admin user, fetches all book records, 
+    and renders the 'manage_books.html' template.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML with list of books.
+    """
       print("manage books called")
       books = Book.objects.all()
       book_html = render_to_string('admin/manage_books.html', {'books':books})
@@ -793,6 +1070,18 @@ def manage_books(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def add_book(request):
+    """
+    Adds a new book to the library collection.
+
+    Displays a form to add a book. On POST, saves the book, logs the action,
+    and redirects to book management view.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Form to add book or redirect on success.
+    """
     print('inside add_book')
     if request.method == "POST":
         form = BookForm(request.POST)
@@ -814,6 +1103,19 @@ def add_book(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def edit_book(request, book_id):
+    """
+    Allows the admin to edit details of an existing book.
+
+    Loads book by ID, displays editable form, updates book on POST,
+    logs the update, and redirects.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        book_id (int): ID of the book to be edited.
+
+    Returns:
+        HttpResponse: Rendered edit form or redirect.
+    """
     print(f"edit_member called with member_id: {book_id}")
     book = get_object_or_404(Book, id=book_id)
 
@@ -835,6 +1137,19 @@ def edit_book(request, book_id):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def delete_book(request, book_id):
+    """
+    Deletes a book from the collection.
+
+    Authenticates admin, deletes book by ID, logs the action,
+    and redirects to manage_books.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        book_id (int): ID of the book to be deleted.
+
+    Returns:
+        HttpResponseRedirect: Redirect to book management view.
+    """
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     AdminActions.objects.create(
@@ -849,6 +1164,18 @@ def delete_book(request, book_id):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def bulk_upload_books(request):
+    """
+    Uploads multiple books from an Excel file via a form.
+
+    Renders a bulk upload form and processes file on valid POST,
+    handles errors, and redirects to book management.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Bulk upload form or redirect on success.
+    """
     if request.method == "POST":
         form = BookBulkUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -866,6 +1193,18 @@ def bulk_upload_books(request):
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def admin_notification(request):
+    """
+    Displays all recent system notifications for the admin.
+
+    Fetches notifications ordered by timestamp and renders them
+    in the admin panel.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML showing notifications.
+    """
     recent_notifications = Notification.objects.order_by('-timestamp')
     user_html = render_to_string('admin/notification.html', {
         'notifications': recent_notifications
@@ -877,6 +1216,19 @@ def admin_notification(request):
 @user_passes_test(lambda u: u.is_staff)
 @csrf_exempt
 def update_borrow_request_status(request, request_id):
+    """
+    Allows admin to update the status of a borrow request.
+
+    On POST, updates status and optionally sets issue date,
+    creates a notification, logs the update, and redirects.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        request_id (int): ID of the borrow request to update.
+
+    Returns:
+        HttpResponse: Borrow update form or redirect on success.
+    """
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
 
     if request.method == 'POST':
@@ -907,6 +1259,14 @@ def update_borrow_request_status(request, request_id):
 
 @csrf_exempt
 def register_view(request):
+    """
+    Handle user registration:
+    - Validate form input
+    - Check for duplicate email or username
+    - Hash the password and generate OTP
+    - Send OTP to user’s email
+    - Redirect to OTP verification page
+    """
     print("inside register view")
     if request.method == 'POST':
         username=request.POST.get('username')
@@ -952,6 +1312,12 @@ def register_view(request):
 
 @csrf_exempt
 def verify_otp(request, user_id):
+    """
+    Verify the OTP entered by the user.
+    - If 'resend' is clicked, send a new OTP
+    - If OTP is valid, mark email as verified and redirect to home
+    - Otherwise, show error
+    """
     try:
         user = UserInfo.objects.get(id=user_id)
     except UserInfo.DoesNotExist:
@@ -1003,7 +1369,9 @@ def verify_otp(request, user_id):
 
 @csrf_exempt
 def resend_otp(request, user_id):
-    """Resend OTP if the user requests a new one."""
+    """
+    Resend a new OTP to the user’s email.
+    """
     user = UserInfo.objects.get(id=user_id)
     new_otp = generate_otp() 
     user.email_otp = new_otp  
@@ -1021,7 +1389,12 @@ def resend_otp(request, user_id):
 
 @csrf_exempt
 def login_view(request):
-    
+        """
+        Handle login for:
+        - Admin users (using Django's User model)
+        - Regular users (using custom UserInfo model)
+        On success: generate and set access and refresh tokens
+       """
         if request.method == 'POST':
             identifier = request.POST.get('identifier')  # Accepts email or username
             password = request.POST.get('password')
@@ -1136,6 +1509,17 @@ def refresh_token_view(request):
 
 @csrf_exempt
 def email(request):
+    """
+    Handles email input for OTP-based password reset.
+
+    - If method is POST:
+        - Checks if email exists in the database.
+        - Generates and sends OTP to the email if exists.
+        - Redirects to OTP verification page.
+    - If method is GET:
+        - Renders the email input form.
+    """
+
     if request.method == 'POST':
         email = request.POST.get('email')
 
@@ -1163,7 +1547,17 @@ def email(request):
 
 @csrf_exempt
 def otp_password(request, user_id):
-    
+    """
+    Verifies the OTP for the given user and redirects to reset password page if correct.
+
+    - Retrieves user by ID.
+    - If method is POST:
+        - Compares entered OTP with the one stored.
+        - Redirects to password reset page on success.
+        - Otherwise, shows error.
+    - If method is GET:
+        - Renders the OTP entry form.
+    """
     try:
         # Get user by user_id, NOT by JWTAuthentication
         user = UserInfo.objects.get(id=user_id)
@@ -1185,6 +1579,16 @@ def otp_password(request, user_id):
 
 @csrf_exempt
 def reset_password(request, user_id):
+    """
+    Allows user to reset their password after OTP verification.
+
+    - If POST:
+        - Validates password strength and match.
+        - Hashes and saves new password.
+        - Redirects to login/homepage on success.
+    - If GET:
+        - Renders the reset password form.
+    """
     user = UserInfo.objects.get(id=user_id) 
     if request.method == 'POST':
         password = request.POST.get('password') 
@@ -1208,6 +1612,12 @@ def reset_password(request, user_id):
 
 # @session_login_required
 def view_profile(request):
+    """
+    Displays the user's profile page using JWT authentication.
+    
+    - Redirects to login if authentication fails.
+    - Renders user data on profile view.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1221,6 +1631,17 @@ def view_profile(request):
 @csrf_exempt
 # @session_login_required
 def edit_profile(request):
+    """
+    Allows the user to edit their profile details including uploading/removing a profile picture.
+
+    - Requires JWT-based user authentication.
+    - If POST:
+        - Updates user details and profile picture.
+        - Validates form and saves changes.
+        - Redirects to same page after update.
+    - If GET:
+        - Displays form with current user data.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1280,6 +1701,18 @@ def edit_profile(request):
 # @session_login_required
 @csrf_exempt
 def home(request):
+    """
+    Displays the user's dashboard with a summary of borrowing activities.
+
+    Authenticates the user and shows counts of borrowed, overdue, 
+    renewal requested, returned, and pending books. Also includes unread notifications.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered 'home.html' dashboard page.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1293,18 +1726,32 @@ def home(request):
     returned_count = BorrowRequest.objects.filter(user=user, status='book_returned').count()
     pending_count = BorrowRequest.objects.filter(user=user, status='pending').count()
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
-
+    
 
     html_content = render_to_string('home.html',{**context,'user':user,'borrowed_count': borrowed_count,
             'overdue_count': overdue_count,
             'renewal_count': renewal_count,
             'pending_count':pending_count,
-            'returned_count': returned_count,'notification_count': notification_count})  
+            'returned_count': returned_count,
+            'notification_count': 
+            notification_count})  
     return HttpResponse(html_content)
   
 
 # @session_login_required
 def book_list(request):
+    """
+    Displays the list of all available books.
+
+    Authenticates the user, fetches all books from the database,
+    and renders the 'book.html' template.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page showing all books.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1319,6 +1766,19 @@ def book_list(request):
 
 # @session_login_required
 def book_detail(request, book_id):
+    """
+    Displays detailed information about a selected book.
+
+    Authenticates the user and fetches book details like title, 
+    author, and description based on the given book ID.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        book_id (int): ID of the selected book.
+
+    Returns:
+        HttpResponse: Rendered 'book_detail.html' page with book information.
+    """
     user_data = JWTAuthentication().authenticate(request)
     user,_=user_data
     print("data",user_data)
@@ -1334,6 +1794,19 @@ def book_detail(request, book_id):
 
 # @session_login_required
 def search_books(request):
+    """
+    Searches books based on a query string provided by the user.
+
+    Authenticates the user and looks up books by title, author,
+    or category (case-insensitive). Returns the search results 
+    rendered in the 'search_results.html' page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page showing the list of matched books.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     user,_=user_data
@@ -1344,6 +1817,7 @@ def search_books(request):
 
     if query:
         books = Book.objects.filter(
+            # check the searched content is title or author or category with Q that ingnore the case sensitive error
             Q(title__icontains=query) |
             Q(author__icontains=query) |
             Q(category__icontains=query)  # Add more fields as necessary
@@ -1354,9 +1828,7 @@ def search_books(request):
     if user_id:
         profile_user = UserInfo.objects.get(id=user_id)
     notification_count = Notification.objects.filter(user=user, is_read=False).count()
-    notification_count = Notification.objects.filter(user=user, is_read=False).count()
     context = user_context_processor(request) 
-    context.update({'notification_count': notification_count})
     context.update({'notification_count': notification_count})
     html_content = render_to_string('search_results.html', {**context,
         'books': books,
@@ -1366,6 +1838,18 @@ def search_books(request):
 
 # @session_login_required
 def borrow_history(request):
+    """
+    Displays the borrowing history of the logged-in user in descending order.
+
+    Authenticates the user, fetches all borrow requests made by the user,
+    and renders them in the 'borrow_history.html' page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page with the user's borrowing history.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1386,6 +1870,17 @@ def borrow_history(request):
 
 # @session_login_required
 def user_book(request):
+    """
+    Retrieves the list of books currently borrowed by the authenticated user.
+
+    Filters borrow requests from the BorrowRequest table where the status is either 
+    'accepted' or 'renew_accpect', indicating that the user has successfully borrowed 
+    or renewed the book. This helps in showing all books currently in possession of the user.
+
+    Returns:
+        HttpResponse: Rendered HTML page displaying the borrowed books.
+    """
+
     user_data = JWTAuthentication().authenticate(request)
     user,_=user_data
     print("data",user_data)
@@ -1403,6 +1898,16 @@ def user_book(request):
 
 # @session_login_required
 def user_duebook(request):
+    """
+    Retrieves and displays a list of books that are overdue for the currently authenticated user.
+
+    This view authenticates the user using JWT, checks for borrow requests where the status is 
+    either 'accepted' or 'renew_accpect', and the due date is earlier than today. It then renders 
+    the 'user_duebook.html' template with the list of overdue books and the user's unread notification count.
+
+    Returns:
+        HttpResponse: Rendered HTML page displaying the user's overdue books and notification count.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1420,6 +1925,20 @@ def user_duebook(request):
 
 # @session_login_required
 def pending_renewal(request):
+    """
+    Displays the list of books for which the user has requested a renewal 
+    but the request is still pending and the due date is past.
+
+    Authenticates the user, fetches the user's renewal requests with status 
+    'renewal_requested' and a due date less than today, and renders the 
+    'pending_renewals.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page with pending renewal requests.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1435,6 +1954,19 @@ def pending_renewal(request):
     return HttpResponse(html_content)
 
 def pending_request(request):
+    """
+    Displays the list of books that the user has requested but are still 
+    pending approval.
+
+    Authenticates the user, fetches borrow requests with status 'pending',
+    and renders the 'pending_request.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page with pending book requests.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1449,6 +1981,20 @@ def pending_request(request):
 
 # @session_login_required
 def returned_book(request):
+    """
+    Displays the list of books returned by the user where the due date 
+    is greater than today.
+
+    Authenticates the user, filters borrow requests with status 
+    'book_returned' and a future due date, and renders the 
+    'return_books.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered page with returned books.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1465,6 +2011,19 @@ def returned_book(request):
 # @session_login_required
 @csrf_exempt
 def request_book(request, book_id):
+        """
+        Handles the submission of a book request by the user.
+
+        Authenticates the user, checks the availability of the selected book,
+        creates a borrow request and logs the activity if the book is available.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            book_id (int): ID of the book to request.
+
+        Returns:
+            HttpResponseRedirect: Redirects to 'borrow_history' after processing the request.
+        """
         user_data = JWTAuthentication().authenticate(request)
         print("data",user_data)
         if not user_data:
@@ -1480,7 +2039,7 @@ def request_book(request, book_id):
             borrow_request = BorrowRequest.objects.create(
                 user=user,
                 book=book,
-                status=""
+                status="pending"
             )
             MemberActivity.objects.create(
             user=user,
@@ -1496,6 +2055,19 @@ def request_book(request, book_id):
 # @session_login_required
 @csrf_exempt
 def returned_books(request):
+    """
+    Displays the list of books that the user has returned.
+
+    This view authenticates the user, retrieves all BorrowRequest entries with the status 
+    'book_returned', calculates the current notification count, and renders the 
+    'returned_books.html' template with relevant context including today's date.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML page showing the list of returned books.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1515,6 +2087,19 @@ def returned_books(request):
 # @session_login_required
 @csrf_exempt
 def canceled_books(request):
+    """
+    Displays the list of books for which the user has canceled their borrow request.
+
+    This view authenticates the user, retrieves all BorrowRequest entries with the status 
+    'Cancel_Request' (indicating cancellation), fetches unread notification count, and 
+    renders the 'canceled_books.html' template with the relevant context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML page showing the list of canceled borrow requests.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1535,6 +2120,19 @@ def canceled_books(request):
 # @session_login_required
 @csrf_exempt
 def renewal_books(request):
+    """
+    Displays the list of books for which the user has requested and received renewal approval.
+
+    This view authenticates the user, fetches all BorrowRequest entries with status 
+    'renew_accpect' (indicating approved renewals), gathers notification count, 
+    and renders the 'renewal_books.html' template.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered HTML page displaying the list of renewed books.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1554,6 +2152,21 @@ def renewal_books(request):
 # @session_login_required
 @csrf_exempt
 def request_renewal(request,request_id):
+    """
+    Handles a renewal request for a borrowed book.
+
+    This view is triggered when a user clicks the 'Renewal Request' button.
+    It updates the status of the corresponding BorrowRequest to 'renewal_requested',
+    creates a RenewalRequests entry, logs the activity in MemberActivity,
+    and sends a WebSocket notification to the user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        request_id (int): The ID of the BorrowRequest for which the renewal is requested.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the borrow history page.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1582,6 +2195,22 @@ def request_renewal(request,request_id):
 # @session_login_required
 @csrf_exempt
 def cancel_book(request,request_id):
+     """
+    Handles the cancellation of a borrow request.
+
+    This view is triggered when a user chooses to cancel a borrow request.
+    It updates the status of the BorrowRequest to 'Cancel_Request',
+    logs the cancellation in MemberActivity, sends a WebSocket notification,
+    creates a user notification entry, and sends an email alert to the user.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        request_id (int): The ID of the BorrowRequest to be canceled.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the notifications page.
+     """
+
      user_data = JWTAuthentication().authenticate(request)
      print("data",user_data)
      if not user_data:
@@ -1621,6 +2250,23 @@ def cancel_book(request,request_id):
 # @session_login_required
 @csrf_exempt
 def return_book(request,request_id):
+    """
+    Handles the return process of a borrowed book.
+
+    This view is triggered when a user confirms the return of a borrowed book.
+    It updates the status of the BorrowRequest to 'book_returned',
+    increments the book's quantity and sets its availability to True,
+    logs the return activity in MemberActivity, sends a WebSocket update,
+    notifies the user via a Notification object, and optionally triggers
+    an admin-side status update.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        request_id (int): The ID of the BorrowRequest being returned.
+
+    Returns:
+        HttpResponseRedirect: Redirects the user to the notifications page.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1664,7 +2310,19 @@ def return_book(request,request_id):
 # @session_login_required
 @csrf_exempt
 def notification(request):
-    """Triggers Celery task and returns due books for the user."""
+    """
+    Handles the user notification view and triggers a Celery task for due date alerts.
+
+    This view authenticates the user, triggers a Celery task (`send_due_date_notifications`)
+    to check for upcoming due books, marks unread notifications as read, retrieves the latest
+    50 notifications, and renders them along with books due in 3 days.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders the 'notification.html' template with the due books and user notifications.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     if not user_data:
@@ -1687,6 +2345,19 @@ def notification(request):
 
 
 def logout_view(request):
+    """
+    Handles user logout and updates logout time.
+
+    This view authenticates the user using JWT, updates the `logout_time` in the `UserInfo` model 
+    if the user is found, flushes the session, deletes authentication cookies, 
+    and redirects the user to the login page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the login page after logging out the user.
+    """
     print('inside logout view')
     user_data = JWTAuthentication().authenticate(request)
     print(user_data)
@@ -1710,6 +2381,18 @@ def logout_view(request):
     return response
 
 def about(request):
+    """
+    Displays the About page.
+
+    Authenticates the user using JWT, fetches unread notification count,
+    and renders the 'about.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered About page with context data.
+    """
     user_data = JWTAuthentication().authenticate(request)
     user,_=user_data
     print("data",user_data)
@@ -1722,6 +2405,18 @@ def about(request):
     return HttpResponse(html_content)
 
 def privacy(request):
+    """
+    Displays the Privacy Policy page.
+
+    Authenticates the user using JWT, fetches unread notification count,
+    and renders the 'privacy.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered Privacy Policy page with context data.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     user,_=user_data
@@ -1734,6 +2429,18 @@ def privacy(request):
     return HttpResponse(html_content)
 
 def terms(request):
+    """
+    Displays the Terms and Conditions page.
+
+    Authenticates the user using JWT, fetches unread notification count,
+    and renders the 'terms.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered Terms and Conditions page with context data.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     user,_=user_data
@@ -1747,6 +2454,18 @@ def terms(request):
 
 
 def contact(request):
+    """
+    Displays the Contact Us page.
+
+    Authenticates the user using JWT, fetches unread notification count,
+    and renders the 'contactus.html' template with context.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Rendered Contact Us page with context data.
+    """
     user_data = JWTAuthentication().authenticate(request)
     print("data",user_data)
     user,_=user_data

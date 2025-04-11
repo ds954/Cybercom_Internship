@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from .models import UserInfo
 
+"""
+ Serializers in DRF are responsible for converting model instances to a format that can be easily rendered into JSON or other content types (serialization), and also for converting incoming data (like JSON from a request) back into model instances (deserialization).
+"""
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserInfo
