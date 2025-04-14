@@ -49,7 +49,7 @@
     }
 
     a.btn {
-        color: black;
+        color: #000000;
         
     }
     .actions {
@@ -75,6 +75,7 @@
     }
 
     #showLessBtn,#showMoreBtn{ 
+        background-color: #c0c4c6;
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
@@ -106,6 +107,8 @@
         display: flex;
         gap:15px;
         margin-bottom: 15px;
+        
+        justify-content: space-between; align-items: center;
     }
 
     .fa-pencil-alt:before, .fa-pencil:before, .fa-trash:before {
@@ -118,9 +121,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <div class="heading">
         <h1 style="margin-bottom: 0;">Manage Books</h1>
-
+        <div style="display: flex; gap: 5px;">
         <a href="{% url 'bulk_upload_books' %}" class="btn">Import Books</a>
         <a href="{% url 'add_book' %}" class="btn">Add Book</a>
+        </div>
     </div>
 <div class="scrollable-table-container">
     <table class="borrow-history-table">
@@ -176,8 +180,8 @@
 </div>
 
     {% if books|length > 5 %}
-    <button id="showMoreBtn">Show More</button>
-    <button id="showLessBtn" style="display: none;">Show Less</button>
+    <button id="showMoreBtn">Load More</button>
+    <button id="showLessBtn" style="display: none;">Load Less</button>
     {% endif %}
 
 

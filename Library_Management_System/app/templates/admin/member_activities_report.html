@@ -32,10 +32,11 @@
     .hidden-row {
         display: none;
     }
+  
     
     #showMoreBtn1, #showLessBtn1, #showLessBtn3, #showLessBtn4,  
     #showMoreBtn2, #showLessBtn2,#showMoreBtn1,#showMoreBtn3,#showMoreBtn4 {
-        background-color: #f0f0f0; 
+        background-color: #c0c4c6; 
         color: black;
         border: none;
         padding: 10px 20px;
@@ -46,7 +47,7 @@
     }
     
     #showMoreBtn1, #showMoreBtn2, #showMoreBtn3, #showMoreBtn4 {
-        background-color: #f0f0f0;
+        background-color: #c0c4c6;
         color: black;
         border: none;
         padding: 10px 20px;
@@ -86,7 +87,7 @@
         border-collapse: collapse;
     }
 
-    .scrollable-table-container thead th {
+    .scrollable-table-container  th {
         position: sticky;
         top: 0;
         background-color: #89aec1; 
@@ -107,6 +108,10 @@
         display: flex;
         gap:15px;
         margin-bottom: 15px;
+        justify-content: space-between;
+    }
+    .table{
+        max-width: 1200px;
     }
 
 
@@ -161,13 +166,13 @@
 </table>
 </div>
 
-<button id="showMoreBtn1" class="button" style="display: none;">Show More</button>
-<button id="showLessBtn1" class="button" style="display: none;">Show Less</button>
+<button id="showMoreBtn1" class="button" style="display: none;">Load More</button>
+<button id="showLessBtn1" class="button" style="display: none;">Load Less</button>
 
 <!-- Borrow Requests & Notifications Table -->
 <h1>Borrow Requests & Notifications</h1>
 <div class="scrollable-table-container" id="borrowRequestsTable">
-<table  style="margin-bottom: 15px;">
+<table class="table" style="margin-bottom: 15px;">
     <tr>
         <th>User</th>
         <th>Username</th>
@@ -189,8 +194,8 @@
 </table>
 </div>
 
-<button id="showMoreBtn2" class="button" style="display: none;">Show More</button>
-<button id="showLessBtn2" class="button" style="display: none;">Show Less</button>
+<button id="showMoreBtn2" class="button" style="display: none;">Load More</button>
+<button id="showLessBtn2" class="button" style="display: none;">Load Less</button>
 
 <!-- Borrow History Table -->
 <h1>Borrow History</h1>
@@ -204,7 +209,7 @@
 <h3>Total Renewal Requests Rejected: {{ renewal_rejected_count }}</h3>
 <h3>Total Renewal Requests Accepted: {{ renewal_accepted_count }}</h3> -->
 <div class="scrollable-table-container" id="borrowHistoryTable">
-<table  style="margin-bottom: 15px;">
+<table class="table" style="margin-bottom: 15px;">
     <tr>
         <th>User</th>
         <th>Borrowed By</th>
@@ -229,12 +234,12 @@
 </tr>
 </table>
 </div>
-<button id="showMoreBtn3" class="button" style="display: none;">Show More</button>
-<button id="showLessBtn3" class="button" style="display: none;">Show Less</button>
+<button id="showMoreBtn3" class="button" style="display: none;">Load More</button>
+<button id="showLessBtn3" class="button" style="display: none;">Load Less</button>
 
-<div class="scrollable-table-container" id="memberActivityTable">
 <h1 style="margin-top: 15px;">Member Activity</h1>
-<table style="margin-bottom: 15px;">
+<div class="scrollable-table-container" id="memberActivityTable">
+<table class="table" style="margin-bottom: 15px;">
 <tr>
     <th>User</th>
     <th>Username</th>
@@ -268,8 +273,8 @@
 </table>
 </div>
 
-<button id="showMoreBtn4" class="button" style="display: none;">Show More</button>
-<button id="showLessBtn4" class="button" style="display: none;">Show Less</button>
+<button id="showMoreBtn4" class="button" style="display: none;">Load More</button>
+<button id="showLessBtn4" class="button" style="display: none;">Load Less</button>
 
 
 <script>

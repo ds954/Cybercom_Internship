@@ -155,9 +155,7 @@ ul li {
     padding-left: 20px;
 }
 
-.sidebar-menu li:hover .submenu {
-    display: block;
-}
+
 #content{
     padding: 30px;
 }
@@ -208,6 +206,16 @@ td,th{
     font-size: 14px;
     padding: 15px 6px;
 }
+#sidebar {
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+.main-content {
+    overflow-x: auto;
+}
+
 </style>
 
 
@@ -277,11 +285,12 @@ td,th{
             <li><a href="{% url 'custom_admin_dashboard' %}"><i class="fas fa-dashboard"></i><span>Dashboard</span></a></li>
             <li><a href="{% url 'manage_members' %}"><i class="fas fa-users"></i><span>Manage Members</span></a></li>
             <li>
-                <a href="{% url 'manage_books' %}"><i class="fas fa-book"></i><span>Manage Books</span></a>
+                <a href="{% url 'manage_books' %}"><i class="fas fa-book"></i><span class="click_book">Books <i class="fas fa-chevron-down"></i></span></a>
                 <ul class="submenu">
-                    <li><a href="{% url 'admin_issued_book' %}"><i class="fas fa-book-reader"></i> Issued</a></li>
-                    <li><a href="{% url 'admin_returned_book' %}"><i class="fas fa-undo"></i> Returned</a></li>
-                    <li><a href="{% url 'admin_not_returned_book' %}"><i class="fas fa-exclamation-circle"></i> Not Returned</a></li>
+                    <li><a href="{% url 'manage_books' %}"><i class="fas fa-book-open"></i> Manage Books</a></li>
+                    <li><a href="{% url 'admin_issued_book' %}"><i class="fas fa-book-reader"></i> Issued Book</a></li>
+                    <li><a href="{% url 'admin_returned_book' %}"><i class="fas fa-undo"></i> Returned Book</a></li>
+                    <li><a href="{% url 'admin_not_returned_book' %}"><i class="fas fa-exclamation-circle"></i> Not Returned Book</a></li>
                 </ul>
             </li>
             <li>
@@ -300,5 +309,30 @@ td,th{
         </div> 
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const submenuToggles = document.querySelectorAll('.sidebar-menu > li > a ');
+
+        submenuToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                const parentLi = this.parentElement;
+                const submenu = parentLi.querySelector('.submenu');
+
+                // Close other open submenus (optional)
+                document.querySelectorAll('.submenu').forEach(menu => {
+                    if (menu !== submenu) {
+                        menu.style.display = 'none';
+                    }
+                });
+
+                // Toggle this submenu
+                if (submenu) {
+                    e.preventDefault(); // Prevent link redirect
+                    submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock %}

@@ -182,7 +182,7 @@
     }
 
     .div-card {
-        margin-bottom: 70px;
+        margin-bottom: 60px;
     }
 
     .card p {
@@ -190,8 +190,11 @@
     }
 
     .filter-contentt {
-        border-radius: 8px;
-        margin-bottom: 25px;
+        /* border-radius: 8px; */
+        padding: 20px;
+        margin-bottom: 50px;
+        border: 1px solid #ccc;
+        max-width: 1010px;
     }
 
     .filter-form {
@@ -248,6 +251,11 @@
         display: none;
 
     }
+    /* #bookStatusChart , #borrowRequestChart{
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px;
+    } */
 
  
 </style>
@@ -258,7 +266,7 @@
     <h1 style="font-weight: bolder;">Welcome {{ admin_user.username }}</h1>
 
 
-    <div style="display: flex; flex-wrap: wrap; gap: 40px;" class="div-card">
+    <div style="display: flex; flex-wrap: wrap; gap: 30px;" class="div-card">
         <a href="{% url 'admin_user' %}">
             <div class="card members-card">
                 <h1>Members</h1>
@@ -317,31 +325,57 @@
             </div>
         </a>
 
-
+        
      </div>
-        <div style="display: flex; flex-direction: column; gap: 40px; "class="filter-contentt">
+    
+        <div style="display: flex; flex-direction: column; gap: 30px; "class="filter-contentt">
             <div class="filter-container">
                 <form method="POST" class="filter-form">
                     {% csrf_token %}
                     <label for="range">
                     <input type="text" id="range" name="date_range" mbsc-input placeholder="Please select date range...">
                     </label>
-                    <button type="submit" class="filter-btn">Filter</button>
+                    <button type="submit" class="filter-btn">Apply Filter</button>
                 </form>
                 <p id="live-selected-range" style="font-weight: bold; margin-top: 10px; color: green;"></p>
             </div>
 
-
-            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-                <div style="width: 400px; height: 300px;">
-                    <h3>Book Status</h3>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 70px; margin-bottom: 50px;">
+                <div class="statusdiv" style="width: 400px; height: 300px; ">
+                    <h1 style="font-weight: 500;">Book Status</h1>
                     <canvas id="bookStatusChart"></canvas>
                 </div>
-                <div style="width: 400px; height: 300px;">
-                    <h3>Borrow Requests</h3>
+                
+                <div class="statusdiv"   style="width: 400px; height: 300px;">
+                    <h1 style="font-weight: 500;">Borrow Requests</h1>
                     <canvas id="borrowRequestChart"></canvas>
                 </div>
+            
+            
             </div>
+            
+            <form method="post" id="date-filter-form" style="padding: 10px;">
+                {% csrf_token %}
+                <label style="margin-right: 10px; font-weight: 500;">Filter by:</label>
+            
+                <!-- Radio Buttons for Filter -->
+                <label class="radio-button">
+                    <input type="radio" name="filter_period" value="last_week"> Last Week
+                </label>
+                <label class="radio-button">
+                    <input type="radio" name="filter_period" value="last_month"> Last Month
+                </label>
+                <label class="radio-button">
+                    <input type="radio" name="filter_period" value="last_6_months"> Last 6 Months
+                </label>
+                <label class="radio-button">
+                    <input type="radio" name="filter_period" value="last_year"> Last Year
+                </label>
+            </form>
+            
+           
+        
         </div>
     </div>
 </div>
@@ -390,7 +424,30 @@
         </div>
 
     </div>
+    
 </div>
+<style>
+    .radio-button {
+        margin-right: 20px;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .radio-button input[type="radio"] {
+        margin-right: 5px;
+    }
+</style>
+<script>
+    // Listen for changes on the radio buttons
+    document.querySelectorAll('input[name="filter_period"]').forEach((radio) => {
+        radio.addEventListener('change', function () {
+            // Automatically submit the form when a radio button is selected
+            document.getElementById('date-filter-form').submit();
+        });
+    });
+</script>
 <!-- This line includes the Chart.js library from a CDN (Content Delivery Network). Chart.js is a powerful JavaScript library for creating various types of charts. -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

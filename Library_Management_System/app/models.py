@@ -16,7 +16,8 @@ class UserInfo(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
     login_time = models.DateTimeField(null=True, blank=True)  
-    logout_time = models.DateTimeField(null=True, blank=True) 
+    logout_time = models.DateTimeField(null=True, blank=True)
+    is_blocked=models.BooleanField(default=False) 
 
     def __str__(self):
         return self.Username

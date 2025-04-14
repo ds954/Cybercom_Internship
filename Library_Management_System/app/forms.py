@@ -9,7 +9,7 @@ class ProfileForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = UserInfo
-        fields = ['Username', 'email', 'firstname', 'lastname', 'phone', 'profile_picture']
+        fields = ['Username', 'email']
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book

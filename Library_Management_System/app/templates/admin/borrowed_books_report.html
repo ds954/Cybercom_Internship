@@ -51,7 +51,9 @@
     background-color: #89aec1; /* Keep the header visible */
     z-index: 2;
 }
-
+.borrow-history-table{
+    max-width: 1200px;
+}
 .hidden-row {
         display: none;
     }
@@ -64,22 +66,23 @@
         font-size: 1em;
         transition: background-color 0.3s ease;
         margin-bottom: 30px;
+        background-color: #c0c4c6;
     
     }
     #showLessBtn1,#showLessBtn2{
         background-color:#E27474;
     }
     .heading{
-    display: flex;
-    gap:15px;
-    margin-bottom: 15px;
-}
+        display: flex;
+        margin-bottom: 15px;
+        justify-content: space-between;
+    }
 </style>
 <div class="heading">
 <h1>Borrowed Books Report</h1>
 
 
-<button class="button"style="margin-bottom: 15px; margine-right:25px; background-color: #c0c4c6 "><a href="{% url 'download_borrowed_books_report' %}"  class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
+<button class="button"style="margin-bottom: 15px; margine-left:25px; background-color: #c0c4c6 "><a href="{% url 'download_borrowed_books_report' %}"  class="btn " style="text-decoration: none; color: black; ">Download PDF</a></button>
 </div>
 
 
@@ -166,8 +169,8 @@
 </div>
 
 {% if borrowed_books|length > 5 %}
-<button id="showMoreBtn1">Show More</button>
-<button id="showLessBtn1" style="display: none;">Show Less</button>
+<button id="showMoreBtn1">Load More</button>
+<button id="showLessBtn1" style="display: none;">Load Less</button>
 {% endif %}
 
 
@@ -178,7 +181,7 @@
     <thead>
     <tr>
         <th>User</th>
-        <th>Username</th>
+        <th>Firstname</th>
         <th>No of Books Borrowed</th>
     </tr>
     </thead>
@@ -186,7 +189,7 @@
     {% for user in user_borrow_stats %}
     <tr class="borrow-row">
         <td>{{ forloop.counter }}</td>
-        <td>{{ user.Username }}</td>
+        <td>{{ user.firstname| default:'N/A' }}</td>
         <td>{{ user.borrow_count }}</td>
     </tr>
     {% empty %}
@@ -200,8 +203,8 @@
 </div>
 
 {% if user_borrow_stats|length > 5 %}
-<button id="showMoreBtn2">Show More</button>
-<button id="showLessBtn2" style="display: none;">Show Less</button>
+<button id="showMoreBtn2">Load More</button>
+<button id="showLessBtn2" style="display: none;">Load Less</button>
 {% endif %}
 
 

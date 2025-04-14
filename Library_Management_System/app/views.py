@@ -55,6 +55,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from .admin import BookAdmin
 from reportlab.platypus import SimpleDocTemplate
 from django.db.models import Count
+from urllib.parse import urlencode
 
 def admin_profile_view(request):
     """
@@ -123,7 +124,7 @@ def borrowed_books_report(request):
     user_borrow_stats = (
         UserInfo.objects.annotate(
             borrow_count=Count('borrowrequest', filter=Q(borrowrequest__status__in=['accepted', 'renew_accpect']))
-        ).values('id', 'Username', 'borrow_count')
+        ).values('id', 'firstname', 'borrow_count')
     )
     renewal_requests = {r.borrow_id_id: r.request_date for r in RenewalRequests.objects.all()}
     most_borrowed = (
@@ -732,6 +733,112 @@ def custom_admin_dashboard(request):
     })
     return HttpResponse(dashboard_html)
 
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def custom_admin_dashboard(request):
+    print("admin dashboard method is called")
+    users = UserInfo.objects.all()
+    books = Book.objects.all()
+    borrow_requests = BorrowRequest.objects.select_related('user', 'book').all()
+    recent_notifications = Notification.objects.order_by('-timestamp')
+
+    today = now().date()
+    start_date = None
+    end_date = None
+
+    # Handle date range from date picker
+    date_range = request.POST.get('date_range')
+    if date_range:
+        try:
+            start_str, end_str = date_range.split(" - ")
+            start_date = datetime.strptime(start_str.strip(), "%m/%d/%Y").date()
+            end_date = datetime.strptime(end_str.strip(), "%m/%d/%Y").date()
+        except ValueError:
+            print("Invalid date format received.")
+
+    # Handle radio button input
+    filter_period = request.POST.get('filter_period')
+    if filter_period:
+        if filter_period == 'last_week':
+            start_date = today - timedelta(days=7)
+        elif filter_period == 'last_month':
+            start_date = today - timedelta(days=30)
+        elif filter_period == 'last_6_months':
+            start_date = today - timedelta(days=182)
+        elif filter_period == 'last_year':
+            start_date = today - timedelta(days=365)
+        end_date = today
+
+    # Base stats
+    total_issued_books = BorrowRequest.objects.filter(status__in=['accepted', 'renew_accpect']).count()
+    total_pending_borrow_requests = BorrowRequest.objects.filter(status='pending').count()
+    total_pending_renewal_requests = BorrowRequest.objects.filter(status='renewal_requested').count()
+    total_returned_books = BorrowRequest.objects.filter(status='book_returned').count()
+    total_not_returned_books = BorrowRequest.objects.filter(
+        status__in=['accepted', 'renew_accpect', 'renewal_requested'],
+        Duedate__lt=now().date()
+    ).count()
+
+    # Filtered stats
+    if start_date and end_date:
+        print(f"Filtering from {start_date} to {end_date}")
+        filter_borrow_requests = borrow_requests.filter(IssuedDate__range=(start_date, end_date))
+        filter_total_issued_books = BorrowRequest.objects.filter(
+            status__in=['accepted', 'renew_accpect'],
+            IssuedDate__range=(start_date, end_date)
+        ).count()
+        filter_total_pending_borrow_requests = BorrowRequest.objects.filter(
+            status='pending', IssuedDate__range=(start_date, end_date)
+        ).count()
+        filter_total_pending_renewal_requests = BorrowRequest.objects.filter(
+            status='renewal_requested', IssuedDate__range=(start_date, end_date)
+        ).count()
+        filter_total_returned_books = BorrowRequest.objects.filter(
+            status='book_returned', IssuedDate__range=(start_date, end_date)
+        ).count()
+        filter_total_not_returned_books = BorrowRequest.objects.filter(
+            status__in=['accepted', 'renew_accpect', 'renewal_requested'],
+            IssuedDate__range=(start_date, end_date),
+            Duedate__lt=now().date()
+        ).count()
+    else:
+        filter_borrow_requests = borrow_requests
+        filter_total_issued_books = total_issued_books
+        filter_total_pending_borrow_requests = total_pending_borrow_requests
+        filter_total_pending_renewal_requests = total_pending_renewal_requests
+        filter_total_returned_books = total_returned_books
+        filter_total_not_returned_books = total_not_returned_books
+
+    dashboard_html = render_to_string('admin/dashboard.html', {
+        'users': users,
+        'books': books,
+        'borrow_requests': borrow_requests,
+        'notifications': recent_notifications,
+        'admin_user': request.user,
+
+        # Raw totals
+        'total_issued_books': total_issued_books,
+        'total_pending_borrow_requests': total_pending_borrow_requests,
+        'total_pending_renewal_requests': total_pending_renewal_requests,
+        'total_returned_books': total_returned_books,
+        'total_not_returned_books': total_not_returned_books,
+
+        # Filtered data
+        'filter_borrow_requests': filter_borrow_requests,
+        'filter_total_issued_books': filter_total_issued_books,
+        'filter_total_pending_borrow_requests': filter_total_pending_borrow_requests,
+        'filter_total_pending_renewal_requests': filter_total_pending_renewal_requests,
+        'filter_total_returned_books': filter_total_returned_books,
+        'filter_total_not_returned_books': filter_total_not_returned_books,
+
+        # For showing selected range on frontend
+        'start_date': start_date,
+        'end_date': end_date,
+    })
+
+    return HttpResponse(dashboard_html)
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def custom_books(request):
@@ -970,18 +1077,56 @@ def add_member(request):
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
-            member=form.save()
-            AdminActions.objects.create(
-                admin_id=request.user,
-                action_type="Add Member",
-                description=f"Added Member: {member.Username}"
+            username = form.cleaned_data['Username']
+            email = form.cleaned_data['email']
+        
+            base_url='http://127.0.0.1:8000/register/'
+            query=urlencode({'username':username,'email':email})
+            registration_link = f"{base_url}?{query}"
+            print('this is registration link:', registration_link)
+            send_mail(
+                'Complete Your Registration',
+                f'Click the link to register: {registration_link}',
+                settings.EMAIL_HOST_USER,
+                [email],
             )
-            messages.success(request, "Member added successfully!")
+            print('email sent')
+            AdminActions.objects.create(
+                    admin_id=request.user,
+                    action_type="Add Member",
+                    description=f"Added Member: {username}"
+                )
             return redirect('manage_members')
     else:
         form = UserForm()
     user_html = render_to_string('admin/add_member.html', {'form': form})
     return HttpResponse(user_html)
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def block_member(request, user_id):
+    try:
+        user = get_object_or_404(UserInfo, id=user_id)
+        user_info = UserInfo.objects.get(Username=user)
+        user_info.is_blocked = True
+        user_info.save()
+    except UserInfo.DoesNotExist:
+        pass
+    return redirect('manage_members')  
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def unblock_member(request, user_id):
+    try:
+        user = get_object_or_404(UserInfo, id=user_id)
+        user_info = UserInfo.objects.get(Username=user)
+        user_info.is_blocked = False
+        user_info.save()
+    except UserInfo.DoesNotExist:
+        pass
+    return redirect('manage_members') 
 
 @csrf_exempt
 @login_required
@@ -1268,6 +1413,23 @@ def register_view(request):
     - Redirect to OTP verification page
     """
     print("inside register view")
+    if request.method == 'GET':
+        username_qs=request.GET.get('username')
+        email_qs=request.GET.get('email')
+        print('username from query: ',username_qs)
+        print('email from query: ',email_qs)
+        context = {}
+
+        if username_qs:
+            context['username'] = username_qs
+            context['readonly_username'] = True
+        if email_qs:
+            context['email'] = email_qs
+            context['readonly_email'] = True
+
+        html_content = render_to_string('register.html', context)
+        return HttpResponse(html_content)
+    
     if request.method == 'POST':
         username=request.POST.get('username')
         email=request.POST.get('email')
@@ -1412,9 +1574,15 @@ def login_view(request):
             # **Check if user is in UserInfo model**
             try:
                 user_info = UserInfo.objects.get(email=identifier)  # Check if it's an email
+                if user_info.is_blocked:
+                    html_content = render_to_string('login.html', {'error': 'Your account has been blocked by Admin.'})
+                    return HttpResponse(html_content)
             except UserInfo.DoesNotExist:
                 try:
                     user_info = UserInfo.objects.get(Username=identifier)  # Check if it's a username
+                    if user_info.is_blocked:
+                        html_content = render_to_string('login.html', {'error': 'Your account has been blocked'})
+                        return HttpResponse(html_content)
                 except UserInfo.DoesNotExist:
                     html_content = render_to_string('login.html', {'error': 'User does not exist'})
                     return HttpResponse(html_content)

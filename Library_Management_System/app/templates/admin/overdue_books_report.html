@@ -48,6 +48,7 @@
         font-size: 1em;
         transition: background-color 0.3s ease;
         margin: 0 5px; 
+        background-color: #c0c4c6;
     }
 
     #showLessBtn{
@@ -78,6 +79,7 @@
         display: flex;
         gap:15px;
         margin-bottom: 15px;
+        justify-content: space-between;
     }
 
 </style>
@@ -128,8 +130,8 @@
 </div>
 
     {% if overdue_books|length > 5 %}
-    <button id="showMoreBtn">Show More</button>
-    <button id="showLessBtn" style="display: none;">Show Less</button>
+    <button id="showMoreBtn">Load More</button>
+    <button id="showLessBtn" style="display: none;">Load Less</button>
     {% endif %}
 
 {% endblock %}
