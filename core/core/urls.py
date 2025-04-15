@@ -4,5 +4,6 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('home.urls'))
+    path('', include('home.urls')),
+    path('user/', include('API.urls')),
 ]

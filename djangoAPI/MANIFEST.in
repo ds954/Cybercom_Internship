@@ -1,0 +1,6 @@
+recursive-include API/templates *
+recursive-include API/static *
+recursive-include API/migrations *
+recursive-include app/templates *
+recursive-include app/static *
+recursive-include app/migrations *

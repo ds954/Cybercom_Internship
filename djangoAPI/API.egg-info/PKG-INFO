@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: API
+Version: 0.1.0
+Summary: A Django app for user information management
+Author: Dhara Savani
+Author-email: dsm952004@gmail.com
+Requires-Dist: django<5.0,>=3.0
+Requires-Dist: djangorestframework<4.0,>=3.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: requires-dist
+Dynamic: summary
