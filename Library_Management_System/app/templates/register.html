@@ -3,7 +3,23 @@
 {% block title %} Register Page {% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'register.css' %}"> 
+    <link rel="stylesheet" href="{% static 'register.css' %}">
+    <!-- Font Awesome CDN for eye icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #555;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -39,45 +55,48 @@
             </div>
         </div>
 
-        <!-- Other Fields -->
+        <!-- Phone -->
         <label for="phone_number">Phone:</label>
         <input type="text" id="phone_number" name="phone_number" placeholder="Enter your phone number">
 
+        <!-- Password -->
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your Password" required>
+        <div class="password-container">
+            <input type="password" id="password" name="password" placeholder="Enter your Password" required>
+            <i class="fa-solid fa-eye toggle-visibility" onclick="togglePassword('password', this)"></i>
+        </div>
 
+        <!-- Confirm Password -->
         <label for="confirm-password">Confirm Password:</label>
-        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your Password" required>
-
-        <label class="show-password">
-            <input type="checkbox" id="showPassword" onclick="togglePasswordVisibility()"> Show Password
-        </label>
+        <div class="password-container">
+            <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your Password" required>
+            <i class="fa-solid fa-eye toggle-visibility" onclick="togglePassword('confirm-password', this)"></i>
+        </div>
 
         {% if error %}
             <p style="color: red;">{{ error }}</p>
         {% endif %}
 
-        <p class="login-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
-
         <button type="submit">Sign Up</button>
+
+        <p class="login-text">Already have an account? <a href="{% url 'login' %}">Login</a></p>
     </form>
 </div>
-
 {% endblock %}
 
 {% block extra_scripts %}
-    <script>
-        function togglePasswordVisibility() {
-            var passwordField = document.getElementById("password");
-            var confirmPasswordField = document.getElementById("confirm-password");
-
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                confirmPasswordField.type = "text";
-            } else {
-                passwordField.type = "password";
-                confirmPasswordField.type = "password";
-            }
+<script>
+    function togglePassword(fieldId, icon) {
+        const input = document.getElementById(fieldId);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
         }
-    </script>
+    }
+</script>
 {% endblock %}

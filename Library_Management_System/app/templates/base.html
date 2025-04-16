@@ -4,6 +4,9 @@
 
 {% block title %}User Dashboard{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'base.css' %}"> 
+{% endblock %}
 {% block branding %}
 <!-- Remove default Django admin branding -->
 {% endblock %}
@@ -11,7 +14,6 @@
 {% block breadcrumbs %}
 <!-- Remove breadcrumbs if not needed -->
 {% endblock %}
-
 {% block nav-global %}
 <style>
     html,body{
