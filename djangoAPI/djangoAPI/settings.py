@@ -24,6 +24,67 @@ SECRET_KEY = "django-insecure-53pv!%9_*u(u+8pv^xj%8&5du&h8q_hm#h0_cz=nc@afw@&$3#
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://7e463cac1b8430bd2568c512c049e25f@o4509162955472896.ingest.us.sentry.io/4509162958356480",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
+# SSL/TLS: Protocols that provide secure communication channels.
+# HTTPS: Encrypts data in transit using SSL/TLS.
+
+SECURE_SSL_REDIRECT = True  # Redirect all non-HTTPS requests to HTTPS
+# Session expiration
+SESSION_COOKIE_AGE = 1800  # 30 minutes
+
+# Secure cookie flags
+SESSION_COOKIE_SECURE = True        # Only send cookies over HTTPS
+SESSION_COOKIE_HTTPONLY = True      # Prevent JS access to session cookies
+
+# Enable CSRF protection
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+
+
+# Cross-Origin Resource Sharing (CORS) is a critical functionality in web security, allowing or restricting web applications to interact with resources from domains other than their own.
+
+# CORS defines a way for web servers to allow web applications running at different origins to access selected resources. When a client from origin example.com tries to access your API at api.mydomain.com, the server at api.mydomain.com must explicitly allow this interaction.
+
+# Common Vulnerabilities
+# Open CORS Policy: Allowing all origins unrestricted access can lead to data leakage and unauthorized access.
+# Lack of CORS Preflight Checks: Not validating OPTIONS requests can allow malicious sites to skip CORS restrictions.
+
+CORS_ALLOW_CREDENTIALS = True 
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',  
+    'http://localhost:8000',
+]
+# CORS_ALLOW_ALL_ORIGINS = True
+
+# Content security Policy
+# A browser-side security layer that tells the browser what sources of scripts/styles are trusted.
+# Let’s say your frontend (served by Django or anywhere else) loads data from API and also includes untrusted JS or 3rd party scripts. If an attacker injects malicious JS into your site, CSP blocks it.
+
+
+# XSS :XSS is when an attacker injects malicious JavaScript into a page that gets rendered to users.
+# This mostly happens in web pages, not JSON APIs. But if your API accepts user-generated content (like comments, usernames), and a frontend displays it without escaping, then XSS can happen.
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'none'",)
+CSP_STYLE_SRC = ("'self'",)
+
+CSP_REPORT_ONLY = True  # Set to False to enforce
+CSP_REPORT_URI = '/csp-report/'  # Django endpoint
+
 
 ALLOWED_HOSTS = []
 
@@ -31,6 +92,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_prometheus',
+    'corsheaders',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -38,10 +101,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "API",
-    "rest_framework"
+    "rest_framework",
+    "rest_framework.authtoken",
+    "sslserver",
 ]
 
+# The `XFrameOptionsMiddleware` is designed to protect your site from clickjacking attacks.
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -49,10 +117,34 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "djangoAPI.urls"
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+         'user': '100/day',         # Authenticated users: 100 requests per day
+        'user_create': '2/day',   # Scoped throttle for user creation
+        'user_update': '20/day',   # Scoped throttle for update/delete
+        'secure_api': '50/day',    # Scoped throttle for secure_api endpoint
+    }
+}
+# Rate Limiting: Limits the number of requests a client can make in a given time period.
+# Throttling: Delays responses after a certain threshold of requests is reached.
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
