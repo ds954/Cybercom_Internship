@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Comments</title>
+</head>
+<body>
+    <h2>Live Comment </h2>
+    
+    <div id="comments">
+        {% for c in data %}
+            <p>{{ c.comment_text }}</p>
+        {% endfor %}
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="comment" id="comment" placeholder="Type a comment">
+        <button type="submit" style="cursor: pointer;">Post</button>
+    </form>
+
+
+    <script>
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/comment/');
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            const comment = data.message;
+            const commentBox = document.getElementById('comments');
+            const p = document.createElement('p');
+            p.textContent = comment;
+            commentBox.appendChild(p);
+        };
+
+        socket.onopen = function() {
+            console.log('WebSocket connected');
+        };
+
+        socket.onclose = function(e) {
+            console.log('WebSocket disconnected');
+        };
+    </script>
+</body>
+</html>

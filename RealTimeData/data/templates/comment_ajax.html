@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Comments</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Live Comment</h2>
+    
+    <div id="comments">
+        {% for comment in comments %}
+            <p>{{ comment.comment_text }}</p>
+        {% endfor %}
+    </div>
+    <form action="" method="post">
+    <input type="text" id="commentInput" placeholder="Enter comment">
+    <button id="postBtn">Post</button>
+    </form>
+
+
+    <script>
+        $('#postBtn').click(function() {
+            const commentText = $('#commentInput').val();
+            if (commentText.trim() !== '') {
+                $.ajax({
+                    url: '/post-comment/',
+                    method: 'POST',
+                    
+                    success: function(response) {
+                        $('#comments').prepend('<p>' + response.comment + '</p>');
+                        $('#commentInput').val('');
+                    },
+                    error: function() {
+                        alert('Failed to post comment.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
