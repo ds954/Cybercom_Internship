@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCreateList,UserUpdate,secure_api,csp_report
+from .views import UserCreateList,UserUpdate,secure_api,csp_report,CSPReportAPIView
 from rest_framework.authtoken.views import obtain_auth_token
 
 def trigger_error(request):
@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/secure/', secure_api),
     path('sentry-debug/', trigger_error),
      path('csp-report/',csp_report , name='csp_report'),
+     path('csp-report1/',CSPReportAPIView.as_view() , name='csp_report'),
 
 ]
 

@@ -19,6 +19,7 @@ from django.urls import path,include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("user/",include('API.urls')),
-    path("",include('django_prometheus.urls'))
+    path("",include('API.urls')),
+    path("",include('django_prometheus.urls')),
+     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]

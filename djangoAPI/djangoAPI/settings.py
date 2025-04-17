@@ -36,6 +36,7 @@ sentry_sdk.init(
 # SSL/TLS: Protocols that provide secure communication channels.
 # HTTPS: Encrypts data in transit using SSL/TLS.
 
+# Secure Sockets Layer, and TLS stands for Transport Layer Security
 SECURE_SSL_REDIRECT = True  # Redirect all non-HTTPS requests to HTTPS
 # Session expiration
 SESSION_COOKIE_AGE = 1800  # 30 minutes
@@ -66,9 +67,12 @@ CORS_ALLOW_METHODS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000',  
-    'http://localhost:8000',
+    'http://127.0.0.1:3000',  
+    # 'http://localhost:8000',
 ]
 # CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
+
 
 # Content security Policy
 # A browser-side security layer that tells the browser what sources of scripts/styles are trusted.
@@ -78,12 +82,25 @@ CORS_ALLOWED_ORIGINS = [
 # XSS :XSS is when an attacker injects malicious JavaScript into a page that gets rendered to users.
 # This mostly happens in web pages, not JSON APIs. But if your API accepts user-generated content (like comments, usernames), and a frontend displays it without escaping, then XSS can happen.
 
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'none'",)
-CSP_STYLE_SRC = ("'self'",)
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_SCRIPT_SRC = ("'none'",)
+# CSP_STYLE_SRC = ("'self'",)
 
-CSP_REPORT_ONLY = True  # Set to False to enforce
-CSP_REPORT_URI = '/csp-report/'  # Django endpoint
+# CSP_REPORT_ONLY = True  # Set to False to enforce
+# CSP_REPORT_URI = '/csp-report/'  # Django endpoint
+
+# settings.py
+
+
+CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "script-src": ("'none'",),
+        "style-src": ("'self'",),
+        "report-uri": "/csp-report/"
+    }
+}
+
 
 
 ALLOWED_HOSTS = []
@@ -92,7 +109,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'oauth2_provider',
     'django_prometheus',
+    'csp',
     'corsheaders',
     "django.contrib.admin",
     "django.contrib.auth",
@@ -118,6 +137,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django_prometheus.middleware.PrometheusAfterMiddleware',
+    'csp.middleware.CSPMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
 
 ROOT_URLCONF = "djangoAPI.urls"
@@ -132,16 +153,19 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
+        # 'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
         'rest_framework.throttling.ScopedRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
          'user': '100/day',         # Authenticated users: 100 requests per day
-        'user_create': '2/day',   # Scoped throttle for user creation
+        'user_create': '5/day',   # Scoped throttle for user creation
         'user_update': '20/day',   # Scoped throttle for update/delete
         'secure_api': '50/day',    # Scoped throttle for secure_api endpoint
-    }
+    },
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ],
 }
 # Rate Limiting: Limits the number of requests a client can make in a given time period.
 # Throttling: Delays responses after a certain threshold of requests is reached.
