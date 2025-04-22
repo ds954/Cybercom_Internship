@@ -70,6 +70,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',  
     # 'http://localhost:8000',
 ]
+# CORS_ORIGIN_WHITELIST='http://127.0.0.1:3000',
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
 
@@ -92,16 +93,63 @@ CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
 # settings.py
 
 
-CONTENT_SECURITY_POLICY_REPORT_ONLY = {
-    "DIRECTIVES": {
-        "default-src": ("'self'",),
-        "script-src": ("'none'",),
-        "style-src": ("'self'",),
-        "report-uri": "/csp-report/"
-    }
-}
+# CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+#     "DIRECTIVES": {
+#         "default-src": ("'self'",),
+#         "script-src": ("'none'",),
+#         "style-src": ("'self'",),
+#         "report-uri": "/csp-report/"
+#     }
+# }
+# CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+#     "DIRECTIVES": {
+#         "default-src": ("'self'",),               # Allow content only from the same origin
+#         # "script-src": ("'self'",),                # Allow scripts only from the same origin
+#         "script-src":("'none'"),
+#         "style-src": ("'self'",'unsafe-inline'),                 
+#         "img-src": ("'self'",),                   # Allow images only from the same origin
+#         "connect-src": ("'self'",),               # Allow AJAX requests only to the same origin
+#         "font-src": ("'self'",),                  # Allow fonts only from the same origin
+#         "object-src": ("'none'",),                # Disallow object (e.g., Flash)
+#         "frame-src": ("'none'",),                 # Disallow framing (X-Frame-Options equivalent)
+#         "base-uri": ("'none'",),                  # Disallow base URIs
+#         "form-action": ("'self'",),               # Allow forms only to submit to the same origin
+#         "frame-ancestors": ("'none'",),           # Prevent embedding in a frame
+#         "report-uri": "/csp-report/"       
+#     }
+# }
 
+# This ensures the current page can only interact with pages from the same origin,
+# providing strong protection against cross-origin attacks (like Spectre).
+# Required for enabling cross-origin isolation and using features like SharedArrayBuffer.
+SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin"
 
+# Same as above, but allows popups to stay connected (weaker isolation).
+SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"
+
+#No protection. Risk of Spectre-style cross-origin leaks.
+SECURE_CROSS_ORIGIN_OPENER_POLICY=None
+
+# Only load cross-origin resources that explicitly allow it via CORP header.
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = "require-corp"
+
+# No embedding restrictions. Not secure.
+SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None
+
+# Cross-Origin-Resource-Policy (CORP)	
+# "same-origin":Only allow same-origin pages to use this resource (like images, scripts).
+# "same-site":Allow resources to be shared across subdomains of the same site.
+# "cross-origin":Allow all origins to embed this resource. Least restrictive.
+
+"""
+The Referer HTTP header is an optional header field that identifies the URL of the web page that initiated a request. It essentially tells the server where the request came from, allowing the server to track the user's navigation path.
+"""
+# no-referrer: Never send the Referer header.
+# same-origin: Send the Referrer header, but only on same-origin requests.
+# strict-origin: Send the Referrer header to all origins, but only include the URL without the path (e.g., https://example.com/).
+# strict-origin-when-cross-origin: Send the full Referrer header on same-origin requests and only the URL without the path on cross-origin requests. This is the default value.
+
+SECURE_REFERRER_POLICY="no-referrer"
 
 ALLOWED_HOSTS = []
 
@@ -123,6 +171,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "sslserver",
+    'django_extensions',
+    'sri'
 ]
 
 # The `XFrameOptionsMiddleware` is designed to protect your site from clickjacking attacks.
@@ -140,9 +190,96 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
-
+AUTHENTICATION_BACKENDS = [
+    'oauth2_provider.backends.OAuth2Backend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+# Use admin login for OAuth
+LOGIN_URL = '/admin/login/'
 ROOT_URLCONF = "djangoAPI.urls"
 
+LOGIN_REDIRECT_URL = "/"
+OAUTH2_PROVIDER = {
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+    },
+    'PKCE_REQUIRED': False,  # Set to True for better security with PKCE
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
+    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,
+
+}
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'level': 'INFO',
+#             'formatter': 'simpleFormatter',
+#         },
+#     },
+#     'loggers': {
+#         '': {  # Root logger (applies to all loggers if not overridden)
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#         },
+#     },
+#     'formatters': {
+#         'simpleFormatter': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+# }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{asctime} {levelname} [{name}:{lineno}] {module} - {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'my_app.log',  # Specify the path to your log file
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB - Maximum size of the log file before rotation
+            'backupCount': 5,           # Keep up to 5 backup log files
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'my_app': {  # A specific logger for your application code (you can adjust the name)
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,  # Prevent messages from propagating to the root logger
+        },
+        'django': {  # Django's own logs
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        '': {  # Root logger - handles anything not caught by specific loggers
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
+    },
+}
+
+OAUTHLIB_INSECURE_TRANSPORT = '1'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -159,13 +296,16 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
          'user': '100/day',         # Authenticated users: 100 requests per day
-        'user_create': '5/day',   # Scoped throttle for user creation
-        'user_update': '20/day',   # Scoped throttle for update/delete
+        'user_create': '4/day',   # Scoped throttle for user creation
+        'user_update': '5/day',   # Scoped throttle for update/delete
         'secure_api': '50/day',    # Scoped throttle for secure_api endpoint
     },
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 # Rate Limiting: Limits the number of requests a client can make in a given time period.
 # Throttling: Delays responses after a certain threshold of requests is reached.
@@ -184,6 +324,11 @@ TEMPLATES = [
         },
     },
 ]
+import os
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 
 WSGI_APPLICATION = "djangoAPI.wsgi.application"
 

@@ -5,11 +5,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from rest_framework.throttling import ScopedRateThrottle
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
-
+from rest_framework.views import APIView
+from oauth2_provider.views.generic import ProtectedResourceView
+from django.http import HttpResponse
+from django.shortcuts import render
 
 # @authentication_classes([TokenAuthentication])
 # @permission_classes([IsAuthenticated])
@@ -18,6 +22,7 @@ class UserCreateList(generics.ListCreateAPIView):
     serializer_class = UserSerializers
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'user_create'
+    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
 
 
 @authentication_classes([TokenAuthentication])
@@ -59,9 +64,6 @@ def csp_report(request):
 #         return JsonResponse({'message': 'CSP report received successfully'}, status=200)
 #     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-import json
 
 class CSPReportAPIView(APIView):
     def post(self, request, *args, **kwargs):
@@ -72,3 +74,30 @@ class CSPReportAPIView(APIView):
         except Exception as e:
             print(f"Error: {e}")
         return Response({"message": "CSP report received."})
+
+class ApiEndpoint(ProtectedResourceView):
+    def get(self,request,*arg,**kwargs):
+        return HttpResponse("Protected with OAuth2!")
+
+import logging
+
+logger = logging.getLogger('my_app')  # Get a logger instance for the current module
+
+def my_view(request):
+    logger.info("Handling request for my_view")
+    logger.debug("This is a debug message")
+    logger.info("This is an info message")
+    logger.warning("This is a warning message")
+    logger.error("This is an error message")
+    logger.critical("This is a critical message")
+    try:
+        # Some code that might raise an exception
+        result = 1 / 0
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        # ... handle the error ...
+    logger.debug("Finished processing my_view")
+    return HttpResponse("Done")
+
+def login_view(request):
+    return render(request,'registrations/login.html')
