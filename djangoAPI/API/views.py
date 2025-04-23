@@ -14,15 +14,25 @@ from rest_framework.views import APIView
 from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.shortcuts import render
+from django_ratelimit.decorators import ratelimit
+from django.http import HttpResponse
+from .throttling import PaidUserRateThrottle,FreeUserRateThrottle,UserSpecificRateThrottle,DynamicUserRateThrottle
 
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
+def user_rate(request, view):
+    if hasattr(request, 'user') and request.user.is_authenticated:
+        return "4/m" if request.user.is_staff else "2/m"
+    return "1/m"  # anonymous fallback
+
+# @ratelimit(key='user', rate=user_rate)
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 class UserCreateList(generics.ListCreateAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = UserSerializers
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'user_create'
-    permission_classes = [IsAuthenticated, TokenHasReadWriteScope]
+    throttle_classes = [DynamicUserRateThrottle]
+    throttle_scope = 'user'
+    
+
 
 
 @authentication_classes([TokenAuthentication])
@@ -30,8 +40,8 @@ class UserCreateList(generics.ListCreateAPIView):
 class UserUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = UserSerializers
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'user_update'
+    throttle_classes = [PaidUserRateThrottle]
+    throttle_scope = 'paid'
 
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
@@ -101,3 +111,16 @@ def my_view(request):
 
 def login_view(request):
     return render(request,'registrations/login.html')
+
+@ratelimit(key='user', rate='2/m') # 5 requests per minute
+def rate_view(request):
+    return HttpResponse("Success")
+
+@ratelimit(key='user', rate='2/m') # 10 requests per minute
+def another_view(request):
+    return HttpResponse("Success")
+
+
+@ratelimit(key='user', rate=user_rate)
+def dynamic_rate_view(request):
+    return HttpResponse("Success")

@@ -124,3 +124,11 @@
 2025-04-22 14:00:05,937 CRITICAL [my_app:92] views - 26292 22056 This is a critical message
 2025-04-22 14:00:05,950 ERROR [my_app:97] views - 26292 22056 An error occurred: division by zero
 2025-04-22 14:00:05,964 DEBUG [my_app:99] views - 26292 22056 Finished processing my_view
+2025-04-23 10:16:50,432 INFO [my_app:87] views - 3180 6148 Handling request for my_view
+2025-04-23 10:16:50,433 DEBUG [my_app:88] views - 3180 6148 This is a debug message
+2025-04-23 10:16:50,434 INFO [my_app:89] views - 3180 6148 This is an info message
+2025-04-23 10:16:50,434 WARNING [my_app:90] views - 3180 6148 This is a warning message
+2025-04-23 10:16:50,434 ERROR [my_app:91] views - 3180 6148 This is an error message
+2025-04-23 10:16:50,441 CRITICAL [my_app:92] views - 3180 6148 This is a critical message
+2025-04-23 10:16:50,446 ERROR [my_app:97] views - 3180 6148 An error occurred: division by zero
+2025-04-23 10:16:50,451 DEBUG [my_app:99] views - 3180 6148 Finished processing my_view

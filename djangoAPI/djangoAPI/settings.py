@@ -83,58 +83,44 @@ CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
 # XSS :XSS is when an attacker injects malicious JavaScript into a page that gets rendered to users.
 # This mostly happens in web pages, not JSON APIs. But if your API accepts user-generated content (like comments, usernames), and a frontend displays it without escaping, then XSS can happen.
 
-# CSP_DEFAULT_SRC = ("'self'",)
-# CSP_SCRIPT_SRC = ("'none'",)
-# CSP_STYLE_SRC = ("'self'",)
-
-# CSP_REPORT_ONLY = True  # Set to False to enforce
-# CSP_REPORT_URI = '/csp-report/'  # Django endpoint
 
 # settings.py
 
 
-# CONTENT_SECURITY_POLICY_REPORT_ONLY = {
-#     "DIRECTIVES": {
-#         "default-src": ("'self'",),
-#         "script-src": ("'none'",),
-#         "style-src": ("'self'",),
-#         "report-uri": "/csp-report/"
-#     }
-# }
-# CONTENT_SECURITY_POLICY_REPORT_ONLY = {
-#     "DIRECTIVES": {
-#         "default-src": ("'self'",),               # Allow content only from the same origin
-#         # "script-src": ("'self'",),                # Allow scripts only from the same origin
-#         "script-src":("'none'"),
-#         "style-src": ("'self'",'unsafe-inline'),                 
-#         "img-src": ("'self'",),                   # Allow images only from the same origin
-#         "connect-src": ("'self'",),               # Allow AJAX requests only to the same origin
-#         "font-src": ("'self'",),                  # Allow fonts only from the same origin
-#         "object-src": ("'none'",),                # Disallow object (e.g., Flash)
-#         "frame-src": ("'none'",),                 # Disallow framing (X-Frame-Options equivalent)
-#         "base-uri": ("'none'",),                  # Disallow base URIs
-#         "form-action": ("'self'",),               # Allow forms only to submit to the same origin
-#         "frame-ancestors": ("'none'",),           # Prevent embedding in a frame
-#         "report-uri": "/csp-report/"       
-#     }
-# }
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        "script-src": ["'none'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "img-src": ["'self'", "https://upload.wikimedia.org"],
+        "connect-src": ["'self'"],
+        "font-src": ["'self'"],
+        "object-src": ["'none'"],
+        "frame-src": ["'none'"],
+        "base-uri": ["'none'"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'none'"],
+    }
+}
+
 
 # This ensures the current page can only interact with pages from the same origin,
 # providing strong protection against cross-origin attacks (like Spectre).
 # Required for enabling cross-origin isolation and using features like SharedArrayBuffer.
-SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin"
+# SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin"
 
 # Same as above, but allows popups to stay connected (weaker isolation).
-SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"
+# SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"
 
 #No protection. Risk of Spectre-style cross-origin leaks.
-SECURE_CROSS_ORIGIN_OPENER_POLICY=None
+# SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 
 # Only load cross-origin resources that explicitly allow it via CORP header.
-SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = "require-corp"
+# SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = "require-corp"
 
 # No embedding restrictions. Not secure.
-SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None
+# SECURE_CROSS_ORIGIN_EMBEDDER_POLICY=None
 
 # Cross-Origin-Resource-Policy (CORP)	
 # "same-origin":Only allow same-origin pages to use this resource (like images, scripts).
@@ -149,7 +135,7 @@ The Referer HTTP header is an optional header field that identifies the URL of t
 # strict-origin: Send the Referrer header to all origins, but only include the URL without the path (e.g., https://example.com/).
 # strict-origin-when-cross-origin: Send the full Referrer header on same-origin requests and only the URL without the path on cross-origin requests. This is the default value.
 
-SECURE_REFERRER_POLICY="no-referrer"
+# SECURE_REFERRER_POLICY="no-referrer"
 
 ALLOWED_HOSTS = []
 
@@ -283,30 +269,34 @@ OAUTHLIB_INSECURE_TRANSPORT = '1'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
 
     'DEFAULT_THROTTLE_CLASSES': [
-        # 'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-        'rest_framework.throttling.ScopedRateThrottle',
+      
+      
+        'API.throttling.DynamicUserRateThrottle',
+
+        
     ],
     'DEFAULT_THROTTLE_RATES': {
-         'user': '100/day',         # Authenticated users: 100 requests per day
-        'user_create': '4/day',   # Scoped throttle for user creation
-        'user_update': '5/day',   # Scoped throttle for update/delete
-        'secure_api': '50/day',    # Scoped throttle for secure_api endpoint
+        'user': '4/min',  
     },
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-    ],
+    
+   
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    
 }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 # Rate Limiting: Limits the number of requests a client can make in a given time period.
 # Throttling: Delays responses after a certain threshold of requests is reached.
 TEMPLATES = [
