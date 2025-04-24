@@ -1,20 +1,18 @@
 from django.contrib import admin
+from oauth2_provider.models import get_application_model
+from oauth2_provider.admin import ApplicationAdmin as DefaultApplicationAdmin
 from .models import UserInfo
-from django.contrib import admin
-from oauth2_provider.models import Application
-# from rest_framework.authtoken.models import Token 
-# Register your models here.
+
 admin.site.register(UserInfo)
+Application = get_application_model()
 
-admin.site.unregister(Application)
+# Unregister the default one if it's already registered
+if admin.site.is_registered(Application):
+    admin.site.unregister(Application)
 
-class OAuthClientAdmin(admin.ModelAdmin):
-    readonly_fields = ('client_id', 'client_secret')  # make them read-only
+# Define your custom admin class
+class CustomApplicationAdmin(DefaultApplicationAdmin):
+    readonly_fields = ('client_id', 'client_secret')
 
-admin.site.register(Application, OAuthClientAdmin)
-
-
-
-# class Tokendisplay(admin.ModelAdmin):
-#     list_display=['key','user', 'created']
-# admin.site.register(Token, Tokendisplay)
+# Register it again with your custom admin class
+admin.site.register(Application, CustomApplicationAdmin)

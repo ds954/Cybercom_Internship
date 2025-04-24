@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import *
+from .views import UserListView, UserDetailView
 urlpatterns = [
    
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
@@ -22,4 +23,6 @@ urlpatterns = [
     path('cancel_borrow_request/<int:pk>/', CancelBorrowRequestView.as_view(), name='cancel_borrow_request'),
     path('return_book/<int:pk>/', ReturnBookView.as_view(), name='return_book'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('api/users/', UserListView.as_view(), name='user-list'),
+    path('api/users/<int:pk>/', UserDetailView.as_view(), name='user-detail'),
 ]

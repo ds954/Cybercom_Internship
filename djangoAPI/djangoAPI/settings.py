@@ -143,6 +143,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "API",
     'oauth2_provider',
     'django_prometheus',
     'csp',
@@ -153,12 +154,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "API",
     "rest_framework",
     "rest_framework.authtoken",
     "sslserver",
     'django_extensions',
-    'sri'
+    'sri',
+    'revproxy.apps.RevProxyConfig'
 ]
 
 # The `XFrameOptionsMiddleware` is designed to protect your site from clickjacking attacks.
@@ -274,17 +275,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 
+ 
     'DEFAULT_THROTTLE_CLASSES': [
-      
-      
-        'API.throttling.DynamicUserRateThrottle',
-
-        
+        'API.throttling.RoleBasedThrottle',
+        'API.throttling.PaidUserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'user': '4/min',  
+        'admin': '7/day',
+        'normal': '5/day',
+        'paid': '4/day',
+        'free': '2/day',
     },
-    
    
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -295,6 +296,9 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
+}
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'API.views.custom_exception_handler'
 }
 
 # Rate Limiting: Limits the number of requests a client can make in a given time period.
@@ -314,10 +318,9 @@ TEMPLATES = [
         },
     },
 ]
-import os
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+# import os
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 WSGI_APPLICATION = "djangoAPI.wsgi.application"

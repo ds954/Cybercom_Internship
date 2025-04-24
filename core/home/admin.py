@@ -5,7 +5,9 @@ from .models import Notification,UserRequest
 from asgiref.sync import async_to_sync
 from django.http import HttpResponseRedirect
 from django.urls import path
+from API.models import UserInfo
 
+admin.site.register(UserInfo)
 
 
 @admin.register(UserRequest)

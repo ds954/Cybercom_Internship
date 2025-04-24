@@ -1,3 +1,12 @@
+import base64
+import hashlib
+from Crypto.Cipher import AES
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import requests
+from django.http import HttpResponse
+import os
+from django.conf import settings
 from rest_framework import generics
 from .models import UserInfo
 from .Serializers import UserSerializers
@@ -16,24 +25,46 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django_ratelimit.decorators import ratelimit
 from django.http import HttpResponse
-from .throttling import PaidUserRateThrottle,FreeUserRateThrottle,UserSpecificRateThrottle,DynamicUserRateThrottle
+from .throttling import PaidUserRateThrottle,FreeUserRateThrottle,RoleBasedThrottle
+from rest_framework.views import exception_handler
+from rest_framework.exceptions import Throttled
 
-def user_rate(request, view):
-    if hasattr(request, 'user') and request.user.is_authenticated:
-        return "4/m" if request.user.is_staff else "2/m"
-    return "1/m"  # anonymous fallback
+# def user_rate(request, view):
+#     if hasattr(request, 'user') and request.user.is_authenticated:
+#         return "4/m" if request.user.is_staff else "2/m"
+#     return "1/m"  # anonymous fallback
+# gateway/views.py
+import requests
+from django.http import JsonResponse
+from django.views import View
+from django.conf import settings
+from revproxy.views import ProxyView
 
-# @ratelimit(key='user', rate=user_rate)
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
+
+class UserMicroserviceView(APIView):
+    def get(self, request):
+        response = requests.get('http://localhost:8001/api/user/api/users/')
+        print("this is response",response)
+        return Response(response.json())
+
+class ProductMicroserviceView(APIView):
+    def get(self, request):
+        response = requests.get('http://localhost:8002/api/products/')
+        return Response(response.json())
+
+# class TestProxyView(ProxyView):
+#     upstream = 'http://127.0.0.1:3000'
+
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
 class UserCreateList(generics.ListCreateAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = UserSerializers
-    throttle_classes = [DynamicUserRateThrottle]
-    throttle_scope = 'user'
-    
-
-
+    throttle_classes = [RoleBasedThrottle]
+    permission_classes=[IsAuthenticated]
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -41,14 +72,12 @@ class UserUpdate(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = UserSerializers
     throttle_classes = [PaidUserRateThrottle]
-    throttle_scope = 'paid'
 
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def secure_api(request):
     return Response({'message': 'Hello, Authenticated User!'})
-
 
 @csrf_exempt
 def csp_report(request):
@@ -61,25 +90,11 @@ def csp_report(request):
     return JsonResponse({'status': 'CSP report received'})
     # return JsonResponse({'error': 'Forced error for testing'}, status=500)
 
-
-# @csrf_exempt
-# def csp_report(request):
-#     if request.method == 'POST':
-#         # Simulating an error if a certain condition is met
-#         if 'blocked-uri' not in request.POST:
-#             print("missing blcked-uri")
-#             return JsonResponse({'error': 'Missing blocked-uri'}, status=400)
-        
-#         # Otherwise, process the report as usual
-#         return JsonResponse({'message': 'CSP report received successfully'}, status=200)
-#     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
-
-
 class CSPReportAPIView(APIView):
     def post(self, request, *args, **kwargs):
         try:
             report = json.loads(request.body)
-            print("🚨 CSP Violation Detected:")
+            print(" CSP Violation Detected:")
             print(json.dumps(report, indent=4))
         except Exception as e:
             print(f"Error: {e}")
@@ -112,15 +127,80 @@ def my_view(request):
 def login_view(request):
     return render(request,'registrations/login.html')
 
-@ratelimit(key='user', rate='2/m') # 5 requests per minute
+# @ratelimit(key='user', rate='2/m') # 5 requests per minute
 def rate_view(request):
     return HttpResponse("Success")
 
-@ratelimit(key='user', rate='2/m') # 10 requests per minute
+# @ratelimit(key='user', rate='2/m') # 10 requests per minute
 def another_view(request):
     return HttpResponse("Success")
 
 
-@ratelimit(key='user', rate=user_rate)
+# @ratelimit(key='user', rate=user_rate)
 def dynamic_rate_view(request):
     return HttpResponse("Success")
+
+BASE_DIR = settings.BASE_DIR
+verify_path = os.path.join(BASE_DIR, "localhost.crt")
+
+def decrypt_aes_cbc(cipher_text_base64, key_base64, iv_base64):
+    key = base64.b64decode(key_base64)
+    iv = base64.b64decode(iv_base64)
+    cipher_text = base64.b64decode(cipher_text_base64)
+
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    decrypted = cipher.decrypt(cipher_text)
+
+    # Remove PKCS7 padding
+    pad_len = decrypted[-1]
+    decrypted = decrypted[:-pad_len]
+
+    return decrypted.decode("utf-8")
+
+@csrf_exempt
+def secure_token_proxy(request):
+    print("POST DATA:", request.POST)
+
+    try:
+        enc_username = request.POST.get("username")
+        enc_password = request.POST.get("password")
+        print(f"Encrypted Username: {enc_username.strip()}")
+        print(f"Encrypted Password: {enc_password.strip()}")
+
+
+        key = "aBT5RV2hhL7lSMB/Tv0suAnMed9tdYIQn7MLqbpX37Q="  # base64
+        iv = "AAAAAAAAAAAAAAAAAAAAAA=="  # base64 16-byte
+
+        username = decrypt_aes_cbc(enc_username, key, iv)
+        password = decrypt_aes_cbc(enc_password, key, iv)
+
+        print("username:", username)
+        print("password:", password)
+
+        data = {
+            "grant_type": "password",
+            "username": username,
+            "password": password,
+            "client_id": "dXmilM4gr2qb8okFhWBiKNMlsBW0IQ9OF2xGcu9L",
+            "client_secret": "eHixGBYIC4pIH0kadjeRLYAuf4ma9VbdX5Ou6zSL03pmAy8J1fM1270lxrZXpZ9m1f0gP16zTciaZDWejeWLYmluWq79B2jWhlkeqUspfNq1pQpZSTciXvrMYUw1opjb"
+        }
+
+        # Send POST request to get token
+        response = requests.post("https://localhost:8000/o/token/", data=data,verify=verify_path)
+
+        # Return the response from the token endpoint
+        return JsonResponse(response.json(), status=response.status_code)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+
+def custom_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+
+    if isinstance(exc, Throttled) and response is not None:
+        wait_seconds = int(exc.wait)
+        wait_hours = round(wait_seconds / 3600)
+        response.data['detail'] = f"Request was throttled. Try again after {wait_hours} hours."
+
+    return response

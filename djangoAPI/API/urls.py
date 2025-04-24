@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import UserCreateList,UserUpdate,secure_api,csp_report,CSPReportAPIView,ApiEndpoint,my_view,login_view,dynamic_rate_view,another_view,rate_view
+from .views import UserCreateList,UserUpdate,secure_api,csp_report,CSPReportAPIView,ApiEndpoint,my_view,login_view,dynamic_rate_view,another_view,rate_view,secure_token_proxy
 from rest_framework.authtoken.views import obtain_auth_token
+from django.urls import re_path
+from API.views import UserMicroserviceView, ProductMicroserviceView
 
 def trigger_error(request):
     division_by_zero = 1 / 0
@@ -19,6 +21,11 @@ urlpatterns = [
      path('dynamic/',dynamic_rate_view,name="dynamic"),
      path('rate/',rate_view,name="rate"),
      path('another/',another_view,name="another"),
+     path('api/secure-token/', secure_token_proxy, name='secure_token_proxy'),
+    #   path('api/auth/', EncryptedAuthView.as_view(), name='encrypted-auth'),
+    # re_path(r'(?P<path>.*)', TestProxyView.as_view()),
+    path('api/users/', UserMicroserviceView.as_view(), name='user_microservice'),
+    path('api/products/', ProductMicroserviceView.as_view(), name='product_microservice'),
 
 ]
 

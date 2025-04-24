@@ -16,7 +16,17 @@ from rest_framework.renderers import TemplateHTMLRenderer
 
 User = settings.AUTH_USER_MODEL
 
+from rest_framework import generics
 
+from .serializers import UserSerializer
+
+class UserListView(generics.ListCreateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
