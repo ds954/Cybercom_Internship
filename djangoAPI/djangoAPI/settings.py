@@ -71,8 +71,8 @@ CORS_ALLOWED_ORIGINS = [
     # 'http://localhost:8000',
 ]
 # CORS_ORIGIN_WHITELIST='http://127.0.0.1:3000',
-# CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
 
 
 # Content security Policy
@@ -88,21 +88,21 @@ CORS_ALLOW_ALL_ORIGINS = False  # This should be False for stricter security
 
 
 
-CONTENT_SECURITY_POLICY = {
-    "DIRECTIVES": {
-        "default-src": ["'self'"],
-        "script-src": ["'none'"],
-        "style-src": ["'self'", "'unsafe-inline'"],
-        "img-src": ["'self'", "https://upload.wikimedia.org"],
-        "connect-src": ["'self'"],
-        "font-src": ["'self'"],
-        "object-src": ["'none'"],
-        "frame-src": ["'none'"],
-        "base-uri": ["'none'"],
-        "form-action": ["'self'"],
-        "frame-ancestors": ["'none'"],
-    }
-}
+# CONTENT_SECURITY_POLICY = {
+#     "DIRECTIVES": {
+#         "default-src": ["'self'"],
+#         "script-src": ["'none'"],
+#         "style-src": ["'self'", "'unsafe-inline'"],
+#         "img-src": ["'self'", "https://upload.wikimedia.org"],
+#         "connect-src": ["'self'"],
+#         "font-src": ["'self'"],
+#         "object-src": ["'none'"],
+#         "frame-src": ["'none'"],
+#         "base-uri": ["'none'"],
+#         "form-action": ["'self'"],
+#         "frame-ancestors": ["'none'"],
+#     }
+# }
 
 
 # This ensures the current page can only interact with pages from the same origin,
@@ -146,7 +146,7 @@ INSTALLED_APPS = [
     "API",
     'oauth2_provider',
     'django_prometheus',
-    'csp',
+    # 'csp',
     'corsheaders',
     "django.contrib.admin",
     "django.contrib.auth",
@@ -174,9 +174,15 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'django_prometheus.middleware.PrometheusAfterMiddleware',
-    'csp.middleware.CSPMiddleware',
+    # 'csp.middleware.CSPMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
 ]
+
+# CROS_ORIGIN_OPENER_POLICY ="same-origin"
+# SECURE_CROSS_ORIGIN_OPENER_POLICY= "same-origin"
+# SECURE_CROSS_ORIGIN_EMBEDDER_POLICY = "require-corp"
+X_FRAME_OPTIONS = 'ALLOWALL'  
+
 AUTHENTICATION_BACKENDS = [
     'oauth2_provider.backends.OAuth2Backend',
     'django.contrib.auth.backends.ModelBackend',

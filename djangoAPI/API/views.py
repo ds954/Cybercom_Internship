@@ -50,6 +50,7 @@ class UserMicroserviceView(APIView):
         response = requests.get('http://localhost:8001/api/user/api/users/')
         print("this is response",response)
         return Response(response.json())
+    
 
 class ProductMicroserviceView(APIView):
     def get(self, request):
@@ -57,7 +58,58 @@ class ProductMicroserviceView(APIView):
         return Response(response.json())
 
 # class TestProxyView(ProxyView):
-#     upstream = 'http://127.0.0.1:3000'
+#     upstream = 'http://127.0.0.1:3000/'
+
+# views.py
+from django.http import HttpResponse
+
+def malicious_content_view(request):
+    print("called")
+    html = """
+    <html>
+        <head><title>Malicious Page</title></head>
+        <body>
+            <h1>This is a suspicious script injection</h1>
+            <script>
+                alert("🚨 Malicious Script Running!");
+                document.body.innerHTML += "<p>Trying to steal data...</p>";
+            </script>
+        </body>
+    </html>
+    """
+    response = HttpResponse(html, content_type="text/html")
+
+    # Apply STRONG security headers to block cross-origin access
+    # response["Cross-Origin-Opener-Policy"] = "same-origin"
+    # response["Cross-Origin-Resource-Policy"] = "same-origin"
+    # response["Cross-Origin-Embedder-Policy"] = "require-corp"
+    response["X-Frame-Options"] = "ALLOWALL" 
+    # response["X-Frame-Options"] = "DENY" 
+  
+    # response["X-Content-Type-Options"]="nosniff"
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
+def malicious_script(request):
+    html = """
+    <html>
+        <body>
+            <h2>Malicious Content</h2>
+            <script>alert("🚨 Malicious Script Running!");</script>
+        </body>
+    </html>
+    """
+    response = HttpResponse(html)
+    
+    # Comment out these headers to allow embedding
+    # response["Cross-Origin-Opener-Policy"] = "same-origin"
+    # response["Cross-Origin-Resource-Policy"] = "same-origin"
+    # response["Cross-Origin-Embedder-Policy"] = "require-corp"
+    response["X-Frame-Options"] = "ALLOWALL" 
+    # response["X-Frame-Options"] = "DENY" 
+  
+    # response["X-Content-Type-Options"]="nosniff"
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
 
 @authentication_classes([TokenAuthentication])
 class UserCreateList(generics.ListCreateAPIView):
