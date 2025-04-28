@@ -38,6 +38,13 @@ sentry_sdk.init(
 
 # Secure Sockets Layer, and TLS stands for Transport Layer Security
 SECURE_SSL_REDIRECT = True  # Redirect all non-HTTPS requests to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # Recommended value: 1 year (in seconds)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# settings.py
+SECURE_BROWSER_XSS_FILTER = True
+
 # Session expiration
 SESSION_COOKIE_AGE = 1800  # 30 minutes
 
@@ -137,7 +144,8 @@ The Referer HTTP header is an optional header field that identifies the URL of t
 
 # SECURE_REFERRER_POLICY="no-referrer"
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition

@@ -1,5 +1,4 @@
 import base64
-import hashlib
 from Crypto.Cipher import AES
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -27,25 +26,29 @@ from django_ratelimit.decorators import ratelimit
 from django.http import HttpResponse
 from .throttling import PaidUserRateThrottle,FreeUserRateThrottle,RoleBasedThrottle
 from rest_framework.views import exception_handler
+from rest_framework import permissions
 from rest_framework.exceptions import Throttled
+from django.contrib.auth.models import User
+from rest_framework.exceptions import ValidationError
+import requests
+from django.http import JsonResponse
+from django.views import View
+from django.conf import settings
+from revproxy.views import ProxyView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
+from django.http import HttpResponse
 
 # def user_rate(request, view):
 #     if hasattr(request, 'user') and request.user.is_authenticated:
 #         return "4/m" if request.user.is_staff else "2/m"
 #     return "1/m"  # anonymous fallback
 # gateway/views.py
-import requests
-from django.http import JsonResponse
-from django.views import View
-from django.conf import settings
-from revproxy.views import ProxyView
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-import requests
 
 class UserMicroserviceView(APIView):
+    print("microservice called ")
     def get(self, request):
         response = requests.get('http://localhost:8001/api/user/api/users/')
         print("this is response",response)
@@ -61,7 +64,6 @@ class ProductMicroserviceView(APIView):
 #     upstream = 'http://127.0.0.1:3000/'
 
 # views.py
-from django.http import HttpResponse
 
 def malicious_content_view(request):
     print("called")
@@ -89,6 +91,7 @@ def malicious_content_view(request):
     # response["X-Content-Type-Options"]="nosniff"
     response["Access-Control-Allow-Origin"] = "*"
     return response
+
 def malicious_script(request):
     html = """
     <html>
@@ -111,19 +114,41 @@ def malicious_script(request):
     response["Access-Control-Allow-Origin"] = "*"
     return response
 
-@authentication_classes([TokenAuthentication])
-class UserCreateList(generics.ListCreateAPIView):
-    queryset = UserInfo.objects.all()
-    serializer_class = UserSerializers
-    throttle_classes = [RoleBasedThrottle]
-    permission_classes=[IsAuthenticated]
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # Allow access only if the user is the owner of the object
+        return obj.username == request.user.username  # Ensure the object belongs to the current authenticated user
 
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+class UserCreateList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializers
+    throttle_classes = [RoleBasedThrottle]
+    permission_classes=[IsAuthenticated,IsOwner]
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)  # Only return logged-in user's data
+    
+    def perform_update(self, serializer):
+        # Save the changes to the user profile
+        serializer.save()
+
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated,IsOwner])
 class UserUpdate(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserInfo.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializers
     throttle_classes = [PaidUserRateThrottle]
+    def perform_update(self, serializer):
+
+        # Proceed to save the object if validation passes
+        serializer.save()
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except ValidationError as e:
+            # Ensure validation errors are properly returned
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
